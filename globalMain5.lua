@@ -1,5 +1,5 @@
 
-UPDATE_VERSION = 5.51
+UPDATE_VERSION = 5.5
 --[[
 
 5.5:
@@ -71,14 +71,6 @@ function debugInfo(str)
 	end
 	for i, value in pairs(Player.getPlayers()) do
 		if (value.steam_name == "l55tremine") then
-			value.broadcast(str)
-			return
-		end
-		if (value.steam_name == "Tyler") then
-			value.broadcast(str)
-			return
-		end
-		if (value.steam_name == "omn1pot3ntm3") then
 			value.broadcast(str)
 			return
 		end
@@ -1457,10 +1449,10 @@ text = {
 -- Rodney, Markimus, Morten G and Hmmmpf
 -- original scripts can be found on https://github.com/LostSavage/SecretHitlerCE
 -- new edit by 55tremine can be found on https://github.com/l55tremine/secretHitler55
-MOD_NAME = "Secret Hitler: 55x - Modified by Tyler"
+MOD_NAME = "Secret Hitler: 55 - Modified by Tyler"
 
 ADD_ON_VERSION = 6
-linkToWorkshop = "https://steamcommunity.com/sharedfiles/filedetails/?id=2954059664"
+linkToWorkshop = "https://steamcommunity.com/sharedfiles/filedetails/?id=2953402973"
 ----#include \SecretHitlerCE\main.ttslua
 --Static
 
@@ -2963,9 +2955,14 @@ function displayBannerCardsCoroutine()
 	-- Win check
 	if lastLiberalPlayed > 5 or lastFascistPlayed > 6 then
 		if not options.dealRoleCards then giveRoleCards() end
+
+		
 		gameLength = os.time() - timeSinceStart
-		printToAll("Game Took " .. math.floor(gameLength) .. " Seconds")
+		gameLengthM = math.floor(gameLength/60)
+		gameLengthS = math.floor(gameLength - (gameLengthM * 60))
+		printToAll("Game Took " .. gameLengthM .. " Minutes " .. math.floor(gameLengthS) .. " Seconds")
 		unmuteAll()
+
 		bolTD = false
 
 	end
@@ -3160,9 +3157,9 @@ function markDead(tableIn)
 			if timeOfPlayM == 0 then
 				broadcastToAll("Time to Shoot: " .. timeOfPlayS .. " Seconds")
 			elseif timeOfPlayM == 1 then
-				broadcastToAll("Time to Shoot: " .. timeOfPlayM .. " Minute " .. timeOfPlay .. " Seconds")
+				broadcastToAll("Time to Shoot: " .. timeOfPlayM .. " Minute " .. timeOfPlayS .. " Seconds")
 			else
-				broadcastToAll("Time to Shoot: " .. timeOfPlayM .. " Minutes " .. timeOfPlay .. " Seconds")
+				broadcastToAll("Time to Shoot: " .. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds")
 			end
 			timeSinceUV = os.time()
 			getObjectFromGUID("303db7").Clock.startStopwatch()
@@ -3190,7 +3187,7 @@ function markDead(tableIn)
 					giveRoleCards()
 					gameLength = os.time() - timeSinceStart
 					gameLengthM = math.floor(gameLength/60)
-					gameLengthS = math.floor(GameLength - (GameLengthM * 60))
+					gameLengthS = math.floor(gameLength - (gameLengthM * 60))
 					printToAll("Game Took " .. gameLengthM .. " Minutes " .. math.floor(gameLengthS) .. " Seconds")
 					unmuteAll()
 				else
@@ -3764,9 +3761,12 @@ function startVoteCheck()
 			local numFasDown = #cardsDown.fascistPlayedList + #cardsDown.fascistNotUsedList
 			if (numFasDown >= 4) then
 				if (roles[chanColor] == "hitler") then
-					gameLength = os.time() - timeSinceStart
-					printToAll("Game Took " .. math.floor(gameLength) .. " Seconds")
+
 					giveRoleCards()
+					gameLength = os.time() - timeSinceStart
+					gameLengthM = math.floor(gameLength/60)
+					gameLengthS = math.floor(gameLength - (gameLengthM * 60))
+					printToAll("Game Took " .. gameLengthM .. " Minutes " .. math.floor(gameLengthS) .. " Seconds")
 					unmuteAll()
 					bolTD = false
 				else
@@ -4833,22 +4833,23 @@ function playerInspected(clickedObject, inspectorColor, checkedColor)
 			roleColor = {0.1, 0.3, 1}
 		end
 		printToAll(inspectorColor .. ' inspected ' .. checkedColor, playerColor)
-		smartBroadcastToColor(checkedColor .. ' is ' .. roleText .. '!', inspectorColor, roleColor)
-		table.insert(inspected, 1, checkedColor)
-		removeInspect()
+
 
 		timeOfPlay = os.time()-timeSinceUV
 		timeOfPlayM = math.floor(timeOfPlay/60)
 		timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
 
 		if timeOfPlayM == 0 then
-			broadcastToAll("Time to Inspect: " .. timeOfPlayS .. " Seconds")
+			printToAll(inspectorColor .. ' inspected ' .. checkedColor .. "("  .. timeOfPlayS .. " Seconds)", playerColor)
 		elseif timeOfPlayM == 1 then
-			broadcastToAll("Time to Inspect: " .. timeOfPlayM .. "Minute " .. timeOfPlayS .. " Seconds")
+			printToAll(inspectorColor .. ' inspected ' .. checkedColor .. "(" .. timeOfPlayM .. "Minute " .. timeOfPlayS .. " Seconds)", playerColor)
 		else
-			broadcastToAll("Time to Inspect: " .. timeOfPlayM .. "Minutes " .. timeOfPlayS .. " Seconds")
+			printToAll(inspectorColor .. ' inspected ' .. checkedColor .. "(" .. timeOfPlayM .. "Minutes " .. timeOfPlayS .. " Seconds)" , playerColor)
 		end
 
+		smartBroadcastToColor(checkedColor .. ' is ' .. roleText .. '!', inspectorColor, roleColor)
+		table.insert(inspected, 1, checkedColor)
+		removeInspect()
 		
 		timeSinceUV = os.time()
 		getObjectFromGUID("303db7").Clock.startStopwatch()
