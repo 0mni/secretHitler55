@@ -1,6 +1,15 @@
 UPDATE_VERSION = 5.51
 --[[
 
+5.51:
+added display of who has kicked and who has promoted a person - SWAT's idea - done my omn1pot3ntm3
+added timers to indicate how long a play/vote/bullet has taken - Tyler
+added omn1 rule - mute/silence player on death - Tyler
+added Handsome Richard Rule - Force a vote when total # of alive players minus 1, have voted
+    after 10 seconds have passed - Tyler
+added Handsome Nicholas Rule - when a topdeck occurs, instead of reseting to 0, it is reset to
+    3rd position so another topdeck will occur if downvoted again - Tyler
+
 5.5:
 bug fix on save and load of different versions
 
@@ -4845,8 +4854,6 @@ function playerInspected(clickedObject, inspectorColor, checkedColor)
             roleText = text.liberalArticle .. " " .. string.lower(text.liberal)
             roleColor = {0.1, 0.3, 1}
         end
-        printToAll(inspectorColor .. " inspected " .. checkedColor, playerColor)
-
 
         timeOfPlay = math.floor(os.time()-timeSinceUV)
         timeOfPlayM = math.floor(timeOfPlay/60)
