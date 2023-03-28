@@ -140,7 +140,3 @@
 	<Button class="claims" id="claimFas" onClick="buttonClaim"><Text><textcolor color="#000000">Claim </textcolor><textcolor color="#FF0000">Fas</textcolor></Text>   </Button>
 	<Button class="claims" id="claimX" onClick="buttonClaim"> X </Button>
 </HorizontalLayout>
-
-
-
-
