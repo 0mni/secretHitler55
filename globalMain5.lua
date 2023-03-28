@@ -1,5 +1,5 @@
 
-UPDATE_VERSION = 5.5
+UPDATE_VERSION = 5.51
 --[[
 
 5.5:
@@ -7,12 +7,11 @@ bug fix on save and load of different versions
 
 5.4:
 allowed the ability to turn off get draws
-add conflict with conflict to line drawer
 
 5.3: bug testing before release version 6
 fixed typo in reset
 
-5.2: 
+5.2:
 auto conflict lines on noteTaker
 remove lines
 
@@ -23,8 +22,8 @@ reload notetakers on reload votes
 clear drawlog and votes and chat notes only after start button is hit.
 save drawLog between loads
 
-auto draw conflict lines (option on the thing)
-auto not hitler (option on the thing)
+auto draw conflict lines (option on the thing) - WIP
+auto not hitler (option on the thing) - WIP
 
 
 5.0: (5.01 is a small bug fix)
@@ -37,7 +36,7 @@ added claiming GUI - using self claim toggle
 fixed scripting zone rotations
 small zone broken only
 show black roles
-attempting claim fix 
+attempting claim fix
 
 bug fixes and starting UI changes
 4.1:
@@ -51,13 +50,21 @@ claim system only counts if it fits the type given
 fixed zones so they actually resize
 
 todo:
-getdraws doesnt check if its the first word in a sentence
-dont show black roles option?
-dont show role in top left option?
+add conflict with conflict to line drawer
+
+
 
 ]]--
 
--- function only used for debugging. not called in versions on the workshop unless bug hunting
+timeSinceStart = 0
+timeSinceUV = 0
+silenced = {}
+bolSilenced = false
+bolTD = false
+
+bolRichard = false
+richardRemaining = 100
+
 function debugInfo(str)
 	if (Player["White"] ~= nil and Player["White"].steam_name == "Player 1") then
 		printToAll(str)
@@ -67,20 +74,28 @@ function debugInfo(str)
 			value.broadcast(str)
 			return
 		end
+		if (value.steam_name == "Tyler") then
+			value.broadcast(str)
+			return
+		end
+		if (value.steam_name == "omn1pot3ntm3") then
+			value.broadcast(str)
+			return
+		end
 	end
 end
 
 function shufflePlayers()
 	local shufflePlayers = {}
 	local playerColours = {}
-	
+
 	for i, value in pairs(Player.getPlayers()) do
 		if (value ~= nil and value.color ~= "Grey" and value.color ~= "Black" and (value.host == false or options.shuffleHost)) then
 			table.insert(playerColours, value.color)
 			table.insert(shufflePlayers, value)
 		end
 	end
-	
+
 	for i, value in pairs(playerColours) do
 		if #shufflePlayers > 1 then
 			local tempRandInt = math.random(#shufflePlayers)
@@ -95,8 +110,8 @@ function shufflePlayers()
 	end
 end
 
-blbButtons = {} 
-btMode = 0
+blbButtons = {}
+btMode = 1
 stopVoteTouching = true
 spawnTimer = false
 
@@ -109,32 +124,52 @@ newAddTimeNT = 45
 presOnlyTNT = 60
 pleaseConfirmRestart = false
 
+timerRichard = 10
+
+
+--[[ function resetVoteTimer()
+	if (options.richardRule) then
+		tempRichard = timerRichard
+	else
+		tempRichard = 0
+	end
+end --]]
+
+--[[ function voteCheckTimed()
+	Wait.time(function() voteCheckTimed() end, 1)
+	createVoteWait()
+end --]]
+
+function onUpdate()
+    if richardRemaining < 0 then startVoteCheck() end
+end
+
 function refreshBelowLibButtons()
 	if (getObjectFromGUID("1943fd") == nil) then
 		return false
 	end
 	libBoard = getObjectFromGUID("1943fd")
 	libBoard.clearButtons()
-	
+
 	local BLBparameters = {
-		label="Stop Vote\nTouching", 
+		label="Stop Vote\nTouching",
 		tooltip = "This stops non-promoted people from\ntouching other people's votes",
 		click_function="voteTouchSwitch",
 		function_owner=Global,
 		position={-7.5, 0,5.5},
-		height=400, 
-		width=1000, 
-		font_size=150, 
+		height=400,
+		width=1000,
+		font_size=150,
 		color = getButClr(stopVoteTouching)
 	}
-	
+
 	blbButtons[BLBparameters.click_function] = 0--numButtons()
 	libBoard.createButton(BLBparameters)
-	
+
 	BLBparameters.click_function="BTSwitch"
 	blbButtons[BLBparameters.click_function] = 1--numButtons()
 	BLBparameters.position = {-4.5, 0,5.5}
-	
+
 	if btMode == 1 then
 		BLBparameters.label="Move\nBrown Teal"
 		BLBparameters.tooltip = "Moves anyone who sits in brown or teal to grey\ndoesn't do anything to promoted players"
@@ -151,53 +186,53 @@ function refreshBelowLibButtons()
 		BLBparameters.color = stringColorToRGB("Red")
 		libBoard.createButton(BLBparameters)
 	end
-	
-	--non-toggle 
+
+	--non-toggle
 	BLBparameters.color = stringColorToRGB("White")
-	
+
 	BLBparameters.label = "Get Notetaker"
 	BLBparameters.tooltip = "Gives the player who clicks it a notetaker if promoted/host"
 	BLBparameters.click_function="getNotetaker"
 	BLBparameters.position = {-1.5, 0,5.5}
 	libBoard.createButton(BLBparameters)
-	
+
 	BLBparameters.label = "Return Votes"
 	BLBparameters.tooltip = "Returns all non-stacked votes to people's hands"
 	BLBparameters.click_function="returnVotes"
 	BLBparameters.position = {1.5, 0,5.5}
 	libBoard.createButton(BLBparameters)
-	
+
 	BLBparameters.label = "Recreate Votes"
 	BLBparameters.tooltip = "Deletes all votes and remakes them in people's hands"
 	BLBparameters.click_function="recreateVotes"
 	BLBparameters.position = {4.5, 0,5.5}
 	libBoard.createButton(BLBparameters)
-	
+
 	BLBparameters.label = "Reset Game"
 	BLBparameters.tooltip = "Resets the game."
 	BLBparameters.click_function="resetGame"
 	BLBparameters.position = {7.5, 0,5.5}
 	libBoard.createButton(BLBparameters)
-	
+
 	if (pleaseConfirmRestart) then
 		libBoard.createButton({
-			label="Are you sure?", 
+			label="Are you sure?",
 			click_function="nullFunction",
 			function_owner=Global,
 			position={7.5, 0,6.5},
-			height=0, 
-			width=0, 
+			height=0,
+			width=0,
 			font_size=150,
 		})
-		
+
 		BLBparameters.width = 400
-		
+
 		BLBparameters.label = "Yes"
 		BLBparameters.tooltip = "Confirms the reset"
 		BLBparameters.click_function="confirmReset"
 		BLBparameters.position = {7, 0,7.5}
 		libBoard.createButton(BLBparameters)
-		
+
 		BLBparameters.label = "No"
 		BLBparameters.tooltip = "cancels"
 		BLBparameters.click_function="cancelReset"
@@ -221,7 +256,7 @@ function BTSwitch(object, colour)
 	if Player[colour].admin then
 		local tempParams = {}
 		tempParams.index = blbButtons["BTSwitch"]
-		
+
 		if btMode == 0 then
 			btMode = 1
 			tempParams.label="Move\nBrown Teal"
@@ -268,7 +303,7 @@ function getNotetaker(obj, color, alt_click)
 			params.type = 'backgammon_board'
 			params.scale = {1.8, 1.8, 1.8}
 		end
-		
+
 		local notetaker = spawnObject(params)
 		if options.noteType < 7 then
 			notetaker.setLuaScript(newNoteTakerLuaScript(color, 'true', 'false', 'false', 'false', 'false', 'true'))
@@ -331,17 +366,17 @@ function recreateVotesCo()
 			value.setScale(tempScale)
 		end
 	end
-	
+
 	--local neinCopy 	= getObjectFromGUID("bd31d9")
 	--local jaCopy 	= getObjectFromGUID("9532bb")
-	
-	
+
+
 	local spawmParams = {
-		type = "Deck", 
+		type = "Deck",
 		sound = false,
 		scale = {1.51, 1, 1.51}
 	}
-	
+
 	for i, value in pairs(colours) do
 		if (roles[value] ~= nil) then
 			spawmParams.position = getObjectFromGUID(policySafety_zone_guids[value]).getPosition()
@@ -349,11 +384,11 @@ function recreateVotesCo()
 			wait(2)
 			newVoteDeck.setCustomObject(voteInfo)
 			wait(3)
-			
+
 			local newNein = newVoteDeck.takeObject()
 			local newJa = newVoteDeck.takeObject()
 			wait(3)
-			
+
 			newNein.setDescription(value .. '\'s Nein Card')
 			newNein.interactable = true
 			newNein.setLock(false)
@@ -361,7 +396,10 @@ function recreateVotesCo()
 			newNein.drag_selectable = false
 			newNein.use_snap_points = false
 			newNein.use_grid = false
-			
+			local tempRot = getObjectFromGUID(HAND_ZONE_GUIDS[i]).getRotation()
+			tempRot[2] = tempRot[2] + 180
+			newNein.setRotation(tempRot)
+
 			newJa.setDescription(value .. '\'s Ja Card')
 			newJa.interactable = true
 			newJa.setLock(false)
@@ -369,39 +407,30 @@ function recreateVotesCo()
 			newJa.drag_selectable = false
 			newJa.use_snap_points = false
 			newJa.use_grid = false
-			
-			-- rotation
-			if (getObjectFromGUID(HAND_ZONE_GUIDS[i]) == nil) then
-				printToAll("ERROR: Hand zone not found: "..value)
-			else
-				local tempRot = getObjectFromGUID(HAND_ZONE_GUIDS[i]).getRotation()
-				tempRot[2] = tempRot[2] + 180
-				newNein.setRotation(tempRot)
-				newJa.setRotation(tempRot)
-			end
-			
+			newJa.setRotation(tempRot)
+
 			wait(3)
 		end
 	end
-	
-	return 1
+
+	return true
 end
 
 function onObjectPickedUp(player_color, picked_up_object)
 	--it only checks for grey because of an old bug. I realize i dont need it.
 	if player_color ~= "Grey" and Player[player_color].admin ~= true then
-		if ( 
+		if (
 			stopVoteTouching == true
-			and string.len(picked_up_object.getDescription()) > 10 
-			and (string.sub(picked_up_object.getDescription(), string.len(picked_up_object.getDescription())-6) == "Ja Card" 
-			or string.sub(picked_up_object.getDescription(), string.len(picked_up_object.getDescription())-8) == "Nein Card" ) 
+			and string.len(picked_up_object.getDescription()) > 10
+			and (string.sub(picked_up_object.getDescription(), string.len(picked_up_object.getDescription())-6) == "Ja Card"
+			or string.sub(picked_up_object.getDescription(), string.len(picked_up_object.getDescription())-8) == "Nein Card" )
 			and string.sub(picked_up_object.getDescription(), 1, string.len(player_color)) ~= player_color
 		) then
-			
+
 			picked_up_object.setVelocity({0,0,0})
 			picked_up_object.drop()
 		end
-	
+
 	end
 end
 
@@ -423,7 +452,7 @@ end
 function spawnNikosTimer()
 	if (spawnTimer) then
 		local params = {
-			position = {0.00, 1.2, -15.00}, 
+			position = {0.00, 1.2, -15.00},
 			sound = false,
 			type = "Digital_Clock",
 			scale = {1.00, 1.00, 0.21},
@@ -440,7 +469,7 @@ function resetGame(obj, color, alt_click)
 	if (not Player[color].admin or started ~= true) then
 		return false
 	end
-	
+
 	pleaseConfirmRestart = true
 	refreshBelowLibButtons()
 end
@@ -458,23 +487,27 @@ end
 
 function resetGameCo()
 	local tempObj
-	
+
+	bolTD = false
+	unmuteAll()
 	removeInspect()
-	
+
+	getObjectFromGUID("d56164").setValue(" ")
+
 	local ElectionTrackerTemp = getObjectFromGUID(ELECTION_TRACKER_GUID)
 	ElectionTrackerTemp.setPositionSmooth({-3.97, 1.5, -9.39},false,true)
 	ElectionTrackerTemp.setRotation({0.00, 0.00, 0.00})
-	
+
 	tempObj = getObjectFromGUID(settingsPannel_guid)
 	tempObj.setPositionSmooth({32.91, 1.05, 0.00},false,true)
 	tempObj.setRotation({0.00, 180.00, 0.00})
 	tempObj.setScale({0.88, 0.88, 0.88})
 	settingsPannelMakeButtons()
-	
+
 	tempObj = getObjectFromGUID(PRESIDENT_GUID)
 	tempObj.setPositionSmooth({-16.50, 2.08, 17.00},false,true)
 	tempObj.setRotation({0.00, 270.00, 0.00})
-	
+
 	tempObj = getObjectFromGUID(PREV_PRESIDENT_GUID)
 	if (tempObj) then
 		tempObj.setPositionSmooth(PREV_PRESIDENT_POS,false,true)
@@ -489,26 +522,26 @@ function resetGameCo()
 		tempObj.interactable = true
 		PREV_PRESIDENT_GUID = tempObj.guid
 	end
-	
+
 	tempObj = getObjectFromGUID(CHANCELOR_GUID)
 	tempObj.setPositionSmooth({16.50, 2.08, 17.00},false,true)
 	tempObj.setRotation({0.00, 90.00, 0.00})
-	
+
 	tempObj = getObjectFromGUID(PREV_CHANCELOR_GUID)
 	tempObj.setPositionSmooth(PREV_CHANCELOR_POS,false,true)
 	tempObj.setRotation(PREV_CHANCELOR_ROT)
-	
+
 	refreshBoardCards()
 	refreshHiddenZones()
-	
+
 	for i, guidOfButtons in ipairs(playerStatusButtonGuids) do
 		tempObj = getObjectFromGUID(guidOfButtons)
 		if (tempObj) then
 			tempObj.destruct()
 		end
 	end
-	
-	if (bulletsToDelete ~= nil) then 
+
+	if (bulletsToDelete ~= nil) then
 		for i, guidOfBullet in ipairs(bulletsToDelete) do
 			tempObj = getObjectFromGUID(guidOfBullet)
 			if (tempObj) then
@@ -518,30 +551,30 @@ function resetGameCo()
 	else
 		bulletsToDelete = {}
 	end
-	
+
 	for i, guidOfBanner in ipairs(bannerGuids) do
 		tempObj = getObjectFromGUID(guidOfBanner)
 		if (tempObj) then
 			tempObj.destruct()
 		end
 	end
-	
+
 	local drawZone = getObjectFromGUID(DRAW_ZONE_GUID)
 	for i, j in ipairs(drawZone.getObjects()) do
 		if j.tag == 'Deck' then
 			j.destruct()
 		end
 	end
-	
+
 	local discardZone = getObjectFromGUID(DISCARD_ZONE_GUID)
 	for i, j in ipairs(discardZone.getObjects()) do
 		if j.tag == 'Deck' then
 			j.destruct()
 		end
 	end
-	
+
 	wait(6)
-	
+
 	local colours = {"White","Brown","Red","Orange","Yellow","Green","Teal","Blue","Purple","Pink"}
 	for i, obj in ipairs(getAllObjects()) do
 		if (obj.tag == "Card" and obj.interactable == true) then
@@ -561,7 +594,7 @@ function resetGameCo()
 			obj.destruct()
 		end
 	end
-	
+
 	--Variable
 	customOnly = nil
 	bannerZoneGuid = nil
@@ -619,10 +652,10 @@ function resetGameCo()
 	}
 	roles = {}
 	started = false
-	
+
 	bulletsToDelete = {}
 	presChanClaims = {}
-	
+
 	wait(6)
 	lockNeededCards()
 	wait(6)
@@ -630,13 +663,13 @@ function resetGameCo()
 	refreshUI()
 	updateClaimUI()
 	claimShows = {}
-	
+
 	if (options.autoDrawConflicts) then -- panda found a bug here, then got banned by scortan
 		getLineDrawer().call('globalCallClear', {})
 	end
-	
+
 	avoidDoubleStart = false
-	
+
 	return true
 end
 
@@ -674,6 +707,10 @@ function setTimerAddTimeNT(obj, color, input, stillEditing)
 	end
 end
 
+function setTimerRichard(obj, color, input, stillEditing)
+	timerRichard = input
+end
+
 
 function getNumAlivePlayers()
 	--[1 Board, 2 Not Hitler, 3 Vote Only, 4 Silenced, 5 Dead, 6 Dead not Hitler]
@@ -693,7 +730,7 @@ nikosTimerScript = "freeTalkTime = "..freeTalkTimeNT.."\nmax45s = "..maxAddsNT..
 parameters = {
 	function_owner=self,
 	rotation={90,180,0},
-	height=400, 
+	height=400,
 	width=1200,
 	font_size = 300,
 	scale = {0.1, 0.021, 0.1},--{0.2,0,0.33},
@@ -718,65 +755,65 @@ end
 
 function onLoad()
 	self.clearButtons()
-	
+
 	self.createButton({
 		label="", click_function="toggleMute", function_owner=self, rotation={90,180,0},
 		position={0.385, -0.02, 0}, height=40, width=40, tooltip = "this button toggles mute in case something goes wrong"
 	})
-	
+
 	parameters.label="Start" --Players
 	parameters.click_function="startTurn"
 	parameters.position={0.3, -0.1, 0}
 	self.createButton(parameters)
-	
+
 	parameters.click_function = "nilFunction"
 	parameters.label="Currently Error" --Players
 	parameters.width=4000
 	parameters.position={0, -0.2, 0}
 	self.createButton(parameters)
-	
+
 	parameters.click_function = "add45"
 	parameters.label="add time" --Players
 	parameters.width=1200
 	parameters.position={-0.3, -0.1, 0}
 	self.createButton(parameters)
-	
+
 	self.setScale({1.00, 1.00, 0.21})
 	--self.setRotation({90.00, 0, 0.00})
-	
+
 	local inputParams = {
 		label="free\ntalk", input_function="setFreeTalkTime", function_owner=self, scale = {0.1, 0.021, 0.1}, rotation={90,180,0},
 		position={-0.1, -0.1, 0}, height=200, width=400, font_size=175
 	}
-	
+
 	inputParams.label = "free\ntalk"
 	inputParams.input_function = "setFreeTalkTime"
 	inputParams.position = {-0.1, -0.075, 0}
 	inputParams.value = freeTalkTime
 	inputParams.tooltip = "the time where people can talk freely"
 	self.createInput(inputParams)
-	
+
 	inputParams.label = "num\n45s"
 	inputParams.input_function = "setNum45s"
 	inputParams.position = {0, -0.075, 0}
 	inputParams.value = max45s
 	inputParams.tooltip = "the number of times people can add seconds"
 	self.createInput(inputParams)
-	
+
 	inputParams.label = "pres time"
 	inputParams.input_function = "setPresOnly"
 	inputParams.position = {0, -0.125, 0}
 	inputParams.value = presOnlyT
 	inputParams.tooltip = "the number of second where it is pres only"
 	self.createInput(inputParams)
-	
+
 	inputParams.label = "45s\ntime"
 	inputParams.input_function = "set45sTime"
 	inputParams.position = {0.1, -0.075, 0}
 	inputParams.value = new45sTime
 	inputParams.tooltip = "how much time is added when they add time"
 	self.createInput(inputParams)
-	
+
 	setOff()
 end
 
@@ -795,7 +832,7 @@ function startTurn(obj, color, alt_click)
 			end
 			currentlyMuted = false
 		end
-		
+
 		self.setValue(freeTalkTime*1)
 		after45 = -1
 		self.Clock.pauseStart()
@@ -810,7 +847,7 @@ end
 
 function presOnly()
 	Timer.destroy(self.getGUID().."timerDone")
-		
+
 	self.setValue(presOnlyT*1)
 	after45 = -1
 	self.Clock.pauseStart()
@@ -823,12 +860,12 @@ function presOnly()
 end
 
 function add45(obj, color, alt_click)
-	
+
 	if (add45sUsed[color] == nil) then
 		add45sUsed[color] = 1
 	elseif (add45sUsed[color] == max45s) then
 		return false
-	else 
+	else
 		add45sUsed[color] = 1 + add45sUsed[color]
 	end
 	--doMute = false
@@ -863,7 +900,7 @@ function setOff()
 end
 
 function checkForDone()
-	
+
 	if (self.getValue() == 0) then
 		if (after45 == -1 and presOnlyTime) then
 			for i, playerObj in pairs(Player.getPlayers()) do
@@ -881,7 +918,7 @@ function checkForDone()
 			continueFreeTalk()
 		end
 	end
-	
+
 	local timerparameters = {}
 	timerparameters.identifier = self.getGUID().."timerDone"
 	timerparameters.function_name = 'checkForDone'
@@ -910,7 +947,7 @@ function setNum45s(obj, color, input, stillEditing)
 	elseif Player[color].admin and stillEditing == false then
 		max45s = input
 	end
-	
+
 end
 
 function set45sTime(obj, color, input, stillEditing)
@@ -920,7 +957,7 @@ function set45sTime(obj, color, input, stillEditing)
 	elseif Player[color].admin and stillEditing == false then
 		new45sTime = input
 	end
-	
+
 end
 
 function setPresOnly(obj, color, input, stillEditing)
@@ -930,13 +967,13 @@ function setPresOnly(obj, color, input, stillEditing)
 	elseif Player[color].admin and stillEditing == false then
 		presOnlyT = input
 	end
-	
+
 end
 
 ]]
 
 function resetNotes()
-	Notes.setNotes("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[ffffff]Mod name: "..MOD_NAME.."\nVersion: "..UPDATE_VERSION.."\nLink to workshop: "..linkToWorkshop)
+	Notes.setNotes("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[ffffff]Mod name: "..MOD_NAME.."\nVersion: "..UPDATE_VERSION.."\nLink to workshop: "..linkToWorkshop)
 end
 
 --unused. may have bugs
@@ -947,9 +984,9 @@ end
 --unused. may have bugs
 function getPlayNotesString()
 	local returnString = ""
-	
+
 	for i, obj in ipairs(playNotes) do
-		
+
 		--rev and conflict
 		if obj["con"] == true and obj["con"] == true then
 			returnString = returnString .. "(revcon) "
@@ -961,12 +998,12 @@ function getPlayNotesString()
 				returnString = returnString .. "(conflict) "
 			end
 		end
-		
+
 		-- if its a single text such as hitler territory
 		if (obj["singleText"] ~= nil) then
 			returnString = returnString .. obj["singleText"]
 		end
-		
+
 		if (obj["plr1"] ~= nil) then
 			returnString = returnString .. obj["plr1"]
 		end
@@ -988,15 +1025,15 @@ function getPlayNotesString()
 		if (obj["con"] == true and obj["2c"] ~= nil) then
 			returnString = returnString .. obj["2c"] .. " > "
 		end
-		
-		
+
+
 		if (obj["1"] ~= nil) then
 			if (obj["inspect"] == true) then
 				returnString = returnString .. ": claims "
 			end
 			returnString = returnString .. obj["1"]
 		end
-		
+
 		returnString = returnString .. "\n"
 	end
 end
@@ -1006,11 +1043,11 @@ function buttonClaim(player, value, id)
 	if (player.seated ~= true) then
 		return
 	end
-	
+
 	if (claimShows[player.color] ~= nil and id ~= "claimX" and id ~= "claimLib" and id ~= "claimFas") then
 		claimShows[player.color] = claimShows[player.color] - 1
 	end
-	
+
 	if (id == "claim???") then
 		makeClaim(player,{"claim", "???"})
 	elseif (id == "claimFFF") then
@@ -1022,7 +1059,7 @@ function buttonClaim(player, value, id)
 	elseif (id == "claimLLL") then
 		makeClaim(player,{"claim", "LLL"})
 	end
-	
+
 	if (id == "claim??") then
 		makeClaim(player,{"claim", "??"})
 	elseif (id == "claimFF") then
@@ -1035,18 +1072,18 @@ function buttonClaim(player, value, id)
 		claimShows[player.color] = nil
 		updateClaimUI()
 	end
-	
+
 	if (id == "claimLib") then
 		makeClaim(player,{"claim", "l"})
 	elseif (id == "claimFas") then
 		makeClaim(player,{"claim", "f"})
 	end
-	
+
 	if (claimShows[player.color] == 0) then
 		claimShows[player.color] = nil
 		updateClaimUI()
 	end
-	
+
 end
 
 function updateClaimUI()
@@ -1056,7 +1093,7 @@ function updateClaimUI()
 		end
 		return
 	end
-	
+
 	local showStr = ""
 	local notFirst = true
 	for i, clr in ipairs(MAIN_PLAYABLE_COLORS) do
@@ -1090,18 +1127,18 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 		player.print("[FF0000]claim error: self claiming is off")
 		return false
 	end
-	
+
 	if (#messageTable < 2) then
 		player.print("[FF0000]claim error: Too few parameters")
 		return false
 	end
-	
+
 	local c3 = ""
 	local c2 = ""
 	local insp = ""
 	local noteNum = 1
 	local conflicted = nil
-	
+
 	-- first parameter
 	if (claimWorks(messageTable[2]) or inspWorks(messageTable[2])) then -- or player.steam_id == "76561198108768977"
 		if (claimWorks(messageTable[2]) and string.len(messageTable[2]) == 3) then
@@ -1115,7 +1152,7 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 		player.print("[FF0000]claim error: three card/inspect claim not valid")
 		return false
 	end
-	
+
 	-- second parameter
 	if (#messageTable > 2 and string.len(messageTable[3]) < 3 and (tonumber(messageTable[3]) or (claimWorks(messageTable[3]) and c2 == ""))) then
 		if (tonumber(messageTable[3])) then
@@ -1124,16 +1161,16 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 			c2 = getDrawColours(messageTable[3])
 		end
 	end
-	
+
 	-- third parameter
 	if (#messageTable > 3 and tonumber(messageTable[4]) and noteNum == -1) then
 		noteNum = tonumber(messageTable[4])
 	end
-	
+
 	-- get line number (notes go from top to bottom when called, this for reverses it)
 	local playerIsPres = nil
 	local lineToChange = 0
-	
+
 	for i=1, #noteTakerNotes do
 		obj = noteTakerNotes[#noteTakerNotes+1-i]
 		if ( ( obj.color1 == player.color or obj.color2 == player.color) and obj.action ~= string.lower(bulletInfo.action) and obj.action ~= 'gives pres to' and ( obj.action ~= 'inspects' or insp ~= "" ) ) then
@@ -1147,20 +1184,20 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 			end
 		end
 	end
-	
+
 	if (lineToChange == 0 or playerIsPres == nil) then
 		player.print("[FF0000]claim error: line not found")
 		return false
 	end
-	
+
 	--inspect is done first
 	if (insp ~= "" and noteTakerNotes[lineToChange].action == 'inspects' and playerIsPres) then
 		noteTakerNotes[lineToChange].result = insp
-		
+
 		if (insp == "claims [FF0000]"..text.fascist.."[-]") then
 			conflicted = true
 		end
-		
+
 		refreshNotes("Global")
 	elseif (insp ~= "") then
 		player.print("[FF0000]claim error: line is NOT for inspect")
@@ -1169,7 +1206,7 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 		player.print("[FF0000]claim error: line is for inspect")
 		return false
 	end
-	
+
 	-- set 3 card draw
 	if (playerIsPres and c3 ~= "") then
 		if noteTakerNotes[lineToChange].action == 'examines deck:' then
@@ -1178,7 +1215,7 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 			noteTakerNotes[lineToChange].claim3 = c3
 		end
 	end
-	
+
 	-- make sure no nil line and error
 	if (presChanClaims == nil) then presChanClaims = {} end
 	if (presChanClaims[lineToChange] == nil) then
@@ -1187,14 +1224,14 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 	if (presChanClaims[lineToChange].color1 ~= (noteTakerNotes[lineToChange].color1) or presChanClaims[lineToChange].color2 ~= (noteTakerNotes[lineToChange].color2)) then
 		presChanClaims[lineToChange] = {p="", c="", color1=(noteTakerNotes[lineToChange].color1), color2=(noteTakerNotes[lineToChange].color2)}
 	end
-	
+
 	if (c2 ~= "") then
 		if (playerIsPres) then
 			presChanClaims[lineToChange]["p"] = c2
 		else
 			presChanClaims[lineToChange]["c"] = c2
 		end
-		
+
 		if (presChanClaims[lineToChange]["p"] ~= "" and presChanClaims[lineToChange]["c"] ~= "" and presChanClaims[lineToChange]["p"] ~= presChanClaims[lineToChange]["c"]
 				and presChanClaims[lineToChange]["p"] ~= "??" and presChanClaims[lineToChange]["c"] ~= "??") then
 			noteTakerNotes[lineToChange].claim1 = presChanClaims[lineToChange]["c"]
@@ -1217,7 +1254,7 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 				noteTakerNotes[lineToChange].claim1 = presChanClaims[lineToChange]["c"]
 				noteTakerNotes[lineToChange].claim2 = ""
 			end
-			
+
 			-- remove conflict tag
 			if (noteTakerNotes[lineToChange].conflict == "(Conflict)") then
 				noteTakerNotes[lineToChange].conflict = ''
@@ -1227,9 +1264,9 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 			end
 		end
 	end
-	
+
 	refreshNotes("Global")
-	
+
 	if (conflicted ~= nil and options.autoDrawConflicts) then
 		local lineDrawer = getLineDrawer()
 		if (noteTakerNotes[lineToChange].color1 ~= '' and noteTakerNotes[lineToChange].color2 ~= '') then
@@ -1286,7 +1323,7 @@ function getDrawColours(str)
 	local comCards = 0
 	local gryCards = 0
 	local questionMarks = 0
-	
+
 	for s in str:gmatch"." do
 		if (s == "l" or s == "L") then
 			libCards = libCards + 1
@@ -1303,9 +1340,9 @@ function getDrawColours(str)
 			questionMarks = questionMarks + 1
 		end
 	end
-	
+
 	local returnString = ""
-	
+
 	--fas
 	if (fasCards > 0) then returnString = returnString .. "[FF0000]" end
 	for i = 1, fasCards do
@@ -1331,7 +1368,7 @@ function getDrawColours(str)
 	for i = 1, questionMarks do
 		returnString = returnString .. "?"
 	end
-	
+
 	return returnString
 end
 
@@ -1350,12 +1387,12 @@ end
 function printDraws(player, messageTable) -- left on top
 	local publicPrint = true
 	local printString = player.steam_name..' got card draws:\n'
-	
+
 	if (player.color == "Black" and messageTable[2] ~= "p") then
 		publicPrint = false
 		printString = printString.."privately gotten by black:\n"
 	end
-	
+
 	for i, drawArr in ipairs(drawLog) do
 		printString = printString..i.." - "..text[drawArr[1]]..drawArr[1].."[-] > "..text[drawArr[2]]..drawArr[2].."[-]: "
 		for j, letterPrint in ipairs(drawArr) do
@@ -1395,7 +1432,7 @@ text = {
 	greyArticle = 'a',
 	greyLetter = 'G',
 	policy = 'Policy',
-	
+
 	White = "[ffffff]",
 	Brown = "[703A16]",
 	Red = "[DA1917]",
@@ -1408,7 +1445,7 @@ text = {
 	Pink = "[F46FCD]",
 	Black = "[3F3F3F]",
 	Grey = "[BCBCBC]"
-	
+
 }
 
 -- {conflict = '', color1 = '', action = '', color2 = '', claim3 = '', claim2 = '', claim1 = '', result = ''}
@@ -1420,10 +1457,10 @@ text = {
 -- Rodney, Markimus, Morten G and Hmmmpf
 -- original scripts can be found on https://github.com/LostSavage/SecretHitlerCE
 -- new edit by 55tremine can be found on https://github.com/l55tremine/secretHitler55
-MOD_NAME = "Secret Hitler: 55"
+MOD_NAME = "Secret Hitler: 55x - Modified by Tyler"
 
 ADD_ON_VERSION = 6
-linkToWorkshop = "https://steamcommunity.com/sharedfiles/filedetails/?id=2076307698"
+linkToWorkshop = "https://steamcommunity.com/sharedfiles/filedetails/?id=2954059664"
 ----#include \SecretHitlerCE\main.ttslua
 --Static
 
@@ -1618,14 +1655,17 @@ options = {
 	policySafety = true,
 	selfClaim = true,
 	scriptedVoting = true,
-	shufflePlayers = false,
+	shufflePlayers = true,
 	shuffleHost = true,
 	voteHistory = true,
-	zoneType = 3, -- [1 None, 2 Small, 3 Gap (version 1), 4 Gap (version 2), 5 Large, 6 11-12 Players]
-	
-	autoNotHitler = false,
-	autoDrawConflicts = false,
-	allowGetDraws = true
+	zoneType = 4, -- [1 None, 2 Small, 3 Gap (version 1), 4 Gap (version 2), 5 Large, 6 11-12 Players]
+
+	autoNotHitler = true,
+	autoDrawConflicts = true,
+	allowGetDraws = true,
+    nicholasRule = false,
+    omn1Rule = true,
+	richardRule = false
 }
 players = {}
 playerRoleCardGuids = {}
@@ -1652,11 +1692,20 @@ voteNotebook = ''
 
 -- Called when a game finishes loading
 function onLoad(saveString)
+
+  getObjectFromGUID("303db7").interactable = false
+  getObjectFromGUID("68faa0").interactable = false
+  getObjectFromGUID("303db7").Clock.startStopwatch()
+  getObjectFromGUID("68faa0").Clock.startStopwatch()
+
+  getObjectFromGUID("d56164").setValue(" ")
+  getObjectFromGUID("d56164").interactable = false
+
 	if not (saveString == '') then
 		local save = JSON.decode(saveString)
-		
+
 		local pastVersion = save['version']
-		
+
 		if (pastVersion == nil or pastVersion ~= UPDATE_VERSION) then
 			activePowerColor = save['a']
 			bannerGuids = save['b']
@@ -1702,7 +1751,7 @@ function onLoad(saveString)
 			newAddTimeNT = save['ntat']
 		end
 	end
-	
+
 	alwaysInit()
 	if not started then
 		local status, err = pcall(init)
@@ -1718,20 +1767,23 @@ function onLoad(saveString)
 		noteTakerCurrLine = 0
 		addNewLine()
 	end
-	
+
 	lockNeededCards()
 	if (started ~= true) then resetNotes() end
 	Physics.play_area = 1
 	--reload text for tabletop glitch showing it really tiny
 	for _, lastVoteGuid in ipairs(lastVote_guids) do
 		local lastVoteObj = getObjectFromGUID(lastVoteGuid)
-		if lastVoteObj then 
+		if lastVoteObj then
 			lastVoteObj.setScale({3.00, 3.00, 3.00})
 			lastVoteObj.TextTool.setValue("   ")
 			lastVoteObj.setScale({5.00, 5.00, 5.00})
 		end
 	end
 end
+
+
+
 
 function lockNeededCards()
 	local tempObj = getObjectFromGUID("2ab2e8")
@@ -1758,9 +1810,9 @@ end
 
 function onSave()
 	local save = {}
-	
+
 	save['version'] = UPDATE_VERSION
-	
+
 	save['a'] = activePowerColor
 	save['b'] = bannerGuids
 	save['bi'] = bulletInfo
@@ -1817,16 +1869,16 @@ function refreshHiddenZones()
 			scriptObj.setRotation(NO_ROT)
 			if options.zoneType == 1 then
 				--Hide the hidden zone so we can still use it later
-				
+
 				zoneObj.setScale({0.01, 0.01, 0.01})
 				local colorToNumber = {White = 1, Brown = 2, Red = 3, Orange = 4, Yellow = 5, Green = 6, Teal = 7, Blue = 8, Purple = 9, Pink = 10}
 				zoneObj.setPosition({100, 100, 100 + colorToNumber[player] * 2})
-				
+
 				--resize scripting zones around hands
 				scriptObj.setScale({0.01, 0.01, 0.01})
 				scriptObj.setPosition({100, 100, 100 + colorToNumber[player] * 2})
 			elseif options.zoneType == 2 then
-				
+
 				zoneObj.setScale({15.3268776, 5.1, 6.35014629})
 				scriptObj.setScale({15.3268776, 5.1, 6.35014629})
 				forceObjectToPlayer(zoneObj, player, {forward = 0, right = 0, up = 0, forceHeight = 3.51}, NO_ROT)
@@ -1835,7 +1887,7 @@ function refreshHiddenZones()
 				local pos = {White = {29.65, 3.51, -32.75}, Brown = {0, 3.51, -32.75}, Red = {-29.65, 3.51, -32.75}, Orange = {-50.2, 3.51, -19.25}, Yellow = {-50.2, 3.51, 19.25}, Green = {-29.65, 3.51, 32.75}, Teal = {0, 3.51, 32.75}, Blue = {29.65, 3.51, 32.75}, Purple = {50.2, 3.51, 19.25}, Pink = {50.2, 3.51, -19.25}}
 				local scale = {White = {28.4, 5.1, 10.1}, Brown = {28.4, 5.1, 10.1}, Red = {28.4, 5.1, 10.1}, Orange = {9.55, 5.1, 37.25}, Yellow = {9.55, 5.1, 37.25}, Green = {28.4, 5.1, 10.1}, Teal = {28.4, 5.1, 10.1}, Blue = {28.4, 5.1, 10.1}, Purple = {9.55, 5.1, 37.25}, Pink = {9.55, 5.1, 37.25}}
 
-				
+
 				zoneObj.setPosition(pos[player])
 				zoneObj.setScale(scale[player])
 				--resize scripting zones around hands
@@ -1845,7 +1897,7 @@ function refreshHiddenZones()
 				local pos = {White = {29.65, 3.51, -31.9}, Brown = {0, 3.51, -31.9}, Red = {-29.65, 3.51, -31.9}, Orange = {-50.2, 3.51, -19.25}, Yellow = {-50.2, 3.51, 19.25}, Green = {-29.65, 3.51, 31.9}, Teal = {0, 3.51, 31.9}, Blue = {29.65, 3.51, 31.9}, Purple = {50.2, 3.51, 19.25}, Pink = {50.2, 3.51, -19.25}}
 				local scale = {White = {28.4, 5.1, 11.8}, Brown = {28.4, 5.1, 11.8}, Red = {28.4, 5.1, 11.8}, Orange = {9.55, 5.1, 37.25}, Yellow = {9.55, 5.1, 37.25}, Green = {28.4, 5.1, 11.8}, Teal = {28.4, 5.1, 11.8}, Blue = {28.4, 5.1, 11.8}, Purple = {9.55, 5.1, 37.25}, Pink = {9.55, 5.1, 37.25}}
 
-				
+
 				zoneObj.setPosition(pos[player])
 				zoneObj.setScale(scale[player])
 				--resize scripting zones around hands
@@ -1855,7 +1907,7 @@ function refreshHiddenZones()
 				local pos = {White = {29.3, 3.51, -31.9}, Brown = {0, 3.51, -31.9}, Red = {-29.3, 3.51, -31.9}, Orange = {-49.4, 3.51, -19}, Yellow = {-49.4, 3.51, 19}, Green = {-29.3, 3.51, 31.9}, Teal = {0, 3.51, 31.9}, Blue = {29.3, 3.51, 31.9}, Purple = {49.4, 3.51, 19}, Pink = {49.4, 3.51, -19}}
 				local scale = {White = {29.3, 5.1, 11.8}, Brown = {29.3, 5.1, 11.8}, Red = {29.3, 5.1, 11.8}, Orange = {10.8, 5.1, 38.0}, Yellow = {10.8, 5.1, 38.0}, Green = {29.3, 5.1, 11.8}, Teal = {29.3, 5.1, 11.8}, Blue = {29.3, 5.1, 11.8}, Purple = {10.8, 5.1, 38.0}, Pink = {10.8, 5.1, 38.0}}
 
-				
+
 				zoneObj.setPosition(pos[player])
 				zoneObj.setScale(scale[player])
 				--resize scripting zones around hands
@@ -1865,7 +1917,7 @@ function refreshHiddenZones()
 				local pos = {White = {-29.3, 3.51, -49.4}, Brown = {-49.4, 3.51, -29.3}, Red = {-49.4, 3.51, 0}, Orange = {-49.4, 3.51, 29.3}, Yellow = {-29.3, 3.51, 49.4}, Green = {0, 3.51, 49.4}, Teal = {29.3, 3.51, 49.4}, Blue = {49.4, 3.51, 29.3}, Purple = {49.4, 3.51, 0}, Pink = {49.4, 3.51, -29.3}}
 				local scale = {White = {28.4, 5.1, 10.8}, Brown = {10.8, 5.1, 28.4}, Red = {10.8, 5.1, 28.4}, Orange = {10.8, 5.1, 28.4}, Yellow = {28.4, 5.1, 10.8}, Green = {28.4, 5.1, 10.8}, Teal = {28.4, 5.1, 10.8}, Blue = {10.8, 5.1, 28.4}, Purple = {10.8, 5.1, 28.4}, Pink = {10.8, 5.1, 28.4}}
 
-				
+
 				zoneObj.setPosition(pos[player])
 				zoneObj.setScale(scale[player])
 				--resize scripting zones around hands
@@ -2137,11 +2189,14 @@ function init()
 	end
 end
 
+
+
 function onChat(messageIn, player)
+
 	local message = string.gsub(messageIn, '%s+', ' ')
 	local messageTable = string.tokenize(message, ' ')
 	messageTable[1] = string.lower(messageTable[1])
-	
+
 	if messageTable[1] == 'r' then
 		if started then
 			player:print(tellRole(player.color))
@@ -2236,6 +2291,13 @@ function onChat(messageIn, player)
 			return false
 		end
 	end
+
+	local tempVariable = player.steam_id
+	
+	if silenced[tempVariable] ~= nil then
+		return false
+	end
+
 end
 
 function chatHelp(admin)
@@ -2269,7 +2331,7 @@ function settingsPannelMakeButtons()
 	if settingsPannel then
 		settingsPannel.clearButtons()
 		settingsPannel.clearInputs()
-		
+
 		local buttonParam = {
 			font_color = {0, 0, 0},
 			rotation = {0, 0, 0},
@@ -2328,28 +2390,28 @@ function settingsPannelMakeButtons()
 				 rotation={0,0,0},
 				height=200, width=400, font_size=175, validation=2,
 			}
-			
+
 			--positions @@@
 			inputParams.input_function = "setTimerFreeTalkTimeNT"
 			inputParams.position = {0, 0.2, startZ + offsetZ * 7}
 			inputParams.value = freeTalkTimeNT
 			inputParams.tooltip = "the time where people can talk freely.\n(in seconds)"
 			settingsPannel.createInput(inputParams)
-			
+
 			inputParams.label = ""
 			inputParams.input_function = "setTimerPresOnlyNT"
 			inputParams.position = {1, 0.2, startZ + offsetZ * 7}
 			inputParams.value = presOnlyTNT
 			inputParams.tooltip = "the number of second where it is pres only.\n(in seconds)"
 			settingsPannel.createInput(inputParams)
-			
+
 			inputParams.label = ""
 			inputParams.input_function = "setTimerNumAddsNT"
 			inputParams.position = {2, 0.2, startZ + offsetZ * 7}
 			inputParams.value = maxAddsNT
 			inputParams.tooltip = "the number of times people can add seconds."
-			settingsPannel.createInput(inputParams)			
-			
+			settingsPannel.createInput(inputParams)
+
 			inputParams.label = ""
 			inputParams.input_function = "setTimerAddTimeNT"
 			inputParams.position = {3, 0.2, startZ + offsetZ * 7}
@@ -2361,6 +2423,23 @@ function settingsPannelMakeButtons()
 		makeSquareButtonLabel(settingsPannel, options.autoNotHitler, check_string, '', 'Auto Not Hitler', 'autoNotHitlerSwitch', {startX, 0.2, startZ + offsetZ * 9}, 4.1, true)
 		makeSquareButtonLabel(settingsPannel, options.shufflePlayers, check_string, '', 'Shuffle players', 'shufflePlayersFlip', {startX, 0.2, startZ + offsetZ * 10}, 4, true)
 		makeSquareButtonLabel(settingsPannel, options.shuffleHost, check_string, '', 'Shuffle host', 'shuffleHostFlip', {startX + 1.3, 0.2, startZ + offsetZ * 11}, 3.3, options.shufflePlayers)
+        makeSquareButtonLabel(settingsPannel, options.nicholasRule, check_string, '', 'Handsome Nicholas Rule', 'nicholasFlip', {startX, 0.2, startZ + offsetZ * 12}, 6.1, true)
+        makeSquareButtonLabel(settingsPannel, options.omn1Rule, check_string, '', 'Omn1 Rule - Mute on Death', 'omn1Flip', {startX, 0.2, startZ + offsetZ * 13}, 6.8, true)
+		makeSquareButtonLabel(settingsPannel, options.richardRule, check_string, '', 'Richard Rule', 'richardFlip', {startX, 0.2, startZ + offsetZ * 14}, 3.7, true)
+		if (options.richardRule) then
+			local inputParams = { --scale = {0.2, 0.2, 0.2},
+				 rotation={0,0,0},
+				height=300, width=600, font_size=250, validation=2,
+			}
+
+			--positions @@@
+			inputParams.input_function = "setTimerRichard"
+			inputParams.position = {1, 0.2, startZ + offsetZ * 14}
+			inputParams.value = timerRichard
+			inputParams.tooltip = "How much time the last voter gets"
+			settingsPannel.createInput(inputParams)
+
+		end
 
 		--Expansion
 		local abilitiesDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
@@ -2668,6 +2747,27 @@ function shuffleHostFlip(clickedObject, playerColor)
 	end
 end
 
+function nicholasFlip(clickedObject, playerColor)
+	if Player[playerColor].admin then
+		options.nicholasRule = not options.nicholasRule
+		settingsPannelMakeButtons()
+	end
+end
+
+function omn1Flip(clickedObject, playerColor)
+	if Player[playerColor].admin then
+		options.omn1Rule = not options.omn1Rule
+		settingsPannelMakeButtons()
+	end
+end
+
+function richardFlip(clickedObject, playerColor)
+	if Player[playerColor].admin then
+		options.richardRule = not options.richardRule
+		settingsPannelMakeButtons()
+	end
+end
+
 function expansionOptionEnabledSwapGov(clickedObject, playerColor)
 	if Player[playerColor].admin then
 		if bit32.band(options.expansionOptionEnabled, 1) == 1 then
@@ -2863,6 +2963,11 @@ function displayBannerCardsCoroutine()
 	-- Win check
 	if lastLiberalPlayed > 5 or lastFascistPlayed > 6 then
 		if not options.dealRoleCards then giveRoleCards() end
+		gameLength = os.time() - timeSinceStart
+		printToAll("Game Took " .. math.floor(gameLength) .. " Seconds")
+		unmuteAll()
+		bolTD = false
+
 	end
 
 	-- claims buttons
@@ -2876,6 +2981,24 @@ function displayBannerCardsCoroutine()
 
 	return true
 end
+
+function unmuteAll()
+    if not bolSilenced then return "" end
+
+    bolSilenced = false
+
+	for _,playerColor in ipairs(getSeatedPlayers()) do
+		tempSteamID = Player[playerColor].steam_id
+		if silenced[tempSteamID] ~= nil then Player[playerColor].mute() end
+	end
+	
+	for k in pairs(silenced) do
+		silenced[k] = nil
+	end
+
+	
+end
+
 
 function displayBannerCard(card, offset, bannerGuidsOffset)
 	local bannerCard = {}
@@ -2915,9 +3038,9 @@ function boardCardHandler(card)
 				broadcastToAll('Delaying inspect 5 seconds...', {1,1,1})
 				sleep(5)
 			end
-			if not options.dealPartyCards then 
+			if not options.dealPartyCards then
 				createInspectButtons(powerHolder)
-				claimShows[getPres()] = 3 
+				claimShows[getPres()] = 3
 			end
 			if options.autoNotate then
 				notateInfo(powerHolder, 'inspects', '', '', true)
@@ -2954,7 +3077,7 @@ function boardCardHandler(card)
 	else
 		printToAll('ERROR: Player ' .. powerHolder .. ' not found.', {1,0,0})
 	end
-	
+
 	if powerHolder and lastPres then
 		if isBoardCardPickPres(card) then
 			local saveForcePres = forcePres
@@ -2990,6 +3113,11 @@ function nextPres(playerIn)
 end
 
 function movePlacards(playerIn, returnVoteCards)
+
+  timeSinceUV = os.time()
+  getObjectFromGUID("303db7").Clock.startStopwatch()
+  getObjectFromGUID("68faa0").Clock.startStopwatch()
+
 	local moveToPlayer = playerIn
 	if forcePres then
 		moveToPlayer = forcePres
@@ -3018,9 +3146,35 @@ function giveBullet(playerIn)
 end
 
 function markDead(tableIn)
+
+
+
 	if type(tableIn) == 'table' then
 		local victimColor = closestPlayer(tableIn[1], players, 18)
 		if victimColor and victimColor ~= bulletInfo.shooterColor then
+
+			timeOfPlay = os.time()-timeSinceUV
+			timeOfPlayM = math.floor(timeOfPlay/60)
+			timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
+
+			if timeOfPlayM == 0 then
+				broadcastToAll("Time to Shoot: " .. timeOfPlayS .. " Seconds")
+			elseif timeOfPlayM == 1 then
+				broadcastToAll("Time to Shoot: " .. timeOfPlayM .. " Minute " .. timeOfPlay .. " Seconds")
+			else
+				broadcastToAll("Time to Shoot: " .. timeOfPlayM .. " Minutes " .. timeOfPlay .. " Seconds")
+			end
+			timeSinceUV = os.time()
+			getObjectFromGUID("303db7").Clock.startStopwatch()
+			getObjectFromGUID("68faa0").Clock.startStopwatch()
+
+			if options.omn1Rule then
+				bolSilenced = true
+				Player[victimColor].mute()
+				tempSteamId = Player[victimColor].steam_id
+				silenced[tempSteamId] = true
+			end
+			
 			bulletInfo.shooterColor = nil
 			_G.playerStatus[victimColor] = 5
 			refreshStatusButtons()
@@ -3030,10 +3184,15 @@ function markDead(tableIn)
 					notateColor2ByObject(tableIn)
 				end
 			end
-			
+
 			if (options.autoNotHitler) then
 				if (roles[victimColor] == "hitler") then
 					giveRoleCards()
+					gameLength = os.time() - timeSinceStart
+					gameLengthM = math.floor(gameLength/60)
+					gameLengthS = math.floor(GameLength - (GameLengthM * 60))
+					printToAll("Game Took " .. gameLengthM .. " Minutes " .. math.floor(gameLengthS) .. " Seconds")
+					unmuteAll()
 				else
 					playerStatus[victimColor] = 6
 					refreshStatusButtons()
@@ -3098,7 +3257,7 @@ function giveBulletImprison(playerIn, itemInfo, funcName)
 end
 
 function createPolicyCardWait()
-	
+
 	if policyWaitId then
 		Wait.stop(policyWaitId)
 	end
@@ -3123,7 +3282,12 @@ function policyCardCoroutine()
 	local homeTracker = function()
 		local tracker = getObjectFromGUID(ELECTION_TRACKER_GUID)
 		if tracker then
-			tracker.setPositionSmooth(electionTrackerOrgPos)
+			if bolTD then
+				tracker.setPositionSmooth(electionTrackerNichPos)
+				bolTD = false
+			else
+				tracker.setPositionSmooth(electionTrackerOrgPos)
+			end
 			tracker.setRotationSmooth({0, 315, 0})
 		end
 	end
@@ -3488,11 +3652,11 @@ function startVoteCheck()
 	if (started == false or started == nil) then
 		return false
 	end
-	
+
 	local voteCards = {}
 	votes = {}
 	local voteDone = true
-	
+
 	for i, obj in ipairs(getAllObjects()) do
 		if (obj.tag == "Card" and obj.interactable == true and obj.resting and not obj.held_by_color and obj.is_face_down and math.abs(obj.getPosition()[1]) < 42.31 and math.abs(obj.getPosition()[3]) < 23.7) then
 			local desc = obj.getDescription()
@@ -3502,7 +3666,7 @@ function startVoteCheck()
 						table.insert(voteCards, obj)
 						if (votes[value2] == nil) then
 							votes[value2] = -1
-						else 
+						else
 							votes[value2] = 0
 							voteDone = false
 						end
@@ -3511,7 +3675,7 @@ function startVoteCheck()
 						table.insert(voteCards, obj)
 						if (votes[value2] == nil) then
 							votes[value2] = 1
-						else 
+						else
 							votes[value2] = 0
 							voteDone = false
 						end
@@ -3522,29 +3686,66 @@ function startVoteCheck()
 		end
 	end
 	--print(#voteCards.." - "..getNumAlivePlayers())
-	if (#voteCards ~= getNumAlivePlayers()) then
+
+	if (#voteCards < getNumAlivePlayers() -1) then
+		voteDone = false
+    	tempRichard = -999
+	end
+
+
+	if (#voteCards == getNumAlivePlayers() -1 and options.richardRule == true) then
+
+		if tempRichard == -999 then 
+            tempRichard = os.time() 
+            broadcastToAll("Handsome Richard Countdown Begins, " .. timerRichard .. " Seconds",stringColorToRGB("Purple"))
+        end
+		
+
+        richardRemaining = os.time() - tempRichard - timerRichard
+		
+		
+		
+		if richardRemaining < 0 then
+			--broadcastToAll('Voting in: ' .. tempRichard, stringColorToRGB('Green'))
+			voteDone = false
+		--elseif tempRichard == 0 then
+			--bolRichard = true
+
+		else
+			bolRichard = true
+
+
+
+		end
+	end
+
+
+	if (#voteCards < getNumAlivePlayers() and options.richardRule == false) then
 		voteDone = false
 	end
 	
-	if voteDone then
-		voteNotes = getFinalVoteString()
-		setNotes(voteNotes .. '\n\n' .. mainNotes)
-		local presColor = getPres()
-		local chanColor = getChan()
-		local out = '[' .. stringColorToHex(presColor) .. ']' .. presColor .. '[-] > '
-		out = out .. '[' .. stringColorToHex(chanColor) .. ']' .. chanColor .. '[-]\n'
-		out = out .. voteNotes
-		if voteNotebook == '' then
-			voteNotebook = out
-		else
-			voteNotebook = voteNotebook .. '\n\n' .. out
-		end
-		lastVote = out
-		for _, lastVoteGuid in ipairs(lastVote_guids) do
-			local lastVoteObj = getObjectFromGUID(lastVoteGuid)
-			if lastVoteObj then 
-				lastVoteObj.TextTool.setValue(removeBBCode(out))
+	
+		if voteDone then
+		
+			--resetVoteTimer()
+			voteNotes = getFinalVoteString()
+			setNotes(voteNotes .. '\n\n' .. mainNotes)
+			local presColor = getPres()
+			local chanColor = getChan()
+			local out = '[' .. stringColorToHex(presColor) .. ']' .. presColor .. '[-] > '
+			out = out .. '[' .. stringColorToHex(chanColor) .. ']' .. chanColor .. '[-]\n'
+			out = out .. voteNotes
+			if voteNotebook == '' then
+				voteNotebook = out
+			else
+				voteNotebook = voteNotebook .. '\n\n' .. out
 			end
+			lastVote = out
+			for _, lastVoteGuid in ipairs(lastVote_guids) do
+				local lastVoteObj = getObjectFromGUID(lastVoteGuid)
+				if lastVoteObj then
+					lastVoteObj.TextTool.setValue(removeBBCode(out))
+				end
 		end
 		startLuaCoroutine(Global, 'attemptLastVoteFixCo')
 		for i, obj in ipairs(voteCards) do
@@ -3556,21 +3757,25 @@ function startVoteCheck()
 		else
 			votePassed = false
 		end
-		
+
 		if (votePassed and options.autoNotHitler) then
 			-- Get the status of all cards and decks from the zones
 			local cardsDown = getPolicyCardStatus(true)
 			local numFasDown = #cardsDown.fascistPlayedList + #cardsDown.fascistNotUsedList
 			if (numFasDown >= 4) then
 				if (roles[chanColor] == "hitler") then
+					gameLength = os.time() - timeSinceStart
+					printToAll("Game Took " .. math.floor(gameLength) .. " Seconds")
 					giveRoleCards()
+					unmuteAll()
+					bolTD = false
 				else
 					playerStatus[chanColor] = 2
 					refreshStatusButtons()
 				end
 			end
 		end
-		
+
 	else
 		voteNotes = getPrelimVoteString()
 		setNotes(voteNotes .. '\n\n' .. mainNotes)
@@ -3581,18 +3786,18 @@ end
 function attemptLastVoteFixCo()
 	for _, lastVoteGuid in ipairs(lastVote_guids) do
 		local lastVoteObj = getObjectFromGUID(lastVoteGuid)
-		if lastVoteObj then 
+		if lastVoteObj then
 			lastVoteObj.setScale({4.00, 4.00, 5.00})
 		end
 	end
 	wait(2)
 	for _, lastVoteGuid in ipairs(lastVote_guids) do
 		local lastVoteObj = getObjectFromGUID(lastVoteGuid)
-		if lastVoteObj then 
+		if lastVoteObj then
 			lastVoteObj.setScale({5.00, 5.00, 5.00})
 		end
 	end
-	
+
 	return 1
 end
 
@@ -3613,7 +3818,7 @@ function waitReturnVoteCardsCoroutine()
 	if (started == false or started == nil) then
 		return false
 	end
-	
+
 	sleep(2)
 	returnVoteCardsToHand()
 	disableVote = false
@@ -3643,6 +3848,14 @@ function returnVoteCardsToHand()
 end
 
 function getFinalVoteString()
+
+	timeOfPlay = os.time()-timeSinceUV
+	timeOfPlayM = math.floor(timeOfPlay/60)
+	timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
+
+
+
+
 	local jaCount = 0
 	local neinCount = 0
 	local out = '[i]Ja votes[/i]: '
@@ -3665,10 +3878,43 @@ function getFinalVoteString()
 	if neinCount == 0 then out = out .. 'None' end
 	out = out .. '[/i]'
 	if jaCount > neinCount then
-		broadcastToAll('Vote passes', stringColorToRGB('Green'))
+		
+		if bolRichard then
+			if timeOfPlayM == 0 then
+				broadcastToAll('Vote passes via Handsome Richard Rule (' .. timeOfPlayS .. " Seconds)", stringColorToRGB('Green'))
+			elseif timeOfPlayM == 1 then
+				broadcastToAll('Vote passes via Handsome Richard Rule (' .. timeOfPlayM .. " Minute " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Green'))
+			else
+				broadcastToAll('Vote passes via Handsome Richard Rule (' .. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Green'))
+			end	
+		else
+			if timeOfPlayM == 0 then
+				broadcastToAll('Vote passes (' .. timeOfPlayS .. " Seconds)", stringColorToRGB('Green'))
+			elseif timeOfPlayM == 1 then
+				broadcastToAll('Vote passes ('.. timeOfPlayM .. " Minute " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Green'))
+			else
+				broadcastToAll('Vote passes ('.. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Green'))
+			end
+		end		
 		out = '[' .. stringColorToHex('Green') .. ']-<<<<· Vote passes <══¦-•\n' .. '[-]' .. out
 	else
-		broadcastToAll('Vote fails', stringColorToRGB('Red'))
+		if bolRichard then
+			if timeOfPlayM == 0 then
+				broadcastToAll('Vote fails via Handsome Richard Rule (' .. timeOfPlayS .. " Seconds)", stringColorToRGB('Red'))
+			elseif timeOfPlayM == 1 then
+				broadcastToAll('Vote fails via Handsome Richard Rule ('.. timeOfPlayM .. " Minute " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Red'))
+			else
+				broadcastToAll('Vote fails via Handsome Richard Rule ('.. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Red'))
+			end			
+		else
+			if timeOfPlayM == 0 then
+				broadcastToAll('Vote fails (' .. timeOfPlayS .. " Seconds)", stringColorToRGB('Red'))
+			elseif timeOfPlayM == 1 then
+				broadcastToAll('Vote fails ('.. timeOfPlayM .. " Minute " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Red'))
+			else
+				broadcastToAll('Vote fails ('.. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds)", stringColorToRGB('Red'))
+			end
+		end		
 		out = '[' .. stringColorToHex('Red') .. ']-<<<<· Vote fails <══¦-•\n' .. '[-]' .. out
 		if options.autoNotate and recordDownvotes then
 			local lineSave = noteTakerCurrLine
@@ -3691,7 +3937,7 @@ function getFinalVoteString()
 		movePlacards(nextPres(getPres()), false)
 		startLuaCoroutine(Global, 'waitReturnVoteCardsCoroutine')
 	end
-
+	bolRichard = false
 	return out
 end
 
@@ -3734,6 +3980,7 @@ end
 
 function topdeckCard(clickedObject, playerColor)
 	if started then
+		if options.nicholasRule then bolTD = true end
 		if playerColor == getPres() then
 			drawDeck = getDeckFromZoneByGUID(DRAW_ZONE_GUID)
 			if drawDeck then
@@ -3796,7 +4043,7 @@ function drawCards(amount, playerColor)
 		if drawCt > (amount - 1) then
 			lastPres = getPres()
 			lastChan = getChan()
-			
+
 			local drawLogArr = {}
 			table.insert(drawLogArr, lastPres)
 			table.insert(drawLogArr, lastChan)
@@ -3807,7 +4054,7 @@ function drawCards(amount, playerColor)
 				end
 			end
 			table.insert(drawLog,drawLogArr)
-			
+
 			if greyPlayer(playerColor) then
 				deal12P(amount, playerColor)
 			else
@@ -3837,9 +4084,9 @@ function getChan()
 end
 
 function onPlayerChangeColor(color)
-	
+
 	refreshUI()
-	
+
 	if ( color == "Teal" or color == "Brown" ) and Player[color].admin ~= true then
 		if (btMode == 1) then
 			Player[color].changeColor("Grey")
@@ -3849,8 +4096,8 @@ function onPlayerChangeColor(color)
 			return false
 		end
 	end
-	
-	
+
+
 	if started then
 		if color ~= 'Grey' and color ~= 'Black' then
 			printToColor('--------------------------------------',color, {1, 1, 1})
@@ -3922,19 +4169,35 @@ end
 function setupCoroutine()
 	--Get seated players
 	players = getSeatedPlayers()
-
-	if #players < 5 then
+    
+	if #players < 1 then
 		printToAll('Not enough players!', {1,1,1})
 		return true
 	end
 	
+	ruleTextBox = ""
+	if options.nicholasRule then
+		ruleTextBox = ruleTextBox .. "Handsome Nicholas Rule is in Effect \n"
+	end
+	if options.richardRule then
+		ruleTextBox = ruleTextBox .. "Handsome Richard Rule is in Effect " .. timerRichard .. " Seconds \n"
+	end
+    if ruleTextBox == "" then ruleTextBox = " " end
+	getObjectFromGUID("d56164").setValue(ruleTextBox)
+
+	getObjectFromGUID("303db7").Clock.startStopwatch()
+	getObjectFromGUID("68faa0").Clock.startStopwatch()
+	timeSinceStart = os.time()
+	timeSinceUV = os.time()
+	bolRichard = false
+
 	drawLog = {}
 	voteNotes = ''
 	voteNotebook = ''
 	mainNotes = ''
 	noteTakerNotes = {}
 	noteTakerCurrLine = 0
-	
+
 	local playersToRole = getSeatedPlayers()
 	local tmpObj
 
@@ -3957,9 +4220,9 @@ function setupCoroutine()
 		shufflePlayers()
 		printToAll('shuffling done.', {1,1,1})
 	end
-	
+
 	wait(5)
-	
+
 	--Hidden zones and status buttons
 	for i, player in pairs(MAIN_PLAYABLE_COLORS) do
 		if not inTable(players, player) then
@@ -4111,15 +4374,15 @@ function setupCoroutine()
 	panel.setPosition({32.91, -27.15, 0.00})
 	panel.setScale({0.10, 0.10, 0.10})
 	panel.setRotation({0.00, 180.00, 180.00})
-	
-	
+
+
 	local numFascists = 0
 
 	--figure out number of fascists
 	numFascists = math.floor((#players-3)/2)
 
 	printToAll( #players .. ' player game starting!', {1,1,1})
-	
+
 	--do roles
 	local randomPlayer = math.random(#playersToRole)
 	roles[playersToRole[randomPlayer]] = 'hitler'
@@ -4128,29 +4391,29 @@ function setupCoroutine()
 		giveUsableCard(copyPartyCards[1], playersToRole[randomPlayer])
 	end
 	table.remove(playersToRole, randomPlayer)
-	
+
 	for i = 1, numFascists do
 		randomPlayer = math.random(#playersToRole)
 		roles[playersToRole[randomPlayer]] = 'fascist'
 		table.insert(fascists, 1, playersToRole[randomPlayer])
-		
+
 		if options.dealPartyCards then
 			giveUsableCard(copyPartyCards[1], playersToRole[randomPlayer])
 		end
 		table.remove(playersToRole, randomPlayer)
 	end
-	
+
 	for i, player in ipairs(playersToRole) do
 		roles[player] = 'liberal'
 		if options.dealPartyCards then
 			giveUsableCard(copyPartyCards[2], player)
 		end
 	end
-	
+
 	if (options.dealRoleCards) then
 		giveRoleCards()
 	end
-	
+
 	wait(5)
 
 	-- this part is all for notes on info of the game
@@ -4441,7 +4704,7 @@ end
 function toggleSecurityCoroutine()
 	local allObjs = getAllObjects()
 	local tmpObj
-	
+
 	if (currentlyDisabled == nil) then
 		Global.setVar('hold', true)
 		broadcastToAll('WARNING: Security has been disabled!', {1,0,0})
@@ -4455,7 +4718,7 @@ function toggleSecurityCoroutine()
 		currentlyDisabled = true
 	elseif (currentlyDisabled) then
 		broadcastToAll('WARNING: Security has been enabled!', {1,0,0})
-		
+
 		--Expansion
 		tmpObj = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
 		if tmpObj then tmpObj.interactable = false end
@@ -4494,7 +4757,7 @@ function disableSecurityCoroutine()
 end
 
 function enableSecurity()
-	
+
 end
 
 do -- inspect
@@ -4573,6 +4836,24 @@ function playerInspected(clickedObject, inspectorColor, checkedColor)
 		smartBroadcastToColor(checkedColor .. ' is ' .. roleText .. '!', inspectorColor, roleColor)
 		table.insert(inspected, 1, checkedColor)
 		removeInspect()
+
+		timeOfPlay = os.time()-timeSinceUV
+		timeOfPlayM = math.floor(timeOfPlay/60)
+		timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
+
+		if timeOfPlayM == 0 then
+			broadcastToAll("Time to Inspect: " .. timeOfPlayS .. " Seconds")
+		elseif timeOfPlayM == 1 then
+			broadcastToAll("Time to Inspect: " .. timeOfPlayM .. "Minute " .. timeOfPlayS .. " Seconds")
+		else
+			broadcastToAll("Time to Inspect: " .. timeOfPlayM .. "Minutes " .. timeOfPlayS .. " Seconds")
+		end
+
+		
+		timeSinceUV = os.time()
+		getObjectFromGUID("303db7").Clock.startStopwatch()
+		getObjectFromGUID("68faa0").Clock.startStopwatch()
+
 		if options.autoNotate and notate.line and notate.action == 'inspects' then
 			noteTakerNotes[notate.line].color2 = checkedColor
 			refreshNotes(nil)
@@ -4659,22 +4940,22 @@ function giveRoleCards()
 
 	startLuaCoroutine(Global, 'giveRoleCardsCo')
 end
-	
+
 function giveRoleCardsCo()
 	local spawnParams = {
-		type = "Deck", 
+		type = "Deck",
 		sound = false,
 		scale = {1.51, 1, 1.51}
 	}
-	
+
 	local newVoteDeck = spawnObject(spawnParams)
 	wait(5)
 	newVoteDeck.setCustomObject(roleInfo)
 	wait(5)
-	
+
 	local libCards = {}
 	local fasCards = {}
-	
+
 	for i = 1, 9 do
 		if (i < 7) then
 			table.insert(libCards, newVoteDeck.takeObject())
@@ -4683,10 +4964,10 @@ function giveRoleCardsCo()
 		end
 	end
 	local hitCard = newVoteDeck.takeObject({position=newPosition})
-	
+
 	if not options.dealRoleCards then
 		local colours = {"White","Brown","Red","Orange","Yellow","Green","Teal","Blue","Purple","Pink"}
-		
+
 		for i, color in pairs(colours) do
 			if (roles[color] ~= nil) then
 				if (roles[color] == 'hitler') then
@@ -4709,14 +4990,14 @@ function giveRoleCardsCo()
 			end
 		end
 	end
-	
+
 	for i, value in pairs(libCards) do
 		value.destruct()
 	end
 	for i, value in pairs(fasCards) do
 		value.destruct()
 	end
-	
+
 	return 1
 end
 
@@ -5517,7 +5798,7 @@ function refreshUI()
 	updateClaimUI()
 	if started then
 		local clrnums = {"ffffff","703A16","DA1917","F3631C","E6E42B","30B22A","20B09A","1E87FF","9F1FEF","F46FCD","3F3F3F", "BCBCBC"}
-		
+
 		hitText = ""
 		fasTexts = {}
 		for i, playerColor in pairs(MAIN_PLAYABLE_COLORS) do
@@ -5545,9 +5826,9 @@ function refreshUI()
 				end
 				UI.setValue("player" .. playerColor, fasString)
 			end
-			
+
 		end
-		
+
 		-- set black UI (and set visibility again)
 		local blackString = hitText
 		for i, playerColor in pairs(MAIN_PLAYABLE_COLORS) do
@@ -5559,10 +5840,10 @@ function refreshUI()
 		UI.setValue("playerBlack", blackString)
 		UI.setAttribute("playerBlack", "visibility", "Black")
 		UI.setAttribute("playerBlack", 'active', 'true')
-		
+
 		UIhidden = false
 	end
-	
+
 end
 
 function hitVisibility(colorIn)
@@ -6208,6 +6489,7 @@ textColorReplace = 'FFFFFF]'
 
 -- tracker (default)
 electionTrackerOrgPos = {x = -3.970005, y = 1.27525151, z = -9.385001}
+electionTrackerNichPos = {x = 1.41, y = 1.27525151, z = -9.385001}
 electionTrackerMoveX = 2.7
 
 noteTakerDesc = 'Note Taker by Lost Savage\nBased on the work of:\nsmiling Aktheon,\nSwiftPanda,\nThe Blind Dragon\nand Max\n'
@@ -8280,7 +8562,7 @@ end
 function notateInfo(color1In, actionIn, color2In, resultIn, updateLaterIn)
 	local lineSave = noteTakerCurrLine
 	noteTakerCurrLine = #noteTakerNotes
-	
+
 	if not noteTakerBlankLine(noteTakerCurrLine) then
 		addNewLine()
 		noteTakerCurrLine = #noteTakerNotes
@@ -8308,7 +8590,7 @@ function noteTakerBlankLine(currLineIn)
 		and noteTakerNotes[noteTakerCurrLine].claim3 == ''
 		and noteTakerNotes[noteTakerCurrLine].claim2 == ''
 		and noteTakerNotes[noteTakerCurrLine].claim1 == ''
-		and noteTakerNotes[noteTakerCurrLine].result == '' 
+		and noteTakerNotes[noteTakerCurrLine].result == ''
 	) then
 			return true
 	end
@@ -8862,7 +9144,8 @@ function getLineDrawer()
 	end
 end
 
+
+
+
+
 ----#include \SecretHitlerCE\common.ttslua
-
-
-
