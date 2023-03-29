@@ -4431,13 +4431,13 @@ function setupCoroutine()
         end
 
         textRules.setValue(ruleTextBox)
-        textRulesGUID = textRules.guid
+        Global.setVar("textRulesGUID") = textRules.guid
     else
-        if textRulesGUID ~= "" then
-            destroyObjectByGUID(textRulesGUID)
-            textRulesGUID = ""
+        if Global.getVar("textRulesGUID") ~= "" then
+            destroyObjectByGUID(Global.getVar("textRulesGUID"))
+            Global.setVar("textRulesGUID") = ""
         else
-            textRulesGUID = ""
+            Global.setVar("textRulesGUID") = ""
         end
     end
 
