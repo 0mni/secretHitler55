@@ -7,7 +7,7 @@ added timers to indicate how long a play/vote/bullet has taken - Tyler
 added omn1 rule - mute/silence player on death - Tyler
 added Handsome Richard Rule - Force a vote when total # of alive players minus 1, have voted
     after 10 seconds have passed - Tyler
-added Handsome Nicholas Rule - when a topdeck occurs, instead of reseting to 0, it is reset to
+added Handsome Nicholas Rule - when a topdeck occurs, instead of reseting to 1, it is reset to
     3rd position so another topdeck will occur if downvoted again - Tyler
 
 5.5:
@@ -2237,6 +2237,7 @@ function onChat(messageIn, player)
                     local playerFound = getPlayerByNameSteamID(messageTable[3], Player.getPlayers())
                     if playerFound then
                         playerFound:changeColor(messageTable[2])
+                        printToAll(player.steam_name .. " has moved " .. playerFound.steam_name .. " to " .. messageTable[2])
                     else
                         player:print("ERROR: " .. messageTable[3] .. " not found.", {1, 0, 0})
                     end
