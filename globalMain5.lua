@@ -60,8 +60,6 @@ fixed zones so they actually resize
 todo:
 add conflict with conflict to line drawer
 
-
-
 ]]--
 
 timeSinceStart = 0
@@ -69,7 +67,6 @@ timeSinceUV = 0
 silenced = {}
 bolSilenced = false
 bolTD = false
-
 bolRichard = false
 richardRemaining = 100
 
@@ -77,13 +74,16 @@ function debugInfo(str)
     if (Player["White"] ~= nil and Player["White"].steam_name == "Player 1") then
         printToAll(str)
     end
+
     for i, value in pairs(Player.getPlayers()) do
         if (value.steam_name == "l55tremine") then
             value.broadcast(str)
         end
+
         if (value.steam_name == "Tyler") then
             value.broadcast(str)
         end
+
         if (value.steam_name == "omn1pot3ntm3") then
             value.broadcast(str)
             return
@@ -105,9 +105,11 @@ function shufflePlayers()
     for i, value in pairs(playerColours) do
         if #shufflePlayers > 1 then
             local tempRandInt = math.random(#shufflePlayers)
+
             if (Player[playerColours[i]] ~= nil and Player[playerColours[i]].seated and shufflePlayers[tempRandInt].steam_id ~= Player[playerColours[i]].steam_id) then
                 Player[playerColours[i]].changeColor("Grey")
             end
+
             shufflePlayers[tempRandInt].changeColor(playerColours[i])
             table.remove(shufflePlayers, tempRandInt)
         else
@@ -132,20 +134,6 @@ pleaseConfirmRestart = false
 
 timerRichard = 10
 
-
---[[ function resetVoteTimer()
-    if (options.richardRule) then
-        tempRichard = timerRichard
-    else
-        tempRichard = 0
-    end
-end --]]
-
---[[ function voteCheckTimed()
-    Wait.time(function() voteCheckTimed() end, 1)
-    createVoteWait()
-end --]]
-
 function onUpdate()
     if richardRemaining < 0 then startVoteCheck() end
 end
@@ -154,6 +142,7 @@ function refreshBelowLibButtons()
     if (getObjectFromGUID("1943fd") == nil) then
         return false
     end
+
     libBoard = getObjectFromGUID("1943fd")
     libBoard.clearButtons()
 
@@ -254,7 +243,6 @@ function voteTouchSwitch(o, colour)
         tempParams.index = blbButtons["voteTouchSwitch"]
         tempParams.color = getButClr(stopVoteTouching)
         getObjectFromGUID("1943fd").editButton(tempParams)
-        --settingsScreen(o, colour)
     end
 end
 
@@ -279,14 +267,16 @@ function BTSwitch(object, colour)
             tempParams.tooltip = "Doesn't do anything to the people who sit in brown and teal"
             tempParams.color = stringColorToRGB("Red")
         end
+
         getObjectFromGUID("1943fd").editButton(tempParams)
     end
 end
 
 function getNotetaker(obj, color, alt_click)
-    if Player[color].admin and color ~= "Black" then -- and started == true
+    if Player[color].admin and color ~= "Black" then
         --spawn note taker(s)
         local params = {position = {-100, 100, -100}, sound = false}
+
         if options.noteType == 1 then
             params.type = "Chess_Board"
             params.scale = {1.55, 1.55, 1.55}
@@ -311,6 +301,7 @@ function getNotetaker(obj, color, alt_click)
         end
 
         local notetaker = spawnObject(params)
+
         if options.noteType < 7 then
             notetaker.setLuaScript(newNoteTakerLuaScript(color, "true", "false", "false", "false", "false", "true"))
         elseif options.noteType == 7 then
@@ -318,6 +309,7 @@ function getNotetaker(obj, color, alt_click)
         elseif options.noteType == 8 then
             notetaker.setLuaScript(newNoteTakerLuaScript(color, "false", "true", "false", "false", "false", "false"))
         end
+
         if options.noteType == 5 then
             local custom = {}
             custom.image = "http://cloud-3.steamusercontent.com/ugc/486766424829587499//FDF54ECD5D1706DE0A590239E84D62CDE757FE46/"
@@ -335,6 +327,7 @@ end
 
 function returnVotes(obj, color, alt_click)
     local colours = {"White","Brown","Red","Orange","Yellow","Green","Teal","Blue","Purple","Pink","Black"}
+
     if color == "script" or Player[color].admin then
         for i, value in pairs(getAllObjects()) do
             if (value.tag == "Card") then
@@ -356,6 +349,7 @@ end
 
 function recreateVotesCo()
     local colours = {"White","Brown","Red","Orange","Yellow","Green","Teal","Blue","Purple","Pink"}
+
     for i, value in pairs(getAllObjects()) do
         if (value.tag == "Card") then
             for i2, value2 in pairs(colours) do
@@ -372,10 +366,6 @@ function recreateVotesCo()
             value.setScale(tempScale)
         end
     end
-
-    --local neinCopy    = getObjectFromGUID("bd31d9")
-    --local jaCopy  = getObjectFromGUID("9532bb")
-
 
     local spawmParams = {
         type = "Deck",
@@ -444,14 +434,17 @@ function numButtons()
     if (self.getButtons() == nil) then
         return 0
     end
+
     return #self.getButtons()
 end
 
 function getButClr(booleanVar)
     returnValue = stringColorToRGB("Red")
+
     if booleanVar then
         returnValue = stringColorToRGB("Green")
     end
+
     return returnValue
 end
 
@@ -464,6 +457,7 @@ function spawnNikosTimer()
             scale = {1.00, 1.00, 0.21},
             rotation = {90.00, 0, 0}
         }
+
         local spawnedClock = spawnObject(params)
         spawnedClock.setLuaScript(nikosTimerScript)
         spawnedClock.setLock(true)
@@ -497,8 +491,6 @@ function resetGameCo()
     bolTD = false
     unmuteAll()
     removeInspect()
-
-    getObjectFromGUID("d56164").setValue(" ")
 
     local ElectionTrackerTemp = getObjectFromGUID(ELECTION_TRACKER_GUID)
     ElectionTrackerTemp.setPositionSmooth({-3.97, 1.5, -9.39},false,true)
@@ -542,6 +534,7 @@ function resetGameCo()
 
     for i, guidOfButtons in ipairs(playerStatusButtonGuids) do
         tempObj = getObjectFromGUID(guidOfButtons)
+
         if (tempObj) then
             tempObj.destruct()
         end
@@ -566,6 +559,7 @@ function resetGameCo()
     end
 
     local drawZone = getObjectFromGUID(DRAW_ZONE_GUID)
+ 
     for i, j in ipairs(drawZone.getObjects()) do
         if j.tag == "Deck" then
             j.destruct()
@@ -573,6 +567,7 @@ function resetGameCo()
     end
 
     local discardZone = getObjectFromGUID(DISCARD_ZONE_GUID)
+
     for i, j in ipairs(discardZone.getObjects()) do
         if j.tag == "Deck" then
             j.destruct()
@@ -582,17 +577,21 @@ function resetGameCo()
     wait(6)
 
     local colours = {"White","Brown","Red","Orange","Yellow","Green","Teal","Blue","Purple","Pink"}
+
     for i, obj in ipairs(getAllObjects()) do
         if (obj.tag == "Card" and obj.interactable == true) then
             local desc = obj.getDescription()
+
             for i2, value2 in pairs(colours) do
                 if (desc == value2 .. "'s Nein Card" or desc == value2 .. "'s Ja Card") then
                     obj.destruct()
                 end
             end
+
             if (desc == "Fascist Role Card" or desc == "Hitler Role Card" or desc == "Liberal Role Card" or desc == "Fascist Party Card" or desc == "Liberal Party Card") then
                 obj.destruct()
             end
+
             if (isPolicyCard(obj)) then
                 obj.destruct()
             end
@@ -688,6 +687,7 @@ function setTimerFreeTalkTimeNT(obj, color, input, stillEditing)
         freeTalkTimeNT = input
     end
 end
+
 function setTimerNumAddsNT(obj, color, input, stillEditing)
     if Player[color].admin == false then
         Player[color].broadcast("[ff0000]NotePad: You don't have permission to do that")
@@ -696,6 +696,7 @@ function setTimerNumAddsNT(obj, color, input, stillEditing)
         maxAddsNT = input
     end
 end
+
 function setTimerPresOnlyNT(obj, color, input, stillEditing)
     if Player[color].admin == false then
         Player[color].broadcast("[ff0000]NotePad: You don't have permission to do that")
@@ -704,6 +705,7 @@ function setTimerPresOnlyNT(obj, color, input, stillEditing)
         newAddTimeNT = input
     end
 end
+
 function setTimerAddTimeNT(obj, color, input, stillEditing)
     if Player[color].admin == false then
         Player[color].broadcast("[ff0000]NotePad: You don't have permission to do that")
@@ -717,15 +719,16 @@ function setTimerRichard(obj, color, input, stillEditing)
     timerRichard = input
 end
 
-
 function getNumAlivePlayers()
     --[1 Board, 2 Not Hitler, 3 Vote Only, 4 Silenced, 5 Dead, 6 Dead not Hitler]
     runningPlayers = #players
+
     for i, value in pairs(Global.getTable("playerStatus")) do
         if (value == 5 or value == 6) then
             runningPlayers = runningPlayers - 1
         end
     end
+
     return runningPlayers
 end
 
@@ -830,6 +833,7 @@ end
 function startTurn(obj, color, alt_click)
     if (Player[color].admin) then
         Timer.destroy(self.getGUID() .. "timerDone")
+
         if (currentlyMuted == true) then
             for i, playerObj in pairs(Player.getPlayers()) do
                 if (playerObj.seated) then
@@ -866,7 +870,6 @@ function presOnly()
 end
 
 function add45(obj, color, alt_click)
-
     if (add45sUsed[color] == nil) then
         add45sUsed[color] = 1
     elseif (add45sUsed[color] == max45s) then
@@ -874,6 +877,7 @@ function add45(obj, color, alt_click)
     else
         add45sUsed[color] = 1 + add45sUsed[color]
     end
+
     --doMute = false
     local currentTime = self.getValue()
     self.Clock.pauseStart()
@@ -906,7 +910,6 @@ function setOff()
 end
 
 function checkForDone()
-
     if (self.getValue() == 0) then
         if (after45 == -1 and presOnlyTime) then
             for i, playerObj in pairs(Player.getPlayers()) do
@@ -914,6 +917,7 @@ function checkForDone()
                     --playerObj.mute()
                 end
             end
+
             currentlyMuted = true
             presOnlyTime = false
             setOff()
@@ -982,69 +986,8 @@ function resetNotes()
     Notes.setNotes("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n[ffffff]Mod name: " .. MOD_NAME .. "\nVersion: " .. UPDATE_VERSION .. "\nLink to workshop: " .. linkToWorkshop)
 end
 
---unused. may have bugs
-function setGameNotes()
-    Notes.setNotes(voteNotes .. "\n\n" .. getPlayNotesString())
-end
-
---unused. may have bugs
-function getPlayNotesString()
-    local returnString = ""
-
-    for i, obj in ipairs(playNotes) do
-
-        --rev and conflict
-        if obj["con"] == true and obj["con"] == true then
-            returnString = returnString .. "(revcon) "
-        else
-            if obj["rev"] == true then
-                returnString = returnString .. "(rev) "
-            end
-            if obj["con"] == true then
-                returnString = returnString .. "(conflict) "
-            end
-        end
-
-        -- if its a single text such as hitler territory
-        if (obj["singleText"] ~= nil) then
-            returnString = returnString .. obj["singleText"]
-        end
-
-        if (obj["plr1"] ~= nil) then
-            returnString = returnString .. obj["plr1"]
-        end
-        if (obj["midText"] ~= nil) then
-            returnString = returnString .. obj["midText"]
-        end
-        if (obj["plr2"] ~= nil) then
-            if (obj["midText"] == nil) then
-                returnString = returnString .. " > "
-            end
-            returnString = returnString .. obj["plr2"] .. ": "
-        end
-        if (obj["3"] ~= nil) then
-            returnString = returnString .. ": " .. obj["3"] .. " > "
-        end
-        if (obj["2p"] ~= nil) then
-            returnString = returnString .. obj["2p"] .. " > "
-        end
-        if (obj["con"] == true and obj["2c"] ~= nil) then
-            returnString = returnString .. obj["2c"] .. " > "
-        end
-
-
-        if (obj["1"] ~= nil) then
-            if (obj["inspect"] == true) then
-                returnString = returnString .. ": claims "
-            end
-            returnString = returnString .. obj["1"]
-        end
-
-        returnString = returnString .. "\n"
-    end
-end
-
 claimShows = {}
+
 function buttonClaim(player, value, id)
     if (player.seated ~= true) then
         return
@@ -1089,7 +1032,6 @@ function buttonClaim(player, value, id)
         claimShows[player.color] = nil
         updateClaimUI()
     end
-
 end
 
 function updateClaimUI()
@@ -1097,11 +1039,13 @@ function updateClaimUI()
         for i, str in ipairs(uiClaimButtons) do
             UI.setAttribute(str, "active", "false")
         end
+
         return
     end
 
     local showStr = ""
     local notFirst = true
+
     for i, clr in ipairs(MAIN_PLAYABLE_COLORS) do
         if (claimShows[clr] ~= nil) then
             if (notFirst) then
@@ -1109,9 +1053,11 @@ function updateClaimUI()
             else
                 showStr = showStr .. "|"
             end
+
             showStr = showStr .. clr
         end
     end
+
     if (showStr ~= "") then
         for i, str in ipairs(uiClaimButtons) do
             UI.setAttribute(str, "active", "true")
@@ -1125,6 +1071,7 @@ function updateClaimUI()
 end
 
 presChanClaims = {} --this is needed to properly make conflicts
+
 function makeClaim(player, messageTable) -- message table: claim ffl fl
     if (started == false) then
         player.print("[FF0000]claim error: game has not started")
@@ -1179,11 +1126,17 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 
     for i=1, #noteTakerNotes do
         obj = noteTakerNotes[#noteTakerNotes+1-i]
+
         if ( ( obj.color1 == player.color or obj.color2 == player.color) and obj.action ~= string.lower(bulletInfo.action) and obj.action ~= "gives pres to" and ( obj.action ~= "inspects" or insp ~= "" ) ) then
             if (noteNum <= 1) then
                 lineToChange = #noteTakerNotes+1-i
-                if (obj.color1 == player.color) then playerIsPres = true
-                elseif (obj.color2 == player.color) then playerIsPres = false end
+
+                if (obj.color1 == player.color) then
+                    playerIsPres = true
+                elseif (obj.color2 == player.color) then
+                    playerIsPres = false
+                end
+
                 break
             elseif (noteNum > 1) then
                 noteNum = noteNum - 1
@@ -1223,10 +1176,14 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
     end
 
     -- make sure no nil line and error
-    if (presChanClaims == nil) then presChanClaims = {} end
+    if (presChanClaims == nil) then
+        presChanClaims = {}
+    end
+
     if (presChanClaims[lineToChange] == nil) then
         presChanClaims[lineToChange] = {p="", c="", color1=(noteTakerNotes[lineToChange].color1), color2=(noteTakerNotes[lineToChange].color2)}
     end
+
     if (presChanClaims[lineToChange].color1 ~= (noteTakerNotes[lineToChange].color1) or presChanClaims[lineToChange].color2 ~= (noteTakerNotes[lineToChange].color2)) then
         presChanClaims[lineToChange] = {p="", c="", color1=(noteTakerNotes[lineToChange].color1), color2=(noteTakerNotes[lineToChange].color2)}
     end
@@ -1242,7 +1199,8 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
                 and presChanClaims[lineToChange]["p"] ~= "??" and presChanClaims[lineToChange]["c"] ~= "??") then
             noteTakerNotes[lineToChange].claim1 = presChanClaims[lineToChange]["c"]
             noteTakerNotes[lineToChange].claim2 = presChanClaims[lineToChange]["p"]
-                conflicted = true
+            conflicted = true
+
             if (noteTakerNotes[lineToChange].conflict == "") then
                 noteTakerNotes[lineToChange].conflict = "(Conflict)"
             elseif (noteTakerNotes[lineToChange].conflict == "rev") then
@@ -1275,11 +1233,13 @@ function makeClaim(player, messageTable) -- message table: claim ffl fl
 
     if (conflicted ~= nil and options.autoDrawConflicts) then
         local lineDrawer = getLineDrawer()
+
         if (noteTakerNotes[lineToChange].color1 ~= "" and noteTakerNotes[lineToChange].color2 ~= "") then
             local lineDrawer = getLineDrawer()
             lineDrawer.executeScript(lineDrawerRemoveLineScript)
             lineDrawer.call("callRemoveLine", {noteTakerNotes[lineToChange].color1,noteTakerNotes[lineToChange].color2})
         end
+
         lineDrawer.executeScript(lineDrawerImportScript)
     end
 
@@ -1289,10 +1249,10 @@ end
 function inspWorks(str)
     if (string.lower(str) == "l" or string.lower(str) == "lib" or string.lower(str) == "liberal" or
         string.lower(str) == "f" or string.lower(str) == "fas" or string.lower(str) == "fascist" or
-        --string.lower(str) == "c" or string.lower(str) == "com" or string.lower(str) == "communist" or
         string.lower(str) == "n" or string.lower(str) == "not" or string.lower(str) == "nothing") then
         return true
     end
+
     return false
 end
 
@@ -1308,6 +1268,7 @@ function inspStr(str)
     elseif (string.lower(str) == "n" or string.lower(str) == "not" or string.lower(str) == "nothing") then
         return "claims nothing"
     end
+
     return ""
 end
 
@@ -1318,8 +1279,10 @@ function claimWorks(str)
                 return false
             end
         end
+
         return true
     end
+
     return false
 end
 
@@ -1333,13 +1296,10 @@ function getDrawColours(str)
     for s in str:gmatch"." do
         if (s == "l" or s == "L") then
             libCards = libCards + 1
-            --returnString = returnString .. "[0080F8]L[-]"
         elseif (s == "f" or s == "F") then
             fasCards = fasCards + 1
-            --returnString = returnString .. "[FF0000]F[-]"
         elseif (s == "c" or s == "C") then
             comCards = comCards + 1
-            --returnString = returnString .. "[F4AA02]C[-]"
         elseif (s == "g" or s == "G") then
             gryCards = gryCards + 1
         elseif (s == "?") then
@@ -1350,27 +1310,49 @@ function getDrawColours(str)
     local returnString = ""
 
     --fas
-    if (fasCards > 0) then returnString = returnString .. "[FF0000]" end
+    if (fasCards > 0) then
+        returnString = returnString .. "[FF0000]"
+    end
+
     for i = 1, fasCards do
         returnString = returnString .. text.fascistLetter
     end
-    if (fasCards > 0) then returnString = returnString .. "[-]" end
+
+    if (fasCards > 0) then
+        returnString = returnString .. "[-]"
+    end
+
     --lib
-    if (libCards > 0) then returnString = returnString .. "[0080F8]" end
+    if (libCards > 0) then
+        returnString = returnString .. "[0080F8]"
+    end
+
     for i = 1, libCards do
         returnString = returnString .. text.liberalLetter
     end
-    if (libCards > 0) then returnString = returnString .. "[-]" end
+
+    if (libCards > 0) then
+        returnString = returnString .. "[-]"
+    end
+
     --com
-    if (comCards > 0) then returnString = returnString .. "[F4AA02]" end
+    if (comCards > 0) then
+        returnString = returnString .. "[F4AA02]"
+    end
+
     for i = 1, comCards do
         returnString = returnString .. text.communistLetter
     end
-    if (comCards > 0) then returnString = returnString .. "[-]" end
+
+    if (comCards > 0) then
+        returnString = returnString .. "[-]"
+    end
+
     --grey
     for i = 1, gryCards do
         returnString = returnString .. text.greyLetter
     end
+
     for i = 1, questionMarks do
         returnString = returnString .. "?"
     end
@@ -1401,13 +1383,16 @@ function printDraws(player, messageTable) -- left on top
 
     for i, drawArr in ipairs(drawLog) do
         printString = printString .. i .. " - " .. text[drawArr[1]] .. drawArr[1] .. "[-] > " .. text[drawArr[2]] .. drawArr[2] .. "[-]: "
+
         for j, letterPrint in ipairs(drawArr) do
             if (j > 2) then
                 printString = printString .. letterPrint
             end
         end
+
         printString = printString .. "\n"
     end
+
     if (publicPrint) then
         printToAll(printString, {1,1,1})
     else
@@ -1451,10 +1436,7 @@ text = {
     Pink = "[F46FCD]",
     Black = "[3F3F3F]",
     Grey = "[BCBCBC]"
-
 }
-
--- {conflict = "", color1 = "", action = "", color2 = "", claim3 = "", claim2 = "", claim1 = "", result = ""}
 
 -- Created by LostGod on 5/8/2016
 -- Heavily modified by Lost Savage
@@ -1467,9 +1449,8 @@ MOD_NAME = "Secret Hitler: 55x - Modified by Tyler"
 
 ADD_ON_VERSION = 6
 linkToWorkshop = "https://steamcommunity.com/sharedfiles/filedetails/?id=2954059664"
-----#include \SecretHitlerCE\main.ttslua
---Static
 
+--Static
 pastDiscards = {}
 
 -- votes
@@ -1487,15 +1468,12 @@ radio_string = "●"
 check_string = "✓"
 
 --Decks/Cards
---extraRole_card_guids = {"675a6f", "16e480", "0a5960", "02b664", "328440", "05df40", "98f4dd", "7b4b46", "ccb7ed", "c2309a"}
 fakeMembership_card_guid = "55d1c3"
---fascistMembership_card_guid = "e4d489"
---liberalMembership_card_guid = "a73564"
 GREY_POLICY_RIGHT = -9
 GREY_EXPANSION_RIGHT = 9
 
 drawLog = {}
-copyPartyCards = {"7f6315", "e2bd89"} -- fas then lib
+copyPartyCards = {"7f6315", "e2bd89"} --fas then lib
 bulletsToDelete = {}
 
 --Placards and Tracker
@@ -1522,13 +1500,10 @@ policySafety_zone_guids = {White = "e99663", Brown = "13b335", Red = "d7774a", O
 --Other
 uiClaimButtons = {"claim???","claimFFF","claimFFL","claimFLL","claimLLL","claim??","claimFF","claimFL","claimLL","claimX",  "claimLib","claimFas" }
 HIDDEN_ZONE_GUIDS = {White = "f13d0b", Brown = "90049b", Red = "134297", Orange = "344002", Yellow = "9b5558", Green = "7a8301", Teal = "568a75", Blue = "dbd95e", Purple = "cc1b94", Pink = "d954ee"}
---zoneBackup = {White = "f13d0b", Brown = "90049b", Red = "134297", Orange = "344002", Yellow = "9b5558", Green = "7a8301", Teal = "568a75", Blue = "dbd95e", Purple = "cc1b94", Pink = "d954ee"}
 HAND_ZONE_GUIDS = {"c5ae5d", "12ff08", "471ad9", "d09bf5", "de5021", "a30d5f", "83518d", "1d11b0", "18dcbf", "560c1a"}
 boardGreen_rgb = {14/255, 45/255, 18/255}
 boardBrown_rgb = {53/255, 27/255, 17/255}
 lastVote_guids = {"0d8b0c", "cd55ea", "06e71d", "2923c6"}
--- @{100, 100, 100+} hidden zones
--- @{-100, 100, -100} is used to delete/spawn objects
 
 --Variable
 customOnly = nil
@@ -1698,16 +1673,12 @@ voteNotebook = ""
 
 -- Called when a game finishes loading
 function onLoad(saveString)
+    getObjectFromGUID("303db7").interactable = false
+    getObjectFromGUID("68faa0").interactable = false
+    getObjectFromGUID("303db7").Clock.startStopwatch()
+    getObjectFromGUID("68faa0").Clock.startStopwatch()
 
-  getObjectFromGUID("303db7").interactable = false
-  getObjectFromGUID("68faa0").interactable = false
-  getObjectFromGUID("303db7").Clock.startStopwatch()
-  getObjectFromGUID("68faa0").Clock.startStopwatch()
-
-  getObjectFromGUID("d56164").setValue(" ")
-  getObjectFromGUID("d56164").interactable = false
-
-    if not (saveString == "") then
+     if not (saveString == "") then
         local save = JSON.decode(saveString)
 
         local pastVersion = save["version"]
@@ -1759,15 +1730,19 @@ function onLoad(saveString)
     end
 
     alwaysInit()
+
     if not started then
         local status, err = pcall(init)
+
         if not status then
             printToAll("ERROR LOADING: " .. err, {1,0,0})
         end
+
         settingsPannelMakeButtons()
         refreshBoardCards()
         refreshHiddenZones()
     end
+
     if not noteTakerCurrLine or noteTakerCurrLine == 0 then
         noteTakerNotes = {}
         noteTakerCurrLine = 0
@@ -1775,11 +1750,17 @@ function onLoad(saveString)
     end
 
     lockNeededCards()
-    if (started ~= true) then resetNotes() end
+
+    if (started ~= true) then
+        resetNotes()
+    end
+
     Physics.play_area = 1
+
     --reload text for tabletop glitch showing it really tiny
     for _, lastVoteGuid in ipairs(lastVote_guids) do
         local lastVoteObj = getObjectFromGUID(lastVoteGuid)
+
         if lastVoteObj then
             lastVoteObj.setScale({3.00, 3.00, 3.00})
             lastVoteObj.TextTool.setValue("   ")
@@ -1788,26 +1769,30 @@ function onLoad(saveString)
     end
 end
 
-
-
-
 function lockNeededCards()
     local tempObj = getObjectFromGUID("2ab2e8")
+
     if (tempObj) then
         tempObj.setLock(true)
         tempObj.interactable = false
     end
+
     tempObj = getObjectFromGUID(copyPartyCards[1])
+
     if (tempObj) then
         tempObj.setLock(true)
         tempObj.interactable = false
     end
+
     tempObj = getObjectFromGUID(copyPartyCards[2])
+
     if (tempObj) then
         tempObj.setLock(true)
         tempObj.interactable = false
     end
+
     tempObj = getObjectFromGUID(fakeMembership_card_guid)
+
     if (tempObj) then
         tempObj.setLock(true)
         tempObj.interactable = false
@@ -1870,12 +1855,13 @@ function refreshHiddenZones()
     for i, player in pairs(MAIN_PLAYABLE_COLORS) do
         local zoneObj = getObjectFromGUID(HIDDEN_ZONE_GUIDS[player])
         local scriptObj = getObjectFromGUID(policySafety_zone_guids[player])
+
         if (zoneObj ~= nil and scriptObj ~= nil) then
             zoneObj.setRotation(NO_ROT)
             scriptObj.setRotation(NO_ROT)
+
             if options.zoneType == 1 then
                 --Hide the hidden zone so we can still use it later
-
                 zoneObj.setScale({0.01, 0.01, 0.01})
                 local colorToNumber = {White = 1, Brown = 2, Red = 3, Orange = 4, Yellow = 5, Green = 6, Teal = 7, Blue = 8, Purple = 9, Pink = 10}
                 zoneObj.setPosition({100, 100, 100 + colorToNumber[player] * 2})
@@ -1893,9 +1879,9 @@ function refreshHiddenZones()
                 local pos = {White = {29.65, 3.51, -32.75}, Brown = {0, 3.51, -32.75}, Red = {-29.65, 3.51, -32.75}, Orange = {-50.2, 3.51, -19.25}, Yellow = {-50.2, 3.51, 19.25}, Green = {-29.65, 3.51, 32.75}, Teal = {0, 3.51, 32.75}, Blue = {29.65, 3.51, 32.75}, Purple = {50.2, 3.51, 19.25}, Pink = {50.2, 3.51, -19.25}}
                 local scale = {White = {28.4, 5.1, 10.1}, Brown = {28.4, 5.1, 10.1}, Red = {28.4, 5.1, 10.1}, Orange = {9.55, 5.1, 37.25}, Yellow = {9.55, 5.1, 37.25}, Green = {28.4, 5.1, 10.1}, Teal = {28.4, 5.1, 10.1}, Blue = {28.4, 5.1, 10.1}, Purple = {9.55, 5.1, 37.25}, Pink = {9.55, 5.1, 37.25}}
 
-
                 zoneObj.setPosition(pos[player])
                 zoneObj.setScale(scale[player])
+
                 --resize scripting zones around hands
                 scriptObj.setScale(scale[player])
                 scriptObj.setPosition(pos[player])
@@ -1903,9 +1889,9 @@ function refreshHiddenZones()
                 local pos = {White = {29.65, 3.51, -31.9}, Brown = {0, 3.51, -31.9}, Red = {-29.65, 3.51, -31.9}, Orange = {-50.2, 3.51, -19.25}, Yellow = {-50.2, 3.51, 19.25}, Green = {-29.65, 3.51, 31.9}, Teal = {0, 3.51, 31.9}, Blue = {29.65, 3.51, 31.9}, Purple = {50.2, 3.51, 19.25}, Pink = {50.2, 3.51, -19.25}}
                 local scale = {White = {28.4, 5.1, 11.8}, Brown = {28.4, 5.1, 11.8}, Red = {28.4, 5.1, 11.8}, Orange = {9.55, 5.1, 37.25}, Yellow = {9.55, 5.1, 37.25}, Green = {28.4, 5.1, 11.8}, Teal = {28.4, 5.1, 11.8}, Blue = {28.4, 5.1, 11.8}, Purple = {9.55, 5.1, 37.25}, Pink = {9.55, 5.1, 37.25}}
 
-
                 zoneObj.setPosition(pos[player])
                 zoneObj.setScale(scale[player])
+
                 --resize scripting zones around hands
                 scriptObj.setScale(scale[player])
                 scriptObj.setPosition(pos[player])
@@ -1913,9 +1899,9 @@ function refreshHiddenZones()
                 local pos = {White = {29.3, 3.51, -31.9}, Brown = {0, 3.51, -31.9}, Red = {-29.3, 3.51, -31.9}, Orange = {-49.4, 3.51, -19}, Yellow = {-49.4, 3.51, 19}, Green = {-29.3, 3.51, 31.9}, Teal = {0, 3.51, 31.9}, Blue = {29.3, 3.51, 31.9}, Purple = {49.4, 3.51, 19}, Pink = {49.4, 3.51, -19}}
                 local scale = {White = {29.3, 5.1, 11.8}, Brown = {29.3, 5.1, 11.8}, Red = {29.3, 5.1, 11.8}, Orange = {10.8, 5.1, 38.0}, Yellow = {10.8, 5.1, 38.0}, Green = {29.3, 5.1, 11.8}, Teal = {29.3, 5.1, 11.8}, Blue = {29.3, 5.1, 11.8}, Purple = {10.8, 5.1, 38.0}, Pink = {10.8, 5.1, 38.0}}
 
-
                 zoneObj.setPosition(pos[player])
                 zoneObj.setScale(scale[player])
+
                 --resize scripting zones around hands
                 scriptObj.setScale(scale[player])
                 scriptObj.setPosition(pos[player])
@@ -1923,9 +1909,9 @@ function refreshHiddenZones()
                 local pos = {White = {-29.3, 3.51, -49.4}, Brown = {-49.4, 3.51, -29.3}, Red = {-49.4, 3.51, 0}, Orange = {-49.4, 3.51, 29.3}, Yellow = {-29.3, 3.51, 49.4}, Green = {0, 3.51, 49.4}, Teal = {29.3, 3.51, 49.4}, Blue = {49.4, 3.51, 29.3}, Purple = {49.4, 3.51, 0}, Pink = {49.4, 3.51, -29.3}}
                 local scale = {White = {28.4, 5.1, 10.8}, Brown = {10.8, 5.1, 28.4}, Red = {10.8, 5.1, 28.4}, Orange = {10.8, 5.1, 28.4}, Yellow = {28.4, 5.1, 10.8}, Green = {28.4, 5.1, 10.8}, Teal = {28.4, 5.1, 10.8}, Blue = {10.8, 5.1, 28.4}, Purple = {10.8, 5.1, 28.4}, Pink = {10.8, 5.1, 28.4}}
 
-
                 zoneObj.setPosition(pos[player])
                 zoneObj.setScale(scale[player])
+
                 --resize scripting zones around hands
                 scriptObj.setScale(scale[player])
                 scriptObj.setPosition(pos[player])
@@ -1945,6 +1931,7 @@ function refreshHiddenZones()
             end
         end
     end
+
     if options.zoneType == 6 then
         broadcastToAll("Alpha release ... still work in progress.", {1,1,1})
         local params = {type = "Custom_Model", sound = false}
@@ -1958,6 +1945,7 @@ function refreshHiddenZones()
             specular_intensity = 0.05,
             specular_sharpness = 6.3
         }
+
         for i = 1, 2 do
             tableExt[i] = spawnObject(params)
             tableExt[i].setCustomObject(custom)
@@ -1969,6 +1957,7 @@ function refreshHiddenZones()
                 "   self.interactable = false\r\n" ..
                 "end\r\n")
         end
+
         tableExt[1].setPosition({0, 0.1, -46.2})
         tableExt[2].setPosition({0, 0.1, 46.2})
         params = {
@@ -1981,6 +1970,7 @@ function refreshHiddenZones()
             assetbundle = "http://cloud-3.steamusercontent.com/ugc/933813375181578705/3961A9B3B73895140CA5055A8745BEE4A3E39299/"
         }
         local playerHands = {}
+
         for i, color in ipairs(GREY_PLAYABLE_COLORS) do
             playerHands[i] = spawnObject(params)
             playerHands[i].setCustomObject(custom)
@@ -1988,6 +1978,7 @@ function refreshHiddenZones()
             playerHands[i].setDescription(color .. " Hand")
             playerHands[i].setLock(true)
         end
+
         playerHands[1].setPosition({29.3, 3.5, -49.4}) -- Tan
         playerHands[2].setPosition({0, 3.5, -49.4}) -- Maroon
         refreshUI()
@@ -2036,6 +2027,7 @@ function alwaysInit()
     refreshBelowLibButtons()
 
     local drawPileBoard = getObjectFromGUID(drawPileBoard_guid)
+
     if drawPileBoard then
         local button = {
             click_function = "drawThree",
@@ -2047,11 +2039,15 @@ function alwaysInit()
             height = 1300,
             font_size = 650
         }
+
         drawPileBoard.createButton(button)
     end
 
     tmpObj = getObjectFromGUID(fakeMembership_card_guid)
-    if tmpObj then  tmpObj.interactable = false end
+
+    if tmpObj then
+        tmpObj.interactable = false
+    end
 end
 
 function refreshStatusButtons()
@@ -2060,6 +2056,7 @@ function refreshStatusButtons()
 
     for _, buttonGUID in ipairs(playerStatusButtonGuids) do
         tmpObj = getObjectFromGUID(buttonGUID)
+
         if tmpObj then
             tmpObj.clearButtons()
             local ownerColor = tmpObj.getName()
@@ -2072,9 +2069,11 @@ function refreshStatusButtons()
                 font_size = 600,
                 click_function = "changePlayerStatus"
             }
+
             if _G.playerStatus[ownerColor] == 1 then
                 if options.zoneType == 6 then
                     local greenColors = {"Brown", "Red", "Blue", "Purple"}
+
                     if inTable(greenColors, ownerColor) then
                         button.color = boardGreen_rgb
                     else
@@ -2083,6 +2082,7 @@ function refreshStatusButtons()
                 else
                     button.color = boardGreen_rgb
                 end
+
                 button.label = ""
             elseif _G.playerStatus[ownerColor] == 2 then
                 button.color = stringColorToRGB("Green")
@@ -2104,6 +2104,7 @@ function refreshStatusButtons()
                 button.label = imprisonInfo.status
                 button.font_size = 550
             end
+
             tmpObj.createButton(button)
         end
     end
@@ -2111,6 +2112,7 @@ end
 
 function refreshExpansionButtons()
     local fasBoard = getObjectFromGUID(fasPannel_guid)
+
     if fasBoard then
         fasBoard.clearButtons()
         local button = {
@@ -2122,6 +2124,7 @@ function refreshExpansionButtons()
             height = 800,
             font_size = 360
         }
+
         if bit32.band(options.expansionOptionStatus, 1) == 1 then
             button.font_color = {0, 0, 0}
             button.color =  stringColorToRGB("Orange")
@@ -2131,6 +2134,7 @@ function refreshExpansionButtons()
             button.color =  boardGreen_rgb
             button.label = options.expansionOptionText[1]
         end
+
         if bit32.band(options.expansionOptionEnabled, 1) == 1 then
             fasBoard.createButton(button)
         end
@@ -2138,6 +2142,7 @@ function refreshExpansionButtons()
         button.click_function = "expansionOptionStatusReverse"
         button.position = {-12, 0.2, 6}
         button.width = 2800
+
         if bit32.band(options.expansionOptionStatus, 2) == 2 then
             button.font_color = {0, 0, 0}
             button.color =  stringColorToRGB("Orange")
@@ -2147,6 +2152,7 @@ function refreshExpansionButtons()
             button.color =  boardGreen_rgb
             button.label = options.expansionOptionText[3]
         end
+
         if bit32.band(options.expansionOptionEnabled, 2) == 2 then
             fasBoard.createButton(button)
         end
@@ -2157,34 +2163,63 @@ function init()
     local tmpObj
 
     tmpObj = getObjectFromGUID(PRESIDENT_GUID)
-    if tmpObj == nil then error("President") end
+
+    if tmpObj == nil then
+        error("President")
+    end
+
     tmpObj.interactable = false
     tmpObj.setLock(true)
     tmpObj = getObjectFromGUID(CHANCELOR_GUID)
-    if tmpObj == nil then error("Chancellor") end
+
+    if tmpObj == nil then
+        error("Chancellor")
+    end
+
     tmpObj.interactable = false
     tmpObj.setLock(true)
     tmpObj = getObjectFromGUID(PREV_PRESIDENT_GUID)
-    if tmpObj == nil then error("Prev President") end
+
+    if tmpObj == nil then
+        error("Prev President")
+    end
+
     tmpObj.setLock(true)
     tmpObj = getObjectFromGUID(PREV_CHANCELOR_GUID)
-    if tmpObj == nil then error("Prev Chancellor") end
-    tmpObj.setLock(true)
 
+    if tmpObj == nil then
+        error("Prev Chancellor")
+    end
+
+    tmpObj.setLock(true)
     tmpObj = getObjectFromGUID(ELECTION_TRACKER_GUID)
-    if tmpObj == nil then error("Election Tracker") end
+
+    if tmpObj == nil then
+        error("Election Tracker")
+    end
+
     tmpObj.setLock(true)
 
     for i, player in ipairs(MAIN_PLAYABLE_COLORS) do
         tmpObj = getObjectFromGUID(HIDDEN_ZONE_GUIDS[player])
-        if tmpObj == nil then error(player .. " Hidden Zone") end
+
+        if tmpObj == nil then
+            error(player .. " Hidden Zone")
+        end
     end
 
     --Expansion
     tmpObj = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
-    if tmpObj then  tmpObj.interactable = false end
+
+    if tmpObj then
+        tmpObj.interactable = false
+    end
+
     tmpObj = getDeckFromZoneByGUID(EFFECTSPILE_ZONE_GUID)
-    if tmpObj then  tmpObj.interactable = false end
+
+    if tmpObj then
+        tmpObj.interactable = false
+    end
 
     if options.gameType ~= 2 then
         --delete board cards
@@ -2198,7 +2233,6 @@ end
 
 
 function onChat(messageIn, player)
-
     local message = string.gsub(messageIn, "%s+", " ")
     local messageTable = string.tokenize(message, " ")
     messageTable[1] = string.lower(messageTable[1])
@@ -2209,6 +2243,7 @@ function onChat(messageIn, player)
         else
             player:print("[FF0000]ERROR: Game not started.[-]")
         end
+
         return false
     elseif messageTable[1] == "l" then
         player:print(lastVote)
@@ -2219,6 +2254,7 @@ function onChat(messageIn, player)
         else
             player:print("[FF0000]ERROR: Full vote history is not enabled.[-]")
         end
+
         return false
     elseif messageTable[1] == "n" then
         player:print(string.gsub(noteTakerNotesString(100, false, true), "\n$", ""))
@@ -2232,9 +2268,11 @@ function onChat(messageIn, player)
     elseif messageTable[1] == "c" and (player.admin) then
         if messageTable[2] then
             messageTable[2] = string.titlecase(messageTable[2])
+
             if inTable(MAIN_PLAYABLE_COLORS, messageTable[2]) or messageTable[2] == "Black" or messageTable[2] == "Grey" then
                 if messageTable[3] then
                     local playerFound = getPlayerByNameSteamID(messageTable[3], Player.getPlayers())
+
                     if playerFound then
                         playerFound:changeColor(messageTable[2])
                         printToAll(player.steam_name .. " has moved " .. playerFound.steam_name .. " to " .. messageTable[2])
@@ -2250,10 +2288,12 @@ function onChat(messageIn, player)
         else
             player:print("ERROR: No color given.", {1, 0, 0})
         end
+
         return false
     elseif messageTable[1] == "promote" and (player.admin) then
         if messageTable[2] then
             local playerFound = getPlayerByNameSteamID(messageTable[2], Player.getPlayers())
+
             if playerFound then
                 if (playerFound.admin) then
                     playerFound.promote()
@@ -2268,10 +2308,12 @@ function onChat(messageIn, player)
         else
             player.promote()
         end
+
         return false
     elseif messageTable[1] == "kick" and (player.admin) then
         if messageTable[2] then
             local playerFound = getPlayerByNameSteamID(messageTable[2], Player.getPlayers())
+
             if playerFound then
                 playerFound.kick()
                 printToAll(player.steam_name .. " has kicked " .. playerFound.steam_name)
@@ -2279,11 +2321,13 @@ function onChat(messageIn, player)
                 player:print(messageTable[2] .. " not found.", {1, 0, 0})
             end
         end
+
         return false
     elseif messageTable[1] == "list" and (player.admin) then
         for _, p in pairs(Player.getPlayers()) do
             player:print(p.steam_name .. " " .. p.steam_id)
         end
+
         return false
     elseif messageTable[1] == "help" then
         player:print(chatHelp(player.admin))
@@ -2316,36 +2360,261 @@ end
 
 function chatHelp(admin)
     local msg = "chat commands:\n" ..
-                    "   claim - claim your cards \n(claim [cards or inspect] [cards or lineNum] [lineNum] (lineNum only include YOUR plays))\n" ..
-                    "   r - All the role information you can know\n" ..
-                    "   l - Shows the last vote\n" ..
-                    "   h - Vote history\n" ..
-                    "   n - All of the notes\n" ..
-                    "   o - current options\n" ..
-                    "   v - Version info\n" ..
-                    "   help - This message"
+        "   claim - claim your cards \n(claim [cards or inspect] [cards or lineNum] [lineNum] (lineNum only include YOUR plays))\n" ..
+        "   r - All the role information you can know\n" ..
+        "   l - Shows the last vote\n" ..
+        "   h - Vote history\n" ..
+        "   n - All of the notes\n" ..
+        "   o - current options\n" ..
+        "   v - Version info\n" ..
+        "   help - This message"
+
     if admin then
         msg = msg .. "\nadmin chat commands:\n" ..
-                    "   c color [name* or steam id] - sets player to color\n" ..
-                    "   nogetdraws - disables the getting of draws (host only)\n" ..
-                    "   promote [name* or steam id] - promotes/demotes player\n" ..
-                    "   kick name* or steam id - kicks the player\n" ..
-                    "   getdraws - prints all the draws (black is default private, use p to make public)\n" ..
-                    "   list - lists steam ids\n" ..
-                    "   * partial name allowed but must be distinct"
+        "   c color [name* or steam id] - sets player to color\n" ..
+        "   nogetdraws - disables the getting of draws (host only)\n" ..
+        "   promote [name* or steam id] - promotes/demotes player\n" ..
+        "   kick name* or steam id - kicks the player\n" ..
+        "   getdraws - prints all the draws (black is default private, use p to make public)\n" ..
+        "   list - lists steam ids\n" ..
+        "   * partial name allowed but must be distinct"
     end
 
     return msg
 end
 
 do -- settings panel
+    function settingsPannelMakeButtons()
+        local settingsPannel = getObjectFromGUID(settingsPannel_guid)
 
-function settingsPannelMakeButtons()
-    local settingsPannel = getObjectFromGUID(settingsPannel_guid)
-    if settingsPannel then
-        settingsPannel.clearButtons()
-        settingsPannel.clearInputs()
+        if settingsPannel then
+            settingsPannel.clearButtons()
+            settingsPannel.clearInputs()
 
+            local buttonParam = {
+                font_color = {0, 0, 0},
+                rotation = {0, 0, 0},
+                width = 0,
+                height = 0,
+                font_size = 480,
+                function_owner = self,
+                click_function = "nullFunction"
+            }
+            local startX = -6.1
+            local offsetZ = 1.32
+
+            local startZ = -22.9
+            buttonParam.label = "[u]Game Type[/u]"
+            buttonParam.position = {0, 0.2, startZ - 1.4}
+            settingsPannel.createButton(buttonParam)
+            makeSquareButtonLabel(settingsPannel, options.gameType == 0, radio_string, "", "Original", "gameTypeZero", {startX, 0.2, startZ}, 2.45, not customOnly)
+            makeSquareButtonLabel(settingsPannel, options.gameType == 2, radio_string, "", "Custom", "gameTypeTwo", {startX, 0.2, startZ + offsetZ * 1}, 2.3, true)
+            makeDecIncButtonsLabel(settingsPannel, options.liberalCards, "-", "+", "Liberal Cards", "decLiberalCards", "incLiberalCards", {startX + 1.3, 0.2, startZ + offsetZ * 2}, 6.1, false, options.gameType == 2)
+            makeDecIncButtonsLabel(settingsPannel, options.fascistCards, "-", "+", "Fascist Cards", "decFascistCards", "incFascistCards", {startX + 1.3, 0.2, startZ + offsetZ * 3}, 6.1, false, options.gameType == 2)
+            makeDecIncButtonsLabel(settingsPannel, options.greyCards, "-", "+", "Grey Cards", "decGreyCards", "incGreyCards", {startX + 1.3, 0.2, startZ + offsetZ * 4}, 5.65, false, options.gameType == 2)
+
+            startZ = -14.5
+            buttonParam.label = "[u]Note Taker[/u]"
+            buttonParam.position = {0, 0.2, startZ - 1.4}
+            settingsPannel.createButton(buttonParam)
+            local labels = {"Dark wood", "Light wood (tintable)", "Red wood (tintable)", "Black plastic", "Board image", "Swiss cheese", "Private only", "Cooperative"}
+            local offsets = {4.4, 6.6, 6.3, 4.7, 4.7, 4.7, 4.6, 4.6}
+            makeDecIncButtonsLabel(settingsPannel, options.noteType, "-", "+", labels, "decNoteType", "incNoteType", {startX, 0.2, startZ}, offsets, false, true)
+
+            startZ = -11.6
+            buttonParam.label = "[u]Hidden Zones[/u]"
+            buttonParam.position = {0, 0.2, startZ - 1.4}
+            settingsPannel.createButton(buttonParam)
+            labels = {"None", "Small", "Gap (version 1)", "Gap (version 2)", "Large", "11-12 Players"}
+            offsets = {3.2, 3.3, 5.3, 5.35, 3.3, 4.8}
+            makeDecIncButtonsLabel(settingsPannel, options.zoneType, "-", "+", labels, "decZoneType", "incZoneType", {startX, 0.2, startZ}, offsets, false, options.zoneType ~= 6)
+
+            startZ = -8.5
+            buttonParam.label = "[u]Other Options[/u]"
+            buttonParam.position = {0, 0.2, startZ - 1.4}
+            settingsPannel.createButton(buttonParam)
+            makeSquareButtonLabel(settingsPannel, options.dealRoleCards, check_string, "", "Deal role", "roleCardFlip", {startX, 0.2, startZ}, 2.7, true)
+            makeSquareButtonLabel(settingsPannel, options.dealPartyCards, check_string, "", "Deal party membership", "partyCardFlip", {startX, 0.2, startZ + offsetZ}, 5.8, true)
+            makeSquareButtonLabel(settingsPannel, options.scriptedVoting, check_string, "", "Scripted voting", "scriptedVotingFlip", {startX, 0.2, startZ + offsetZ * 2}, 4, true)
+            makeSquareButtonLabel(settingsPannel, options.autoNotate, check_string, "", "Auto notate", "autoNotateFlip", {startX, 0.2, startZ + offsetZ * 3}, 3.4, true)
+
+            if (options.autoNotate) then
+                makeSmallSquareButtonLabel(settingsPannel, recordDownvotes, check_string, "", "Record Downvotes", "recdownFlip", {startX+7, 0.2, startZ + offsetZ * 3}, 3.5, true)
+            end
+
+            makeSquareButtonLabel(settingsPannel, options.selfClaim, check_string, "", "Self Claiming", "selfClaimFlip", {startX, 0.2, startZ + offsetZ * 4}, 3.6, true)
+            makeSquareButtonLabel(settingsPannel, options.policySafety, check_string, "", "Policy safety", "policySafetyFlip", {startX, 0.2, startZ + offsetZ * 5}, 3.5, true)
+            makeSquareButtonLabel(settingsPannel, options.voteHistory, check_string, "", "Vote history", "voteHistoryFlip", {startX, 0.2, startZ + offsetZ * 6}, 3.4, true)
+            makeSquareButtonLabel(settingsPannel, spawnTimer, check_string, "", "Timer On", "timerOnSwitch", {startX, 0.2, startZ + offsetZ * 7}, 2.8, true) --new
+
+            if (spawnTimer) then
+                local inputParams = { --scale = {0.1, 0.1, 0.1},
+                    rotation={0,0,0},
+                    height=200, width=400, font_size=175, validation=2,
+                }
+
+                --positions @@@
+                inputParams.input_function = "setTimerFreeTalkTimeNT"
+                inputParams.position = {0, 0.2, startZ + offsetZ * 7}
+                inputParams.value = freeTalkTimeNT
+                inputParams.tooltip = "the time where people can talk freely.\n(in seconds)"
+                settingsPannel.createInput(inputParams)
+
+                inputParams.label = ""
+                inputParams.input_function = "setTimerPresOnlyNT"
+                inputParams.position = {1, 0.2, startZ + offsetZ * 7}
+                inputParams.value = presOnlyTNT
+                inputParams.tooltip = "the number of second where it is pres only.\n(in seconds)"
+                settingsPannel.createInput(inputParams)
+
+                inputParams.label = ""
+                inputParams.input_function = "setTimerNumAddsNT"
+                inputParams.position = {2, 0.2, startZ + offsetZ * 7}
+                inputParams.value = maxAddsNT
+                inputParams.tooltip = "the number of times people can add seconds."
+                settingsPannel.createInput(inputParams)
+
+                inputParams.label = ""
+                inputParams.input_function = "setTimerAddTimeNT"
+                inputParams.position = {3, 0.2, startZ + offsetZ * 7}
+                inputParams.value = newAddTimeNT
+                inputParams.tooltip = "how much time is added when they add time.\n(in seconds)"
+                settingsPannel.createInput(inputParams)
+            end
+
+            makeSquareButtonLabel(settingsPannel, options.autoDrawConflicts, check_string, "", "Auto Conflict Lines", "autoDrawConflictsSwitch", {startX, 0.2, startZ + offsetZ * 8}, 4.9, true)
+            makeSquareButtonLabel(settingsPannel, options.autoNotHitler, check_string, "", "Auto Not Hitler", "autoNotHitlerSwitch", {startX, 0.2, startZ + offsetZ * 9}, 4.1, true)
+            makeSquareButtonLabel(settingsPannel, options.shufflePlayers, check_string, "", "Shuffle players", "shufflePlayersFlip", {startX, 0.2, startZ + offsetZ * 10}, 4, true)
+            makeSquareButtonLabel(settingsPannel, options.shuffleHost, check_string, "", "Shuffle host", "shuffleHostFlip", {startX + 1.3, 0.2, startZ + offsetZ * 11}, 3.3, options.shufflePlayers)
+            makeSquareButtonLabel(settingsPannel, options.nicholasRule, check_string, "", "Handsome Nicholas Rule", "nicholasFlip", {startX, 0.2, startZ + offsetZ * 12}, 6.1, true)
+            makeSquareButtonLabel(settingsPannel, options.omn1Rule, check_string, "", "Omn1 Rule - Mute on Death", "omn1Flip", {startX, 0.2, startZ + offsetZ * 13}, 6.8, true)
+            makeSquareButtonLabel(settingsPannel, options.richardRule, check_string, "", "Richard Rule", "richardFlip", {startX, 0.2, startZ + offsetZ * 14}, 3.7, true)
+
+            if (options.richardRule) then
+                local inputParams = { --scale = {0.2, 0.2, 0.2},
+                    rotation={0,0,0},
+                    height=300, width=600, font_size=250, validation=2,
+                }
+
+                --positions @@@
+                inputParams.input_function = "setTimerRichard"
+                inputParams.position = {1, 0.2, startZ + offsetZ * 14}
+                inputParams.value = timerRichard
+                inputParams.tooltip = "How much time the last voter gets"
+                settingsPannel.createInput(inputParams)
+            end
+
+            --Expansion
+            local abilitiesDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
+
+            if abilitiesDeck then
+                startZ = 3.7
+                buttonParam.label = "[u]Fan Expansion[/u]"
+                buttonParam.position = {0, 0.2, startZ - 1.4}
+                settingsPannel.createButton(buttonParam)
+                makeDecIncButtonsLabel(settingsPannel, options.expansionAmount, "-", "+", "Cards", "decExpansionAmount", "incExpansionAmount", {startX, 0.2, startZ}, 4.7, false, true)
+                makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 1) == 1, check_string, "", "Swap government", "expansionOptionEnabledSwapGov", {startX, 0.2, startZ + offsetZ}, 4.7, true)
+                makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 4) == 4, check_string, "", "Swap power", "expansionOptionEnabledSwapPower", {startX + 1.3, 0.2, startZ + offsetZ * 2}, 3.4, bit32.band(options.expansionOptionEnabled, 1) == 1)
+                makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 2) == 2, check_string, "", "Reverse", "expansionOptionEnabledReverse", {startX, 0.2, startZ + offsetZ * 3}, 2.4, true)
+                makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 8) == 8, check_string, "", "Setup power abilities", "expansionOptionEnabledSetupPowerAbilities", {startX, 0.2, startZ + offsetZ * 4}, 5.3, true)
+            end
+
+            buttonParam = {
+                click_function = "setupStart",
+                label = "Start",
+                function_owner = self,
+                position = {0, 0.2, 23.5},
+                rotation = {0, 0, 0},
+                width = 3300,
+                height = 1700,
+                font_size = 750
+            }
+            settingsPannel.createButton(buttonParam)
+        else
+            printToAll("ERROR: Settings pannel not found.", {1,0,0})
+        end
+    end
+
+    function makeSquareButtonLabel(objectIn, valueIn, trueButtonTextIn, falseButtonTextIn, labelTextIn, clickFunctionIn, buttonPositionIn, textOffsetIn, enabledIn)
+        local buttonParam = {
+            rotation = {0, 0, 0},
+            width = 600,
+            height = 600,
+            font_size = 480,
+            function_owner = self,
+            click_function = clickFunctionIn,
+            position = buttonPositionIn
+        }
+        local textParam = {
+            label = labelTextIn,
+            font_color = {0, 0, 0},
+            rotation = {0, 0, 0},
+            width = 0,
+            height = 0,
+            font_size = 480,
+            function_owner = self,
+            click_function = "nullFunction",
+            position = {buttonPositionIn[1] + textOffsetIn, buttonPositionIn[2], buttonPositionIn[3]}
+        }
+
+        if valueIn then
+            buttonParam.label = trueButtonTextIn
+        else
+            buttonParam.label = falseButtonTextIn
+        end
+
+        if not enabledIn then
+            buttonParam.click_function = "nullFunction"
+            buttonParam.color = stringColorToRGB("Grey")
+            buttonParam.font_color = {0.3, 0.3, 0.3}
+            textParam.font_color = {0.3, 0.3, 0.3}
+        end
+
+        objectIn.createButton(buttonParam)
+        objectIn.createButton(textParam)
+    end
+
+    --this is only used once because I'm lazy
+    function makeSmallSquareButtonLabel(objectIn, valueIn, trueButtonTextIn, falseButtonTextIn, labelTextIn, clickFunctionIn, buttonPositionIn, textOffsetIn, enabledIn)
+        local buttonParam = {
+            rotation = {0, 0, 0},
+            width = 500,
+            height = 500,
+            font_size = 330,
+            function_owner = self,
+            click_function = clickFunctionIn,
+            position = buttonPositionIn
+        }
+        local textParam = {
+            label = labelTextIn,
+            font_color = {0, 0, 0},
+            rotation = {0, 0, 0},
+            width = 0,
+            height = 0,
+            font_size = 330,
+            function_owner = self,
+            click_function = "nullFunction",
+            position = {buttonPositionIn[1] + textOffsetIn, buttonPositionIn[2], buttonPositionIn[3]}
+        }
+
+        if valueIn then
+            buttonParam.label = trueButtonTextIn
+        else
+            buttonParam.label = falseButtonTextIn
+        end
+
+        if not enabledIn then
+            buttonParam.click_function = "nullFunction"
+            buttonParam.color = stringColorToRGB("Grey")
+            buttonParam.font_color = {0.3, 0.3, 0.3}
+            textParam.font_color = {0.3, 0.3, 0.3}
+        end
+
+        objectIn.createButton(buttonParam)
+        objectIn.createButton(textParam)
+    end
+
+    function makeDecIncButtonsLabel(objectIn, valueIn, decButtonTextIn, incButtonTextIn, labelTextIn, decFunctionIn, incFunctionIn, positionIn, textOffsetIn, showValueIn, enabledIn)
         local buttonParam = {
             font_color = {0, 0, 0},
             rotation = {0, 0, 0},
@@ -2355,574 +2624,388 @@ function settingsPannelMakeButtons()
             function_owner = self,
             click_function = "nullFunction"
         }
-        local startX = -6.1
-        local offsetZ = 1.32
 
-        local startZ = -22.9
-        buttonParam.label = "[u]Game Type[/u]"
-        buttonParam.position = {0, 0.2, startZ - 1.4}
-        settingsPannel.createButton(buttonParam)
-        makeSquareButtonLabel(settingsPannel, options.gameType == 0, radio_string, "", "Original", "gameTypeZero", {startX, 0.2, startZ}, 2.45, not customOnly)
-        makeSquareButtonLabel(settingsPannel, options.gameType == 2, radio_string, "", "Custom", "gameTypeTwo", {startX, 0.2, startZ + offsetZ * 1}, 2.3, true)
-        makeDecIncButtonsLabel(settingsPannel, options.liberalCards, "-", "+", "Liberal Cards", "decLiberalCards", "incLiberalCards", {startX + 1.3, 0.2, startZ + offsetZ * 2}, 6.1, false, options.gameType == 2)
-        makeDecIncButtonsLabel(settingsPannel, options.fascistCards, "-", "+", "Fascist Cards", "decFascistCards", "incFascistCards", {startX + 1.3, 0.2, startZ + offsetZ * 3}, 6.1, false, options.gameType == 2)
-        makeDecIncButtonsLabel(settingsPannel, options.greyCards, "-", "+", "Grey Cards", "decGreyCards", "incGreyCards", {startX + 1.3, 0.2, startZ + offsetZ * 4}, 5.65, false, options.gameType == 2)
+        local valueOffset
 
-        startZ = -14.5
-        buttonParam.label = "[u]Note Taker[/u]"
-        buttonParam.position = {0, 0.2, startZ - 1.4}
-        settingsPannel.createButton(buttonParam)
-        local labels = {"Dark wood", "Light wood (tintable)", "Red wood (tintable)", "Black plastic", "Board image", "Swiss cheese", "Private only", "Cooperative"}
-        local offsets = {4.4, 6.6, 6.3, 4.7, 4.7, 4.7, 4.6, 4.6}
-        makeDecIncButtonsLabel(settingsPannel, options.noteType, "-", "+", labels, "decNoteType", "incNoteType", {startX, 0.2, startZ}, offsets, false, true)
-
-        startZ = -11.6
-        buttonParam.label = "[u]Hidden Zones[/u]"
-        buttonParam.position = {0, 0.2, startZ - 1.4}
-        settingsPannel.createButton(buttonParam)
-        labels = {"None", "Small", "Gap (version 1)", "Gap (version 2)", "Large", "11-12 Players"}
-        offsets = {3.2, 3.3, 5.3, 5.35, 3.3, 4.8}
-        makeDecIncButtonsLabel(settingsPannel, options.zoneType, "-", "+", labels, "decZoneType", "incZoneType", {startX, 0.2, startZ}, offsets, false, options.zoneType ~= 6)
-
-        startZ = -8.5
-        buttonParam.label = "[u]Other Options[/u]"
-        buttonParam.position = {0, 0.2, startZ - 1.4}
-        settingsPannel.createButton(buttonParam)
-        makeSquareButtonLabel(settingsPannel, options.dealRoleCards, check_string, "", "Deal role", "roleCardFlip", {startX, 0.2, startZ}, 2.7, true)
-        makeSquareButtonLabel(settingsPannel, options.dealPartyCards, check_string, "", "Deal party membership", "partyCardFlip", {startX, 0.2, startZ + offsetZ}, 5.8, true)
-        makeSquareButtonLabel(settingsPannel, options.scriptedVoting, check_string, "", "Scripted voting", "scriptedVotingFlip", {startX, 0.2, startZ + offsetZ * 2}, 4, true)
-        makeSquareButtonLabel(settingsPannel, options.autoNotate, check_string, "", "Auto notate", "autoNotateFlip", {startX, 0.2, startZ + offsetZ * 3}, 3.4, true)
-        if (options.autoNotate) then
-            makeSmallSquareButtonLabel(settingsPannel, recordDownvotes, check_string, "", "Record Downvotes", "recdownFlip", {startX+7, 0.2, startZ + offsetZ * 3}, 3.5, true)
-        end
-        makeSquareButtonLabel(settingsPannel, options.selfClaim, check_string, "", "Self Claiming", "selfClaimFlip", {startX, 0.2, startZ + offsetZ * 4}, 3.6, true)
-        makeSquareButtonLabel(settingsPannel, options.policySafety, check_string, "", "Policy safety", "policySafetyFlip", {startX, 0.2, startZ + offsetZ * 5}, 3.5, true)
-        makeSquareButtonLabel(settingsPannel, options.voteHistory, check_string, "", "Vote history", "voteHistoryFlip", {startX, 0.2, startZ + offsetZ * 6}, 3.4, true)
-        makeSquareButtonLabel(settingsPannel, spawnTimer, check_string, "", "Timer On", "timerOnSwitch", {startX, 0.2, startZ + offsetZ * 7}, 2.8, true) --new
-        if (spawnTimer) then
-            local inputParams = { --scale = {0.1, 0.1, 0.1},
-                 rotation={0,0,0},
-                height=200, width=400, font_size=175, validation=2,
-            }
-
-            --positions @@@
-            inputParams.input_function = "setTimerFreeTalkTimeNT"
-            inputParams.position = {0, 0.2, startZ + offsetZ * 7}
-            inputParams.value = freeTalkTimeNT
-            inputParams.tooltip = "the time where people can talk freely.\n(in seconds)"
-            settingsPannel.createInput(inputParams)
-
-            inputParams.label = ""
-            inputParams.input_function = "setTimerPresOnlyNT"
-            inputParams.position = {1, 0.2, startZ + offsetZ * 7}
-            inputParams.value = presOnlyTNT
-            inputParams.tooltip = "the number of second where it is pres only.\n(in seconds)"
-            settingsPannel.createInput(inputParams)
-
-            inputParams.label = ""
-            inputParams.input_function = "setTimerNumAddsNT"
-            inputParams.position = {2, 0.2, startZ + offsetZ * 7}
-            inputParams.value = maxAddsNT
-            inputParams.tooltip = "the number of times people can add seconds."
-            settingsPannel.createInput(inputParams)
-
-            inputParams.label = ""
-            inputParams.input_function = "setTimerAddTimeNT"
-            inputParams.position = {3, 0.2, startZ + offsetZ * 7}
-            inputParams.value = newAddTimeNT
-            inputParams.tooltip = "how much time is added when they add time.\n(in seconds)"
-            settingsPannel.createInput(inputParams)
-        end
-        makeSquareButtonLabel(settingsPannel, options.autoDrawConflicts, check_string, "", "Auto Conflict Lines", "autoDrawConflictsSwitch", {startX, 0.2, startZ + offsetZ * 8}, 4.9, true)
-        makeSquareButtonLabel(settingsPannel, options.autoNotHitler, check_string, "", "Auto Not Hitler", "autoNotHitlerSwitch", {startX, 0.2, startZ + offsetZ * 9}, 4.1, true)
-        makeSquareButtonLabel(settingsPannel, options.shufflePlayers, check_string, "", "Shuffle players", "shufflePlayersFlip", {startX, 0.2, startZ + offsetZ * 10}, 4, true)
-        makeSquareButtonLabel(settingsPannel, options.shuffleHost, check_string, "", "Shuffle host", "shuffleHostFlip", {startX + 1.3, 0.2, startZ + offsetZ * 11}, 3.3, options.shufflePlayers)
-        makeSquareButtonLabel(settingsPannel, options.nicholasRule, check_string, "", "Handsome Nicholas Rule", "nicholasFlip", {startX, 0.2, startZ + offsetZ * 12}, 6.1, true)
-        makeSquareButtonLabel(settingsPannel, options.omn1Rule, check_string, "", "Omn1 Rule - Mute on Death", "omn1Flip", {startX, 0.2, startZ + offsetZ * 13}, 6.8, true)
-        makeSquareButtonLabel(settingsPannel, options.richardRule, check_string, "", "Richard Rule", "richardFlip", {startX, 0.2, startZ + offsetZ * 14}, 3.7, true)
-        if (options.richardRule) then
-            local inputParams = { --scale = {0.2, 0.2, 0.2},
-                 rotation={0,0,0},
-                height=300, width=600, font_size=250, validation=2,
-            }
-
-            --positions @@@
-            inputParams.input_function = "setTimerRichard"
-            inputParams.position = {1, 0.2, startZ + offsetZ * 14}
-            inputParams.value = timerRichard
-            inputParams.tooltip = "How much time the last voter gets"
-            settingsPannel.createInput(inputParams)
-
+        if type(labelTextIn) == "table" then
+            valueOffset = 0
+            buttonParam.label = labelTextIn[valueIn]
+            buttonParam.position = {positionIn[1] + textOffsetIn[valueIn], positionIn[2], positionIn[3]}
+        else
+            valueOffset = 1.3
+            buttonParam.label = labelTextIn
+            buttonParam.position = {positionIn[1] + textOffsetIn, positionIn[2], positionIn[3]}
         end
 
-        --Expansion
-        local abilitiesDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
-        if abilitiesDeck then
-            startZ = 3.7
-            buttonParam.label = "[u]Fan Expansion[/u]"
-            buttonParam.position = {0, 0.2, startZ - 1.4}
-            settingsPannel.createButton(buttonParam)
-            makeDecIncButtonsLabel(settingsPannel, options.expansionAmount, "-", "+", "Cards", "decExpansionAmount", "incExpansionAmount", {startX, 0.2, startZ}, 4.7, false, true)
-            makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 1) == 1, check_string, "", "Swap government", "expansionOptionEnabledSwapGov", {startX, 0.2, startZ + offsetZ}, 4.7, true)
-            makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 4) == 4, check_string, "", "Swap power", "expansionOptionEnabledSwapPower", {startX + 1.3, 0.2, startZ + offsetZ * 2}, 3.4, bit32.band(options.expansionOptionEnabled, 1) == 1)
-            makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 2) == 2, check_string, "", "Reverse", "expansionOptionEnabledReverse", {startX, 0.2, startZ + offsetZ * 3}, 2.4, true)
-            makeSquareButtonLabel(settingsPannel, bit32.band(options.expansionOptionEnabled, 8) == 8, check_string, "", "Setup power abilities", "expansionOptionEnabledSetupPowerAbilities", {startX, 0.2, startZ + offsetZ * 4}, 5.3, true)
+        if not enabledIn then
+            buttonParam.font_color = {0.3, 0.3, 0.3}
         end
 
-        buttonParam = {
-            click_function = "setupStart",
-            label = "Start",
-            function_owner = self,
-            position = {0, 0.2, 23.5},
-            rotation = {0, 0, 0},
-            width = 3300,
-            height = 1700,
-            font_size = 750
-        }
-        settingsPannel.createButton(buttonParam)
-    else
-        printToAll("ERROR: Settings pannel not found.", {1,0,0})
-    end
-end
+        objectIn.createButton(buttonParam)
 
-function makeSquareButtonLabel(objectIn, valueIn, trueButtonTextIn, falseButtonTextIn, labelTextIn, clickFunctionIn, buttonPositionIn, textOffsetIn, enabledIn)
-    local buttonParam = {
-        rotation = {0, 0, 0},
-        width = 600,
-        height = 600,
-        font_size = 480,
-        function_owner = self,
-        click_function = clickFunctionIn,
-        position = buttonPositionIn
-    }
-    local textParam = {
-        label = labelTextIn,
-        font_color = {0, 0, 0},
-        rotation = {0, 0, 0},
-        width = 0,
-        height = 0,
-        font_size = 480,
-        function_owner = self,
-        click_function = "nullFunction",
-        position = {buttonPositionIn[1] + textOffsetIn, buttonPositionIn[2], buttonPositionIn[3]}
-    }
-    if valueIn then
-        buttonParam.label = trueButtonTextIn
-    else
-        buttonParam.label = falseButtonTextIn
-    end
-    if not enabledIn then
-        buttonParam.click_function = "nullFunction"
-        buttonParam.color = stringColorToRGB("Grey")
-        buttonParam.font_color = {0.3, 0.3, 0.3}
-        textParam.font_color = {0.3, 0.3, 0.3}
-    end
-    objectIn.createButton(buttonParam)
-    objectIn.createButton(textParam)
-end
+        if not enabledIn then
+            buttonParam.color = stringColorToRGB("Grey")
+        end
 
---this is only used once because I'm lazy
-function makeSmallSquareButtonLabel(objectIn, valueIn, trueButtonTextIn, falseButtonTextIn, labelTextIn, clickFunctionIn, buttonPositionIn, textOffsetIn, enabledIn)
-    local buttonParam = {
-        rotation = {0, 0, 0},
-        width = 500,
-        height = 500,
-        font_size = 330,
-        function_owner = self,
-        click_function = clickFunctionIn,
-        position = buttonPositionIn
-    }
-    local textParam = {
-        label = labelTextIn,
-        font_color = {0, 0, 0},
-        rotation = {0, 0, 0},
-        width = 0,
-        height = 0,
-        font_size = 330,
-        function_owner = self,
-        click_function = "nullFunction",
-        position = {buttonPositionIn[1] + textOffsetIn, buttonPositionIn[2], buttonPositionIn[3]}
-    }
-    if valueIn then
-        buttonParam.label = trueButtonTextIn
-    else
-        buttonParam.label = falseButtonTextIn
-    end
-    if not enabledIn then
-        buttonParam.click_function = "nullFunction"
-        buttonParam.color = stringColorToRGB("Grey")
-        buttonParam.font_color = {0.3, 0.3, 0.3}
-        textParam.font_color = {0.3, 0.3, 0.3}
-    end
-    objectIn.createButton(buttonParam)
-    objectIn.createButton(textParam)
-end
+        buttonParam.label = decButtonTextIn
+        buttonParam.position = positionIn
+        buttonParam.width = 600
+        buttonParam.height = 600
 
-function makeDecIncButtonsLabel(objectIn, valueIn, decButtonTextIn, incButtonTextIn, labelTextIn, decFunctionIn, incFunctionIn, positionIn, textOffsetIn, showValueIn, enabledIn)
-    local buttonParam = {
-        font_color = {0, 0, 0},
-        rotation = {0, 0, 0},
-        width = 0,
-        height = 0,
-        font_size = 480,
-        function_owner = self,
-        click_function = "nullFunction"
-    }
+        if enabledIn then
+            buttonParam.click_function = decFunctionIn
+        end
 
-    local valueOffset
-    if type(labelTextIn) == "table" then
-        valueOffset = 0
-        buttonParam.label = labelTextIn[valueIn]
-        buttonParam.position = {positionIn[1] + textOffsetIn[valueIn], positionIn[2], positionIn[3]}
-    else
-        valueOffset = 1.3
-        buttonParam.label = labelTextIn
-        buttonParam.position = {positionIn[1] + textOffsetIn, positionIn[2], positionIn[3]}
-    end
-    if not enabledIn then
-        buttonParam.font_color = {0.3, 0.3, 0.3}
-    end
-    objectIn.createButton(buttonParam)
+        objectIn.createButton(buttonParam)
 
-    if not enabledIn then
-        buttonParam.color = stringColorToRGB("Grey")
-    end
-    buttonParam.label = decButtonTextIn
-    buttonParam.position = positionIn
-    buttonParam.width = 600
-    buttonParam.height = 600
-    if enabledIn then
-        buttonParam.click_function = decFunctionIn
-    end
-    objectIn.createButton(buttonParam)
+        buttonParam.label = incButtonTextIn
+        buttonParam.position = {positionIn[1] + 1.3 + valueOffset, positionIn[2], positionIn[3]}
 
-    buttonParam.label = incButtonTextIn
-    buttonParam.position = {positionIn[1] + 1.3 + valueOffset, positionIn[2], positionIn[3]}
-    if enabledIn then
-        buttonParam.click_function = incFunctionIn
-    end
-    objectIn.createButton(buttonParam)
-
-    if valueOffset > 0 then
-        buttonParam.label = valueIn
         if enabledIn then
             buttonParam.click_function = incFunctionIn
         end
-        buttonParam.position = {positionIn[1] + valueOffset, positionIn[2], positionIn[3]}
+
         objectIn.createButton(buttonParam)
-    end
-end
 
-function gameTypeZero(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.gameType = 0
-        options.fascistCards = 11
-        options.liberalCards = 6
-        options.greyCards = 0
-        refreshBoardCards()
-        settingsPannelMakeButtons()
-    end
-end
+        if valueOffset > 0 then
+            buttonParam.label = valueIn
 
-function gameTypeTwo(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.gameType = 2
-        refreshBoardCards()
-        settingsPannelMakeButtons()
-    end
-end
+            if enabledIn then
+                buttonParam.click_function = incFunctionIn
+            end
 
-function decNoteType(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.noteType > 1 then
-            options.noteType = options.noteType - 1
+            buttonParam.position = {positionIn[1] + valueOffset, positionIn[2], positionIn[3]}
+            objectIn.createButton(buttonParam)
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function incNoteType(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.noteType < 8 then
-            options.noteType = options.noteType + 1
+    function gameTypeZero(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.gameType = 0
+            options.fascistCards = 11
+            options.liberalCards = 6
+            options.greyCards = 0
+            refreshBoardCards()
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function decZoneType(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.zoneType > 1 then
-            options.zoneType = options.zoneType - 1
+    function gameTypeTwo(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.gameType = 2
+            refreshBoardCards()
+            settingsPannelMakeButtons()
         end
-        refreshHiddenZones()
-        settingsPannelMakeButtons()
     end
-end
 
-function incZoneType(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.zoneType < 6 then
-            options.zoneType = options.zoneType + 1
+    function decNoteType(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.noteType > 1 then
+                options.noteType = options.noteType - 1
+            end
+
+            settingsPannelMakeButtons()
         end
-        refreshHiddenZones()
-        settingsPannelMakeButtons()
     end
-end
 
-function roleCardFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.dealRoleCards = not options.dealRoleCards
-        settingsPannelMakeButtons()
-    end
-end
+    function incNoteType(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.noteType < 8 then
+                options.noteType = options.noteType + 1
+            end
 
-function partyCardFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.dealPartyCards = not options.dealPartyCards
-        settingsPannelMakeButtons()
-    end
-end
-
-function scriptedVotingFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.scriptedVoting = not options.scriptedVoting
-        settingsPannelMakeButtons()
-    end
-end
-
-function autoNotateFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.autoNotate = not options.autoNotate
-        settingsPannelMakeButtons()
-    end
-end
-
-function selfClaimFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.selfClaim = not options.selfClaim
-        settingsPannelMakeButtons()
-    end
-end
-
-function recdownFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        recordDownvotes = not recordDownvotes
-        settingsPannelMakeButtons()
-    end
-end
-
-function policySafetyFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.policySafety = not options.policySafety
-        settingsPannelMakeButtons()
-    end
-end
-
-function voteHistoryFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.voteHistory = not options.voteHistory
-        settingsPannelMakeButtons()
-    end
-end
-
-function timerOnSwitch(obj, color)
-    if Player[color].admin then
-        spawnTimer = not spawnTimer
-        settingsPannelMakeButtons()
-    end
-end
-
-function autoDrawConflictsSwitch(obj, color)
-    if Player[color].admin then
-        options.autoDrawConflicts = not options.autoDrawConflicts
-        settingsPannelMakeButtons()
-    end
-end
-
-function autoNotHitlerSwitch(obj, color)
-    if Player[color].admin then
-        options.autoNotHitler = not options.autoNotHitler
-        settingsPannelMakeButtons()
-    end
-end
-
-function shufflePlayersFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.shufflePlayers = not options.shufflePlayers
-        settingsPannelMakeButtons()
-    end
-end
-
-function shuffleHostFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.shuffleHost = not options.shuffleHost
-        settingsPannelMakeButtons()
-    end
-end
-
-function nicholasFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.nicholasRule = not options.nicholasRule
-        settingsPannelMakeButtons()
-    end
-end
-
-function omn1Flip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.omn1Rule = not options.omn1Rule
-        settingsPannelMakeButtons()
-    end
-end
-
-function richardFlip(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        options.richardRule = not options.richardRule
-        settingsPannelMakeButtons()
-    end
-end
-
-function expansionOptionEnabledSwapGov(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if bit32.band(options.expansionOptionEnabled, 1) == 1 then
-            options.expansionOptionEnabled = options.expansionOptionEnabled - 1
-        else
-            options.expansionOptionEnabled = options.expansionOptionEnabled + 1
+            settingsPannelMakeButtons()
         end
-        refreshExpansionButtons()
-        settingsPannelMakeButtons()
     end
-end
 
-function expansionOptionEnabledReverse(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if bit32.band(options.expansionOptionEnabled, 2) == 2 then
-            options.expansionOptionEnabled = options.expansionOptionEnabled - 2
-        else
-            options.expansionOptionEnabled = options.expansionOptionEnabled + 2
+    function decZoneType(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.zoneType > 1 then
+                options.zoneType = options.zoneType - 1
+            end
+
+            refreshHiddenZones()
+            settingsPannelMakeButtons()
         end
-        refreshExpansionButtons()
-        settingsPannelMakeButtons()
     end
-end
 
-function expansionOptionEnabledSwapPower(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if bit32.band(options.expansionOptionEnabled, 4) == 4 then
-            options.expansionOptionEnabled = options.expansionOptionEnabled - 4
-        else
-            options.expansionOptionEnabled = options.expansionOptionEnabled + 4
+    function incZoneType(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.zoneType < 6 then
+                options.zoneType = options.zoneType + 1
+            end
+
+            refreshHiddenZones()
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function expansionOptionEnabledSetupPowerAbilities(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if bit32.band(options.expansionOptionEnabled, 8) == 8 then
-            options.expansionOptionEnabled = options.expansionOptionEnabled - 8
-        else
-            options.expansionOptionEnabled = options.expansionOptionEnabled + 8
+    function roleCardFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.dealRoleCards = not options.dealRoleCards
+            settingsPannelMakeButtons()
         end
-        refreshExpansionButtons()
-        settingsPannelMakeButtons()
     end
-end
 
-function expansionOptionStatusSwapGov(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if bit32.band(options.expansionOptionStatus, 1) == 1 then
-            options.expansionOptionStatus = options.expansionOptionStatus - 1
-        else
-            options.expansionOptionStatus = options.expansionOptionStatus + 1
+    function partyCardFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.dealPartyCards = not options.dealPartyCards
+            settingsPannelMakeButtons()
         end
-        refreshExpansionButtons()
     end
-end
 
-function expansionOptionStatusReverse(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if bit32.band(options.expansionOptionStatus, 2) == 2 then
-            options.expansionOptionStatus = options.expansionOptionStatus - 2
-        else
-            options.expansionOptionStatus = options.expansionOptionStatus + 2
+    function scriptedVotingFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.scriptedVoting = not options.scriptedVoting
+            settingsPannelMakeButtons()
         end
-        refreshExpansionButtons()
     end
-end
 
-function decLiberalCards(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.liberalCards > 5 then
-            options.liberalCards = options.liberalCards - 1
+    function autoNotateFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.autoNotate = not options.autoNotate
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function incLiberalCards(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.liberalCards < 8 then
-            options.liberalCards = options.liberalCards + 1
+    function selfClaimFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.selfClaim = not options.selfClaim
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function decFascistCards(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.fascistCards > 10 then
-            options.fascistCards = options.fascistCards - 1
+    function recdownFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            recordDownvotes = not recordDownvotes
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function incFascistCards(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.fascistCards < 15 then
-            options.fascistCards = options.fascistCards + 1
+    function policySafetyFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.policySafety = not options.policySafety
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function decGreyCards(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.greyCards > 0 then
-            options.greyCards = options.greyCards - 1
+    function voteHistoryFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.voteHistory = not options.voteHistory
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function incGreyCards(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.greyCards < 2 then
-            options.greyCards = options.greyCards + 1
+    function timerOnSwitch(obj, color)
+        if Player[color].admin then
+            spawnTimer = not spawnTimer
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function decExpansionAmount(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.expansionAmount > 0 then
-            options.expansionAmount = options.expansionAmount - 1
+    function autoDrawConflictsSwitch(obj, color)
+        if Player[color].admin then
+            options.autoDrawConflicts = not options.autoDrawConflicts
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
-function incExpansionAmount(clickedObject, playerColor)
-    if Player[playerColor].admin then
-        if options.expansionAmount < 4 then
-            options.expansionAmount = options.expansionAmount + 1
+    function autoNotHitlerSwitch(obj, color)
+        if Player[color].admin then
+            options.autoNotHitler = not options.autoNotHitler
+            settingsPannelMakeButtons()
         end
-        settingsPannelMakeButtons()
     end
-end
 
+    function shufflePlayersFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.shufflePlayers = not options.shufflePlayers
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function shuffleHostFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.shuffleHost = not options.shuffleHost
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function nicholasFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.nicholasRule = not options.nicholasRule
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function omn1Flip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.omn1Rule = not options.omn1Rule
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function richardFlip(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            options.richardRule = not options.richardRule
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function expansionOptionEnabledSwapGov(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if bit32.band(options.expansionOptionEnabled, 1) == 1 then
+                options.expansionOptionEnabled = options.expansionOptionEnabled - 1
+            else
+                options.expansionOptionEnabled = options.expansionOptionEnabled + 1
+            end
+
+            refreshExpansionButtons()
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function expansionOptionEnabledReverse(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if bit32.band(options.expansionOptionEnabled, 2) == 2 then
+                options.expansionOptionEnabled = options.expansionOptionEnabled - 2
+            else
+                options.expansionOptionEnabled = options.expansionOptionEnabled + 2
+            end
+
+            refreshExpansionButtons()
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function expansionOptionEnabledSwapPower(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if bit32.band(options.expansionOptionEnabled, 4) == 4 then
+                options.expansionOptionEnabled = options.expansionOptionEnabled - 4
+            else
+                options.expansionOptionEnabled = options.expansionOptionEnabled + 4
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function expansionOptionEnabledSetupPowerAbilities(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if bit32.band(options.expansionOptionEnabled, 8) == 8 then
+                options.expansionOptionEnabled = options.expansionOptionEnabled - 8
+            else
+                options.expansionOptionEnabled = options.expansionOptionEnabled + 8
+            end
+
+            refreshExpansionButtons()
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function expansionOptionStatusSwapGov(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if bit32.band(options.expansionOptionStatus, 1) == 1 then
+                options.expansionOptionStatus = options.expansionOptionStatus - 1
+            else
+                options.expansionOptionStatus = options.expansionOptionStatus + 1
+            end
+
+            refreshExpansionButtons()
+        end
+    end
+
+    function expansionOptionStatusReverse(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if bit32.band(options.expansionOptionStatus, 2) == 2 then
+                options.expansionOptionStatus = options.expansionOptionStatus - 2
+            else
+                options.expansionOptionStatus = options.expansionOptionStatus + 2
+            end
+
+            refreshExpansionButtons()
+        end
+    end
+
+    function decLiberalCards(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.liberalCards > 5 then
+                options.liberalCards = options.liberalCards - 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function incLiberalCards(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.liberalCards < 8 then
+                options.liberalCards = options.liberalCards + 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function decFascistCards(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.fascistCards > 10 then
+                options.fascistCards = options.fascistCards - 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function incFascistCards(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.fascistCards < 15 then
+                options.fascistCards = options.fascistCards + 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function decGreyCards(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.greyCards > 0 then
+                options.greyCards = options.greyCards - 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function incGreyCards(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.greyCards < 2 then
+                options.greyCards = options.greyCards + 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function decExpansionAmount(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.expansionAmount > 0 then
+                options.expansionAmount = options.expansionAmount - 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
+
+    function incExpansionAmount(clickedObject, playerColor)
+        if Player[playerColor].admin then
+            if options.expansionAmount < 4 then
+                options.expansionAmount = options.expansionAmount + 1
+            end
+
+            settingsPannelMakeButtons()
+        end
+    end
 end
 
 --adds a ja card to the list of ja card guids
@@ -3004,20 +3087,23 @@ function displayBannerCardsCoroutine()
 end
 
 function unmuteAll()
-    if not bolSilenced then return "" end
+    if not bolSilenced then
+        return ""
+    end
 
     bolSilenced = false
 
     for _,playerColor in ipairs(getSeatedPlayers()) do
         tempSteamID = Player[playerColor].steam_id
-        if silenced[tempSteamID] ~= nil then Player[playerColor].mute() end
+
+        if silenced[tempSteamID] ~= nil then
+            Player[playerColor].mute()
+        end
     end
     
     for k in pairs(silenced) do
         silenced[k] = nil
     end
-
-    
 end
 
 
@@ -3038,6 +3124,7 @@ function displayBannerCard(card, offset, bannerGuidsOffset)
     bannerCard[2].setRotation({90, 0, 0})
     bannerCard[3].setRotation({90, 270, 0})
     bannerCard[4].setRotation({90, 90, 0})
+
     for i, j in ipairs(bannerCard) do
         bannerCard[i].setScale({13, 0, 13})
         bannerCard[i].setLock(true)
@@ -3048,21 +3135,26 @@ end
 
 function boardCardHandler(card)
     local powerHolder = lastPres
+
     if bit32.band(options.expansionOptionEnabled, 4) == 4 and bit32.band(options.expansionOptionStatus, 1) == 1 then
         powerHolder = lastChan
     end
+
     if powerHolder then
         if isBoardCardInspect(card) then
             --expansion
             local abilitiesDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
+
             if abilitiesDeck then
                 broadcastToAll("Delaying inspect 5 seconds...", {1,1,1})
                 sleep(5)
             end
+
             if not options.dealPartyCards then
                 createInspectButtons(powerHolder)
                 claimShows[getPres()] = 3
             end
+
             if options.autoNotate then
                 notateInfo(powerHolder, "inspects", "", "", true)
             end
@@ -3073,24 +3165,28 @@ function boardCardHandler(card)
         elseif isBoardCardBullet(card) then
             giveBullet(powerHolder)
             bulletInfo.shooterColor = powerHolder
+
             if options.autoNotate then
                 notateInfo(powerHolder, string.lower(bulletInfo.action), "", "", true)
             end
         elseif isBoardCardImprison(card) then
             giveImprison(powerHolder)
             imprisonInfo.shooterColor = powerHolder
+
             if options.autoNotate then
                 notateInfo(powerHolder, string.lower(imprisonInfo.action), "", "", true)
             end
         elseif isBoardCardTopCard(card) then
             smartBroadcastToColor("Examine the top card from the deck and put it back in the draw pile.", powerHolder, {1, 1, 1})
             drawCards(1, powerHolder)
+
             if options.autoNotate then
                 notateInfo(powerHolder, "examines deck:", "", "", false)
             end
         elseif isBoardCardTopThree(card) then
             smartBroadcastToColor("Examine the top three cards from the deck and put them back in the draw pile (right to left to keep the order).", powerHolder, {1, 1, 1})
             drawCards(3, powerHolder)
+
             if options.autoNotate then
                 notateInfo(powerHolder, "examines deck:", "", "", false)
             end
@@ -3104,6 +3200,7 @@ function boardCardHandler(card)
             local saveForcePres = forcePres
             forcePres = nil
             movePlacards(powerHolder, true)
+
             if saveForcePres then
                 forcePres = saveForcePres
             else
@@ -3117,11 +3214,13 @@ end
 
 function nextPres(playerIn)
     local nextList
+
     if bit32.band(options.expansionOptionStatus, 2) == 2 then
         nextList = {White = "Maroon", Brown = "White", Red = "Brown", Orange = "Red", Yellow = "Orange", Green = "Yellow", Teal = "Green", Blue = "Teal", Purple = "Blue", Pink = "Purple", Tan = "Pink", Maroon = "Tan"}
     else
         nextList = {White = "Brown", Brown = "Red", Red = "Orange", Orange = "Yellow", Yellow = "Green", Green = "Teal", Teal = "Blue", Blue = "Purple", Purple = "Pink", Pink = "Tan", Tan = "Maroon", Maroon = "White"}
     end
+
     local checkPres = playerIn
     local returnVal = nextList[checkPres]
 
@@ -3134,12 +3233,12 @@ function nextPres(playerIn)
 end
 
 function movePlacards(playerIn, returnVoteCards)
-
-  timeSinceUV = os.time()
-  getObjectFromGUID("303db7").Clock.startStopwatch()
-  getObjectFromGUID("68faa0").Clock.startStopwatch()
+    timeSinceUV = os.time()
+    getObjectFromGUID("303db7").Clock.startStopwatch()
+    getObjectFromGUID("68faa0").Clock.startStopwatch()
 
     local moveToPlayer = playerIn
+
     if forcePres then
         moveToPlayer = forcePres
         forcePres = nil
@@ -3157,9 +3256,16 @@ function movePlacards(playerIn, returnVoteCards)
 
     local tmpPres = getObjectFromGUID(PRESIDENT_GUID)
     tmpPres.setVar("lastPres", moveToPlayer)
-    if tmpPres then giveObjectToPlayer(tmpPres, moveToPlayer, {forward = 11, right = 0, up = 0, forceHeight = 2.2}, NO_ROT, false, false) end
+
+    if tmpPres then
+        giveObjectToPlayer(tmpPres, moveToPlayer, {forward = 11, right = 0, up = 0, forceHeight = 2.2}, NO_ROT, false, false)
+    end
+
     local tmpChan = getObjectFromGUID(CHANCELOR_GUID)
-    if tmpChan then giveObjectToPlayer(tmpChan, moveToPlayer, {forward = 11, right = 0, up = 0, forceHeight = 2.8}, NO_ROT, false, false) end
+
+    if tmpChan then
+        giveObjectToPlayer(tmpChan, moveToPlayer, {forward = 11, right = 0, up = 0, forceHeight = 2.8}, NO_ROT, false, false)
+    end
 end
 
 function giveBullet(playerIn)
@@ -3167,13 +3273,10 @@ function giveBullet(playerIn)
 end
 
 function markDead(tableIn)
-
-
-
     if type(tableIn) == "table" then
         local victimColor = closestPlayer(tableIn[1], players, 18)
-        if victimColor and victimColor ~= bulletInfo.shooterColor then
 
+        if victimColor and victimColor ~= bulletInfo.shooterColor then
             timeOfPlay = math.floor(os.time()-timeSinceUV)
             timeOfPlayM = math.floor(timeOfPlay/60)
             timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
@@ -3185,6 +3288,7 @@ function markDead(tableIn)
             else
                 broadcastToAll("Time to Shoot: " .. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds")
             end
+
             timeSinceUV = os.time()
             getObjectFromGUID("303db7").Clock.startStopwatch()
             getObjectFromGUID("68faa0").Clock.startStopwatch()
@@ -3200,6 +3304,7 @@ function markDead(tableIn)
             _G.playerStatus[victimColor] = 5
             refreshStatusButtons()
             Wait.time(function() tableIn[1].setLock(true) end, 2)
+
             if options.autoNotate then
                 if notate.line and notate.action == string.lower(bulletInfo.action) then
                     notateColor2ByObject(tableIn)
@@ -3230,11 +3335,13 @@ end
 function markImprisoned(tableIn)
     if type(tableIn) == "table" then
         local victimColor = closestPlayer(tableIn[1], players, 18)
+
         if victimColor and victimColor ~= imprisonInfo.shooterColor then
             imprisonInfo.shooterColor = nil
             _G.playerStatus[victimColor] = 7
             refreshStatusButtons()
             Wait.time(function() tableIn[1].setLock(true) end, 2)
+
             if options.autoNotate then
                 if notate.line and notate.action == string.lower(imprisonInfo.action) then
                     notateColor2ByObject(tableIn)
@@ -3269,9 +3376,11 @@ function giveBulletImprison(playerIn, itemInfo, funcName)
             "   Global.call('" .. funcName .. "', {self})\r\n" ..
             "end\r\n")
     wait(5)
+
     if (bulletsToDelete == nil) then
         bulletsToDelete = {}
     end
+
     table.insert(bulletsToDelete, item.guid)
     item.setPosition({0, 30, 0})
     giveObjectToPlayer(item, playerIn, {forward = 20, right = 0, up = 0, forceHeight = 6}, NO_ROT)
@@ -3282,6 +3391,7 @@ function createPolicyCardWait()
     if policyWaitId then
         Wait.stop(policyWaitId)
     end
+
     policyWaitId = Wait.time(function() startPolicyCardCheck() end, 1)
 end
 
@@ -3289,6 +3399,7 @@ function startPolicyCardCheck()
     if (started ~= true) then
         return false
     end
+
     if not Global.getVar("hold") then
         Global.setVar("hold", true)
         startLuaCoroutine(Global, "policyCardCoroutine")
@@ -3302,6 +3413,7 @@ function policyCardCoroutine()
 
     local homeTracker = function()
         local tracker = getObjectFromGUID(ELECTION_TRACKER_GUID)
+
         if tracker then
             if bolTD then
                 tracker.setPositionSmooth(electionTrackerNichPos)
@@ -3309,6 +3421,7 @@ function policyCardCoroutine()
             else
                 tracker.setPositionSmooth(electionTrackerOrgPos)
             end
+
             tracker.setRotationSmooth({0, 315, 0})
         end
     end
@@ -3316,19 +3429,29 @@ function policyCardCoroutine()
     local movePrevPlacards = function()
         if lastPres and lastChan then
             local tmpPres = getObjectFromGUID(PREV_PRESIDENT_GUID)
-            if tmpPres then giveObjectToPlayer(tmpPres, lastPres, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, false) end
+
+            if tmpPres then
+                giveObjectToPlayer(tmpPres, lastPres, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, false)
+            end
+
             local tmpChan = getObjectFromGUID(PREV_CHANCELOR_GUID)
-            if tmpChan then giveObjectToPlayer(tmpChan, lastChan, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, false) end
+
+            if tmpChan then
+                giveObjectToPlayer(tmpChan, lastChan, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, false)
+            end
         end
     end
 
     local homePrevPlacards = function()
         local tmpPres = getObjectFromGUID(PREV_PRESIDENT_GUID)
+
         if tmpPres then
             tmpPres.setRotationSmooth(PREV_PRESIDENT_ROT, false, false)
             tmpPres.setPositionSmooth(PREV_PRESIDENT_POS, false, false)
         end
+
         local tmpChan = getObjectFromGUID(PREV_CHANCELOR_GUID)
+
         if tmpChan then
             tmpChan.setRotationSmooth(PREV_CHANCELOR_ROT, false, false)
             tmpChan.setPositionSmooth(PREV_CHANCELOR_POS, false, false)
@@ -3348,12 +3471,14 @@ function policyCardCoroutine()
     -- protect the cards
     if #cardLists.drawDeckList == 1 and #cardLists.drawList > 1 then
         local tmpDeck = getObjectFromGUID(cardLists.drawDeckList[1])
+
         if tmpDeck then
             tmpDeck.interactable = false
         end
     end
     if #cardLists.discardDeckList == 1 and #cardLists.discardList > 1 then
         local tmpDeck = getObjectFromGUID(cardLists.discardDeckList[1])
+
         if tmpDeck then
             tmpDeck.interactable = false
         end
@@ -3361,22 +3486,32 @@ function policyCardCoroutine()
 
     --Expansion
     tmpObj = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
-    if tmpObj then tmpObj.interactable = false end
+
+    if tmpObj then
+        tmpObj.interactable = false
+    end
+
     tmpObj = getDeckFromZoneByGUID(EFFECTSPILE_ZONE_GUID)
-    if tmpObj then tmpObj.interactable = false end
+
+    if tmpObj then
+        tmpObj.interactable = false
+    end
 
     -- Msg if cards are added to the draw deck
     if lastDrawCt and #cardLists.drawList > lastDrawCt and #cardLists.drawDeckList == 1 then
         broadcastToAll("WARNING: One or more cards have been added to the draw deck!", {1,0,0})
     end
+
     lastDrawCt = #cardLists.drawList
 
     if started and #cardLists.fascistList > options.fascistCards then
         broadcastToAll("CHEATING DETECTED: Too many " .. text.fascistAbbr ..  " " .. text.policy .. " cards.", {1,0,0})
     end
+
     if started and #cardLists.liberalList > options.liberalCards then
         broadcastToAll("CHEATING DETECTED: Too many " .. text.liberalAbbr ..  " " .. text.policy .. " cards.", {1,0,0})
     end
+
     if started and #cardLists.greyList > options.greyCards then
         broadcastToAll("CHEATING DETECTED: Too many " .. text.greyAbbr ..  " " .. text.policy .. " cards.", {1,0,0})
     end
@@ -3385,6 +3520,7 @@ function policyCardCoroutine()
     if started and #cardLists.fascistList == options.fascistCards and #cardLists.liberalList == options.liberalCards and #cardLists.greyList == options.greyCards and (#cardLists.discardDeckList == 0 or #cardLists.discardDeckList == 1) then
         -- Reshuffle
         local autoNotateReshuffle = false
+
         if #cardLists.drawList < 3 and #cardLists.discardDeckList == 1 and (#cardLists.drawDeckList == 0 or #cardLists.drawDeckList == 1) then
             if cardLists.drawDeckList[1] then
                 local tmpDeck = getObjectFromGUID(cardLists.drawDeckList[1])
@@ -3392,24 +3528,31 @@ function policyCardCoroutine()
             else
                 pos = getPositionByGUID(DRAW_ZONE_GUID)
             end
+
             broadcastToAll("Starting reshuffle...", {1,1,1})
             local discardDeck = getObjectFromGUID(cardLists.discardDeckList[1])
+
             for i, obj in ipairs(discardDeck.getObjects()) do
                 table.insert(pastDiscards, shortenDesc(str))
             end
+
             table.insert(pastDiscards, "s")
             discardDeck.setPositionSmooth({pos["x"], 3, pos["z"]}, false, true)
             sleep(2)
             local expectedCards = #cardLists.drawList + #cardLists.discardList
             local drawDeck = getDeckFromZoneByGUID(DRAW_ZONE_GUID)
+
             if drawDeck and #drawDeck.getObjects() == expectedCards then
                 lastDrawCt = expectedCards
                 drawDeck.shuffle()
                 broadcastToAll("reshuffle done.", {1,1,1})
+
                 if options.autoNotate then
                     autoNotateReshuffle = true
                 end
+
                 local discardPileBoard = getObjectFromGUID(discardPileBoard_guid)
+
                 if discardPileBoard then
                     discardPileBoard.setName(0)
                 end
@@ -3427,6 +3570,7 @@ function policyCardCoroutine()
             tmpZone = getObjectFromGUID(bannerZoneGuid)
             inZone = tmpZone.getObjects()
             local cardType = nil
+
             for i, j in ipairs(inZone) do
                 if isLiberalPolicyCard(j) and not j.is_face_down then
                     cardType = text.liberalLetter
@@ -3434,6 +3578,7 @@ function policyCardCoroutine()
                     cardType = text.greyLetter
                 end
             end
+
             if cardType then
                 if options.autoNotate then
                     if topdeck then
@@ -3443,13 +3588,16 @@ function policyCardCoroutine()
                     else
                         notateInfo(lastPres, ">", lastChan, "[0080F8]" .. cardType .. "[-]", false)
                     end
+
                     homeTracker()
                 end
+
                 if topdeck then
                     homePrevPlacards()
                 else
                     movePrevPlacards()
                 end
+
                 startLuaCoroutine(Global, "displayBannerCardsCoroutine")
             else
                 lastLiberalPlayed = 0 -- didn't find the card
@@ -3460,6 +3608,7 @@ function policyCardCoroutine()
             tmpZone = getObjectFromGUID(bannerZoneGuid)
             inZone = tmpZone.getObjects()
             local cardType = nil
+
             for i, j in ipairs(inZone) do
                 if isFascistPolicyCard(j) and not j.is_face_down then
                     cardType = text.fascistLetter
@@ -3467,6 +3616,7 @@ function policyCardCoroutine()
                     cardType = text.greyLetter
                 end
             end
+
             if cardType then
                 if options.autoNotate then
                     if topdeck then
@@ -3476,25 +3626,35 @@ function policyCardCoroutine()
                     else
                         notateInfo(lastPres, ">", lastChan, "[FF0000]" .. cardType .. "[-]", false)
                     end
+
                     homeTracker()
-                    if lastFascistPlayed == 4 then notateInfo("", "", "", "[FF0000]" .. text.hitler .. " territory![-]", false) end
+
+                    if lastFascistPlayed == 4 then
+                        notateInfo("", "", "", "[FF0000]" .. text.hitler .. " territory![-]", false)
+                    end
                 end
                 if topdeck then
                     homePrevPlacards()
                 else
                     movePrevPlacards()
                 end
+
                 startLuaCoroutine(Global, "displayBannerCardsCoroutine")
             else
                 lastFascistPlayed = 0 -- didn't find the card
             end
         end
-        if autoNotateReshuffle then notateInfo("", "", "", "*Reshuffle*", false) end
+
+        if autoNotateReshuffle then
+            notateInfo("", "", "", "*Reshuffle*", false)
+        end
+
         if lastLiberalPlayed or lastFascistPlayed then
             -- Lock placed policy cards
             if boardCardWaitId then
                 Wait.stop(boardCardWaitId)
             end
+
             boardCardWaitId = Wait.time(
                 function()
                     testReadyToLock(
@@ -3532,6 +3692,7 @@ function getPolicyCardStatus(removeCards)
     discardZone = getObjectFromGUID(DISCARD_ZONE_GUID)
 
     local inZone = drawZone.getObjects()
+
     for i, j in ipairs(inZone) do
         if isFascistPolicyCard(j) then
             smartTableInsert(returnTable.fascistList, j.guid)
@@ -3548,6 +3709,7 @@ function getPolicyCardStatus(removeCards)
         elseif j.tag == "Deck" then
             smartTableInsert(returnTable.drawDeckList, j.guid)
             local inDeck = j.getObjects()
+
             for k, l in ipairs(inDeck) do
                 if l.description == FASCISTPOLICY_STRING then
                     smartTableInsert(returnTable.fascistList, l.guid)
@@ -3563,21 +3725,26 @@ function getPolicyCardStatus(removeCards)
                     params.position = {0,5,0}
                     params.guid = l.guid
                     local card = j.takeObject(params)
+
                     if not cardError then
                         cardError = true
                         printToAll("ERROR: That is not a policy card.", {1,0,0})
                     end
+
                     removeCt = removeCt + 1
                 end
             end
         end
     end
+
     removeCt = 0
     inZone = discardZone.getObjects()
+
     for i, j in ipairs(inZone) do
         if j.tag == "Deck" then
             smartTableInsert(returnTable.discardDeckList, j.guid)
             local inDeck = j.getObjects()
+
             for k, l in ipairs(inDeck) do
                 if l.description == FASCISTPOLICY_STRING then
                     smartTableInsert(returnTable.fascistList, l.guid)
@@ -3593,22 +3760,28 @@ function getPolicyCardStatus(removeCards)
                     params.position = {0,5,0}
                     params.guid = l.guid
                     local card = j.takeObject(params)
+
                     if not cardError then
                         cardError = true
                         printToAll("ERROR: That is not a policy card.", {1,0,0})
                     end
+
                     removeCt = removeCt + 1
                 end
             end
         end
     end
+
     local tmpZoneGuid
     local tmpZone
     local cardFound = false
+
     for i = #liberal_zone_guids, 1, -1 do
         tmpZone = getObjectFromGUID(liberal_zone_guids[i])
+
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if isLiberalPolicyCard(j) then
                     smartTableInsert(returnTable.liberalList, j.guid)
@@ -3624,11 +3797,14 @@ function getPolicyCardStatus(removeCards)
             end
         end
     end
+
     cardFound = false
+
     for i = #fascist_zone_guids, 1, -1 do
         tmpZone = getObjectFromGUID(fascist_zone_guids[i])
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if isFascistPolicyCard(j) then
                     smartTableInsert(returnTable.fascistList, j.guid)
@@ -3652,6 +3828,7 @@ function allPolicyCardsKnown()
     local cardLists = {}
 
     cardLists = getPolicyCardStatus(false)
+
     if started and #cardLists.fascistList == options.fascistCards and #cardLists.liberalList == options.liberalCards and #cardLists.greyList == options.greyCards and #cardLists.drawDeckList == 1 and (#cardLists.discardDeckList == 0 or #cardLists.discardDeckList == 1) then
         return true
     end
@@ -3662,9 +3839,11 @@ end
 function createVoteWait()
     startVoteCheck()
     if started == true and not disableVote and options.scriptedVoting then
+
         if voteWaitId then
             Wait.stop(voteWaitId)
         end
+
         voteWaitId = Wait.time(function() startVoteCheck() end, 1)
     end
 end
@@ -3681,98 +3860,94 @@ function startVoteCheck()
     for i, obj in ipairs(getAllObjects()) do
         if (obj.tag == "Card" and obj.interactable == true and obj.resting and not obj.held_by_color and obj.is_face_down and math.abs(obj.getPosition()[1]) < 42.31 and math.abs(obj.getPosition()[3]) < 23.7) then
             local desc = obj.getDescription()
+
             for i2, value2 in pairs(players) do
                 if (playerStatus[value2] ~= 5 and playerStatus[value2] ~= 6) then
                     if (desc == value2 .. "'s Nein Card") then
                         table.insert(voteCards, obj)
+
                         if (votes[value2] == nil) then
                             votes[value2] = -1
                         else
                             votes[value2] = 0
                             voteDone = false
                         end
+
                         break
                     elseif (desc == value2 .. "'s Ja Card") then
                         table.insert(voteCards, obj)
+
                         if (votes[value2] == nil) then
                             votes[value2] = 1
                         else
                             votes[value2] = 0
                             voteDone = false
                         end
+
                         break
                     end
                 end
             end
         end
     end
-    --print(#voteCards.." - "..getNumAlivePlayers())
 
     if (#voteCards < getNumAlivePlayers() -1) then
         voteDone = false
         tempRichard = -999
     end
 
-
     if (#voteCards == getNumAlivePlayers() -1 and options.richardRule == true) then
-
         if tempRichard == -999 then 
             tempRichard = os.time() 
             broadcastToAll("Handsome Richard Countdown Begins, " .. timerRichard .. " Seconds",stringColorToRGB("Purple"))
         end
-        
 
         richardRemaining = os.time() - tempRichard - timerRichard
-        
-        
-        
-        if richardRemaining < 0 then
-            --broadcastToAll("Voting in: " .. tempRichard, stringColorToRGB("Green"))
-            voteDone = false
-        --elseif tempRichard == 0 then
-            --bolRichard = true
 
+        if richardRemaining < 0 then
+            voteDone = false
         else
             bolRichard = true
-
-
-
         end
     end
-
 
     if (#voteCards < getNumAlivePlayers() and options.richardRule == false) then
         voteDone = false
     end
     
-    
-        if voteDone then
-        
-            --resetVoteTimer()
-            voteNotes = getFinalVoteString()
-            setNotes(voteNotes .. "\n\n" .. mainNotes)
-            local presColor = getPres()
-            local chanColor = getChan()
-            local out = "[" .. stringColorToHex(presColor) .. "]" .. presColor .. "[-] > "
-            out = out .. "[" .. stringColorToHex(chanColor) .. "]" .. chanColor .. "[-]\n"
-            out = out .. voteNotes
-            if voteNotebook == "" then
-                voteNotebook = out
-            else
-                voteNotebook = voteNotebook .. "\n\n" .. out
-            end
-            lastVote = out
-            for _, lastVoteGuid in ipairs(lastVote_guids) do
-                local lastVoteObj = getObjectFromGUID(lastVoteGuid)
-                if lastVoteObj then
-                    lastVoteObj.TextTool.setValue(removeBBCode(out))
-                end
+    if voteDone then
+        voteNotes = getFinalVoteString()
+        setNotes(voteNotes .. "\n\n" .. mainNotes)
+        local presColor = getPres()
+        local chanColor = getChan()
+        local out = "[" .. stringColorToHex(presColor) .. "]" .. presColor .. "[-] > "
+        out = out .. "[" .. stringColorToHex(chanColor) .. "]" .. chanColor .. "[-]\n"
+        out = out .. voteNotes
+
+        if voteNotebook == "" then
+            voteNotebook = out
+        else
+            voteNotebook = voteNotebook .. "\n\n" .. out
         end
+
+        lastVote = out
+
+        for _, lastVoteGuid in ipairs(lastVote_guids) do
+            local lastVoteObj = getObjectFromGUID(lastVoteGuid)
+
+            if lastVoteObj then
+                lastVoteObj.TextTool.setValue(removeBBCode(out))
+            end
+        end
+
         startLuaCoroutine(Global, "attemptLastVoteFixCo")
+
         for i, obj in ipairs(voteCards) do
             obj.flip()
         end
+
         disableVote = true
+
         if string.find(out, "Vote passes") then
             votePassed = true
         else
@@ -3783,6 +3958,7 @@ function startVoteCheck()
             -- Get the status of all cards and decks from the zones
             local cardsDown = getPolicyCardStatus(true)
             local numFasDown = #cardsDown.fascistPlayedList + #cardsDown.fascistNotUsedList
+
             if (numFasDown >= 4) then
                 if (roles[chanColor] == "hitler") then
                     giveRoleCards()
@@ -3798,7 +3974,6 @@ function startVoteCheck()
                 end
             end
         end
-
     else
         voteNotes = getPrelimVoteString()
         setNotes(voteNotes .. "\n\n" .. mainNotes)
@@ -3809,13 +3984,17 @@ end
 function attemptLastVoteFixCo()
     for _, lastVoteGuid in ipairs(lastVote_guids) do
         local lastVoteObj = getObjectFromGUID(lastVoteGuid)
+
         if lastVoteObj then
             lastVoteObj.setScale({4.00, 4.00, 5.00})
         end
     end
+
     wait(2)
+
     for _, lastVoteGuid in ipairs(lastVote_guids) do
         local lastVoteObj = getObjectFromGUID(lastVoteGuid)
+
         if lastVoteObj then
             lastVoteObj.setScale({5.00, 5.00, 5.00})
         end
@@ -3853,55 +4032,52 @@ end
 
 function returnVoteCardsToHand()
     returnVotes("script","script","script");
-    --[[for i, playerColor in pairs(players) do
-        jaCard = getObjectFromGUID(jaCardGuids[playerColor])
-        neinCard = getObjectFromGUID(neinCardGuids[playerColor])
-        if jaCard and neinCard then
-            if greyPlayer(playerColor) then
-                giveObjectToPlayer(jaCard, playerColor, {forward = GREY_FORWARD, right = GREY_RIGHT, up = GREY_UP}, {x = 0, y = 180, z = 180, exactRot = true}, false, true)
-                giveObjectToPlayer(neinCard, playerColor, {forward = GREY_FORWARD, right = GREY_RIGHT, up = GREY_UP}, {x = 0, y = 180, z = 180, exactRot = true}, false, true)
-            else
-                local jaCardRot = jaCard.getRotation()
-                local neinCardRot = neinCard.getRotation()
-                giveObjectToPlayer(jaCard, playerColor, {forward = 0, right = 0, up = 0}, {x = jaCardRot["x"], y = jaCardRot["y"], z = jaCardRot["z"], exactRot = true}, false, true)
-                giveObjectToPlayer(neinCard, playerColor, {forward = 0, right = 0, up = 0}, {x = neinCardRot["x"], y = neinCardRot["y"], z = neinCardRot["z"], exactRot = true}, false, true)
-            end
-        end
-    end]]--
 end
 
 function getFinalVoteString()
-
     timeOfPlay = math.floor(os.time()-timeSinceUV)
     timeOfPlayM = math.floor(timeOfPlay/60)
     timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
-
-
-
-
     local jaCount = 0
     local neinCount = 0
     local out = "[i]Ja votes[/i]: "
+
     for i, playerColor in pairs(ALL_PLAYABLE_COLORS) do -- used for the order
         if votes[playerColor] == 1 and inTable(players, playerColor) then
-            if string.sub(out, -1) == "]" then out = out .. ", " end
+            if string.sub(out, -1) == "]" then
+                out = out .. ", "
+            end
+
             out = out .. "[" .. stringColorToHex(playerColor) .. "]" .. playerColor .. "[-]"
             jaCount = jaCount + 1
         end
     end
-    if jaCount == 0 then out = out .. "None" end
+
+    if jaCount == 0 then
+        out = out .. "None"
+    end
+
     out = out .. "[/i]\n[i]Nein votes[/i]:[i] "
+
     for i, playerColor in pairs(ALL_PLAYABLE_COLORS) do -- used for the order
         if votes[playerColor] == -1 and inTable(players, playerColor) then
-            if string.sub(out, -1) == "]" then out = out .. ", " end
+
+            if string.sub(out, -1) == "]" then
+                out = out .. ", "
+            end
+
             out = out .. "[" .. stringColorToHex(playerColor) .. "]" .. playerColor .. "[-]"
             neinCount = neinCount + 1
         end
     end
-    if neinCount == 0 then out = out .. "None" end
+
+    if neinCount == 0 then
+        out = out .. "None"
+    end
+
     out = out .. "[/i]"
+
     if jaCount > neinCount then
-        
         if bolRichard then
             if timeOfPlayM == 0 then
                 broadcastToAll("Vote passes via Handsome Richard Rule (" .. timeOfPlayS .. " Seconds)", stringColorToRGB("Green"))
@@ -3919,6 +4095,7 @@ function getFinalVoteString()
                 broadcastToAll("Vote passes (".. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds)", stringColorToRGB("Green"))
             end
         end     
+
         out = "[" .. stringColorToHex("Green") .. "]-<<<<· Vote passes <══¦-•\n" .. "[-]" .. out
     else
         if bolRichard then
@@ -3938,14 +4115,18 @@ function getFinalVoteString()
                 broadcastToAll("Vote fails (".. timeOfPlayM .. " Minutes " .. timeOfPlayS .. " Seconds)", stringColorToRGB("Red"))
             end
         end     
+
         out = "[" .. stringColorToHex("Red") .. "]-<<<<· Vote fails <══¦-•\n" .. "[-]" .. out
+
         if options.autoNotate and recordDownvotes then
             local lineSave = noteTakerCurrLine
             noteTakerCurrLine = #noteTakerNotes
+
             if not noteTakerBlankLine(noteTakerCurrLine) then
                 addNewLine()
                 noteTakerCurrLine = #noteTakerNotes
             end
+
             noteTakerNotes[noteTakerCurrLine].color1 = getPres()
             noteTakerNotes[noteTakerCurrLine].action = ">"
             noteTakerNotes[noteTakerCurrLine].color2 = getChan()
@@ -3953,43 +4134,59 @@ function getFinalVoteString()
             noteTakerCurrLine = lineSave
             refreshNotes(nil)
         end
+
         local tracker = getObjectFromGUID(ELECTION_TRACKER_GUID)
+
         if tracker then
             tracker.translate({electionTrackerMoveX, 0, 0})
         end
+
         movePlacards(nextPres(getPres()), false)
         startLuaCoroutine(Global, "waitReturnVoteCardsCoroutine")
     end
+
     bolRichard = false
     return out
 end
 
 function getPrelimVoteString()
     local out = "[u]Voted[/u]:[i] "
+
     for i, playerColor in pairs(ALL_PLAYABLE_COLORS) do -- used for the order
         if votes[playerColor] ~= nil and math.abs(votes[playerColor]) == 1 and inTable(players, playerColor) and not (_G.playerStatus[playerColor] > 3) then
-            if string.sub(out, -1) == "]" then out = out .. ", " end
+            if string.sub(out, -1) == "]" then
+                out = out .. ", "
+            end
+
             out = out .. "[" .. stringColorToHex(playerColor) .. "]" .. playerColor .. "[-]"
         end
     end
+
     out = out .. "[/i]\n[u]Waiting on[/u]:[i] "
+
     for i, playerColor in pairs(ALL_PLAYABLE_COLORS) do -- used for the order
         if (votes[playerColor] == 0 or votes[playerColor] == nil) and inTable(players, playerColor) and not (_G.playerStatus[playerColor] > 3) then
-            if string.sub(out, -1) == "]" then out = out .. ", " end
+            if string.sub(out, -1) == "]" then
+                out = out .. ", "
+            end
+
             out = out .. "[" .. stringColorToHex(playerColor) .. "]" .. playerColor .. "[-]"
         end
     end
-    out = out .. "[/i]"
 
+    out = out .. "[/i]"
     return out
 end
 
 function editButtonByLabel(objectGUIDIn, oldLabelIn, newLabelIn, newFunctionIn)
     local bObject = getObjectFromGUID(objectGUIDIn)
+
     if bObject then
         local buttonList = bObject.getButtons()
+
         if buttonList then
             local button
+
             for _, button in ipairs(buttonList) do
                 if button.label == oldLabelIn then
                     button.label = newLabelIn
@@ -4003,9 +4200,13 @@ end
 
 function topdeckCard(clickedObject, playerColor)
     if started then
-        if options.nicholasRule then bolTD = true end
+        if options.nicholasRule then
+            bolTD = true
+        end
+
         if playerColor == getPres() then
             drawDeck = getDeckFromZoneByGUID(DRAW_ZONE_GUID)
+
             if drawDeck then
                 lastPres = playerColor
                 topdeck = true
@@ -4013,6 +4214,7 @@ function topdeckCard(clickedObject, playerColor)
                 params.position = {0, 2, 0}
                 params.flip = true
                 local card = drawDeck.takeObject(params)
+
                 if isLiberalPolicyCard(card) then
                     broadcastToAll("The topdeck is ".. text.liberalArticle .. " " .. text.liberal .. " " .. text.policy .. "!", {0.1, 0.3, 1})
                 else
@@ -4033,10 +4235,12 @@ function drawThree(clickedObject, playerColor)
     if started then
         local drawPlayer = getPres()
         local drawPlayerText = "president"
+
         if bit32.band(options.expansionOptionStatus, 1) == 1 then
             drawPlayer = getChan()
             drawPlayerText = "chancellor"
         end
+
         if playerColor == drawPlayer then
             if blockDraw then
                 smartBroadcastToColor("ERROR: You can only draw once (move the Chancellor placard to reset).", playerColor, {1, 0, 0})
@@ -4059,10 +4263,11 @@ end
 function drawCards(amount, playerColor)
     local drawCt = 0
     local drawDeck = nil
-
     drawDeck = getDeckFromZoneByGUID(DRAW_ZONE_GUID)
+
     if drawDeck then
         drawCt = #drawDeck.getObjects()
+
         if drawCt > (amount - 1) then
             lastPres = getPres()
             lastChan = getChan()
@@ -4070,12 +4275,15 @@ function drawCards(amount, playerColor)
             local drawLogArr = {}
             table.insert(drawLogArr, lastPres)
             table.insert(drawLogArr, lastChan)
+
             for i, obj in ipairs(drawDeck.getObjects()) do
                 table.insert(drawLogArr, shortenDesc(obj.description))
+
                 if (i == amount) then
                     break
                 end
             end
+
             table.insert(drawLog,drawLogArr)
 
             if greyPlayer(playerColor) then
@@ -4083,6 +4291,7 @@ function drawCards(amount, playerColor)
             else
                 drawDeck.deal(amount, playerColor)
             end
+
             if amount == 1 then
                 broadcastToAll("Dealing 1 card to " .. playerColor .. ".", stringColorToRGBExtra(playerColor))
             else
@@ -4107,7 +4316,6 @@ function getChan()
 end
 
 function onPlayerChangeColor(color)
-
     refreshUI()
 
     if ( color == "Teal" or color == "Brown" ) and Player[color].admin ~= true then
@@ -4119,7 +4327,6 @@ function onPlayerChangeColor(color)
             return false
         end
     end
-
 
     if started then
         if color ~= "Grey" and color ~= "Black" then
@@ -4140,16 +4347,17 @@ function onPlayerChangeColor(color)
         end
     else
         local needRefresh = true
+
         if lastPlayerCt then
             if lastPlayerCt < 7 and #getSeatedPlayers() < 7 then
                 needRefresh = false
-            elseif lastPlayerCt > 6 and lastPlayerCt < 9 and
-                     #getSeatedPlayers() > 6 and #getSeatedPlayers() < 9 then
+            elseif lastPlayerCt > 6 and lastPlayerCt < 9 and #getSeatedPlayers() > 6 and #getSeatedPlayers() < 9 then
                 needRefresh = false
             elseif lastPlayerCt > 8 and #getSeatedPlayers() > 8 then
                 needRefresh = false
             end
         end
+
         if needRefresh then
             refreshBoardCards()
         end
@@ -4164,10 +4372,12 @@ function onPlayerChangeColor(color)
                 break
             end
         end
+
         if colorFound then
             greyPlayerSteamIds[colorFound] = nil
             destroyObjectByGUID(greyAvatarGuids[colorFound])
             local textObj = getObjectFromGUID(GREY_TEXT_GUIDS[colorFound])
+
             if textObj then
                 textObj.TextTool.setValue(" ")
             end
@@ -4176,6 +4386,7 @@ function onPlayerChangeColor(color)
 end
 
 avoidDoubleStart = false
+
 function setupStart(clickedObject, playerColor)
     if Player[playerColor].admin and avoidDoubleStart == false then
         avoidDoubleStart = true
@@ -4197,16 +4408,38 @@ function setupCoroutine()
         printToAll("Not enough players!", {1,1,1})
         return true
     end
-    
-    ruleTextBox = ""
-    if options.nicholasRule then
-        ruleTextBox = ruleTextBox .. "Handsome Nicholas Rule is in Effect \n"
+
+    if options.nicholasRule or options.richardRule then
+        local textRules = spawnObject({
+            type = "3DText",
+            position = {0, 1, 0},
+            rotation = {0, 0, 0},
+            scale = {1, 1, 1},
+            sound = false,
+            snap_to_grid = false
+        })
+
+        textRules.interactable = false
+        ruleTextBox = ""
+
+        if options.nicholasRule then
+            ruleTextBox = ruleTextBox .. "Handsome Nicholas Rule is in Effect \n"
+        end
+
+        if options.richardRule then
+            ruleTextBox = ruleTextBox .. "Handsome Richard Rule is in Effect " .. timerRichard .. " Seconds \n"
+        end
+
+        textRules.setValue(ruleTextBox)
+        textRulesGUID = textRules.guid
+    else
+        if textRulesGUID ~= "" then
+            destroyObjectByGUID(textRulesGUID)
+            textRulesGUID = ""
+        else
+            textRulesGUID = ""
+        end
     end
-    if options.richardRule then
-        ruleTextBox = ruleTextBox .. "Handsome Richard Rule is in Effect " .. timerRichard .. " Seconds \n"
-    end
-    if ruleTextBox == "" then ruleTextBox = " " end
-    getObjectFromGUID("d56164").setValue(ruleTextBox)
 
     getObjectFromGUID("303db7").Clock.startStopwatch()
     getObjectFromGUID("68faa0").Clock.startStopwatch()
@@ -4226,12 +4459,15 @@ function setupCoroutine()
 
     -- if its hotseat dont shuffle and turn off policy safety
     local playerOneName = Player[players[1]].steam_name
+
     if not playerOneName or string.match(playerOneName, "Player %d") then
         printToAll("Hotseat game detected.", {1,1,1})
+
         if options.shufflePlayers then
             options.shufflePlayers = false
             printToAll("Shuffle players is now disabled.", {1,0,0})
         end
+
         if options.policySafety then
             options.policySafety = false
             printToAll("Policy safety is now disabled.", {1,0,0})
@@ -4250,6 +4486,7 @@ function setupCoroutine()
     for i, player in pairs(MAIN_PLAYABLE_COLORS) do
         if not inTable(players, player) then
             local hideZone = getObjectFromGUID(HIDDEN_ZONE_GUIDS[player])
+
             if (hideZone) then
                 hideZone.setScale({0,0,0})
             end
@@ -4266,6 +4503,7 @@ function setupCoroutine()
                 block.setLock(true)
                 forceObjectToPlayer(block, player, {forward = 7, right = 0, up = 0, forceHeight = 1.09}, FACE_UP_ROT)
             end
+
             -- Player Status Buttons
             local paramsStatus = {
                 type = "backgammon_piece_white",
@@ -4280,12 +4518,14 @@ function setupCoroutine()
             forceObjectToPlayer(buttonStatusBase, player, {forward = 11, right = -8.5, up = 0, forceHeight = 1.09}, FACE_UP_ROT)
         end
     end
+
     if options.zoneType == 6 then -- Tan and Maroon
         local paramsStatus = {
             type = "backgammon_piece_white",
             callback = "statusButtonCallback",
             sound = false
         }
+
         for _, color in ipairs(GREY_PLAYABLE_COLORS) do
             if greyPlayerSteamIds[color] then
                 table.insert(players, 1, color)
@@ -4303,13 +4543,16 @@ function setupCoroutine()
 
     --Expansion
     local abilitiesDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
+
     if abilitiesDeck then
         abilitiesDeck.randomize()
+
         for _, player in pairs(players) do
             if greyPlayer(player) then
                 for i = 1, options.expansionAmount, 1 do
                     local params = {}
                     local card = abilitiesDeck.takeObject(params)
+
                     if card then
                         giveObjectToPlayer(card, player, {forward = GREY_FORWARD, right = GREY_EXPANSION_RIGHT, up = GREY_UP}, FACE_DOWN_ROT, false, true)
                     end
@@ -4318,19 +4561,25 @@ function setupCoroutine()
                 abilitiesDeck.deal(options.expansionAmount, player)
             end
         end
+
         if bit32.band(options.expansionOptionEnabled, 8) == 8 then
             Wait.frames(function() setupPowerAbilities(abilitiesDeck) end, 2)
         end
     else
         local tmpZone = getObjectFromGUID(ABILITIESPILE_ZONE_GUID)
+
         if tmpZone then
             local inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 destroyObject(j)
             end
+
             destroyObject(tmpZone)
         end
+
         tmpZone = getObjectFromGUID(EFFECTSPILE_ZONE_GUID)
+
         if tmpZone then
             inZone = tmpZone.getObjects()
             for _, j in ipairs(inZone) do
@@ -4342,6 +4591,7 @@ function setupCoroutine()
 
     --spawn note taker(s)
     local params = {position = {-100, 100, -100}, sound = false}
+
     if options.noteType == 1 then
         params.type = "Chess_Board"
         params.scale = {1.55, 1.55, 1.55}
@@ -4364,10 +4614,12 @@ function setupCoroutine()
         params.type = "backgammon_board"
         params.scale = {1.8, 1.8, 1.8}
     end
+
     for _, player in pairs(players) do
         if not greyPlayer(player) then
             if Player[player].admin or options.noteType > 6 then
                 local notetaker = spawnObject(params)
+
                 if options.noteType < 7 then
                     notetaker.setLuaScript(newNoteTakerLuaScript(player, "true", "false", "false", "false", "false", "true"))
                 elseif options.noteType == 7 then
@@ -4375,29 +4627,28 @@ function setupCoroutine()
                 elseif options.noteType == 8 then
                     notetaker.setLuaScript(newNoteTakerLuaScript(player, "false", "true", "false", "false", "false", "false"))
                 end
+
                 if options.noteType == 5 then
                     local custom = {}
                     custom.image = "http://cloud-3.steamusercontent.com/ugc/486766424829587499//FDF54ECD5D1706DE0A590239E84D62CDE757FE46/"
                     notetaker.setCustomObject(custom)
                 elseif options.noteType == 6 then
-                        local custom = {}
-                        custom.diffuse = "http://cloud-3.steamusercontent.com/ugc/478894184492866532/6639B6E1AB511AB10D53DB91B2A47A0A63410DDF/"
-                        custom.mesh = "http://cloud-3.steamusercontent.com/ugc/478894184492865468/51C18F993BBDD5D1B55FE5261A625B2CE0B2FD9F/"
-                        custom.type = 4
-                        custom.material = 3
-                        notetaker.setCustomObject(custom)
+                    local custom = {}
+                    custom.diffuse = "http://cloud-3.steamusercontent.com/ugc/478894184492866532/6639B6E1AB511AB10D53DB91B2A47A0A63410DDF/"
+                    custom.mesh = "http://cloud-3.steamusercontent.com/ugc/478894184492865468/51C18F993BBDD5D1B55FE5261A625B2CE0B2FD9F/"
+                    custom.type = 4
+                    custom.material = 3
+                    notetaker.setCustomObject(custom)
                 end
             end
         end
     end
 
     --hide the settings pannel
-    --destroyObjectByGUID(settingsPannel_guid)
     panel = getObjectFromGUID(settingsPannel_guid)
     panel.setPosition({32.91, -27.15, 0.00})
     panel.setScale({0.10, 0.10, 0.10})
     panel.setRotation({0.00, 180.00, 180.00})
-
 
     local numFascists = 0
 
@@ -4410,9 +4661,11 @@ function setupCoroutine()
     local randomPlayer = math.random(#playersToRole)
     roles[playersToRole[randomPlayer]] = "hitler"
     table.insert(hitler, 1, playersToRole[randomPlayer])
+
     if options.dealPartyCards then
         giveUsableCard(copyPartyCards[1], playersToRole[randomPlayer])
     end
+
     table.remove(playersToRole, randomPlayer)
 
     for i = 1, numFascists do
@@ -4423,11 +4676,13 @@ function setupCoroutine()
         if options.dealPartyCards then
             giveUsableCard(copyPartyCards[1], playersToRole[randomPlayer])
         end
+
         table.remove(playersToRole, randomPlayer)
     end
 
     for i, player in ipairs(playersToRole) do
         roles[player] = "liberal"
+
         if options.dealPartyCards then
             giveUsableCard(copyPartyCards[2], player)
         end
@@ -4442,34 +4697,44 @@ function setupCoroutine()
     -- this part is all for notes on info of the game
     mainNotes = "For long games the old notes will be\nremoved automatically by the note taker.\nThis is functionality does not work well when\nenabling player names in the notes.\n\n"
     mainNotes = mainNotes .. "Only the president can draw cards.\n\nTo topdeck a card move the election tracker\nto the \34REVEAL & PASS TOP POLICY\34 circle.\n\n"
+
     if not options.dealRoleCards then
         mainNotes = mainNotes .. "[FFFF00]No role cards will be dealt.[-]\n\n"
     end
+
     if not options.dealPartyCards then
         mainNotes = mainNotes .. "[FFFF00]No party membership cards will be dealt.[-]\n\n"
     end
+
     mainNotes = mainNotes .. "There are [0000FF][b]" .. #players - #fascists - #hitler .. " " .. string.upper(text.liberal) .. "S[/b][-]\nagainst "
+
     if #fascists > 0 then
         mainNotes = mainNotes .. "[FF0000][b]" .. #fascists .. " " .. string.upper(text.fascist) .. "[/b][-]"
     end
+
     if #hitler > 1 and #fascists > 0 then
         mainNotes = mainNotes .. ","
     end
+
     if #hitler > 1 then
         mainNotes = mainNotes .. " [FF0000][b]" .. #hitler - 1 .. " FAKE " .. string.upper(text.hitler)
     end
+
     if #hitler == 2 then
         mainNotes = mainNotes .. "[/b][-]"
     elseif #hitler > 2 then
         mainNotes = mainNotes .. "S[/b][-]"
     end
+
     mainNotes = mainNotes .. " and [FF0000][b]" .. string.upper(text.hitler) .. "[/b][-].\n"
     mainNotes = mainNotes .. string.upper(text.hitler)
+
     if #players < 7 then
         mainNotes = mainNotes .. " [b]knows[/b] who the "
     else
         mainNotes = mainNotes .. " [b]doesn't know[/b] who the "
     end
+
     mainNotes = mainNotes .. string.upper(text.fascist) .. "S are.\n\n"
     setNotes(mainNotes)
 
@@ -4487,9 +4752,11 @@ function setupCoroutine()
     for i = 1, options.liberalCards do
         spawnLiberalPolicy(getPositionByGUID(DRAW_ZONE_GUID), FACE_DOWN_ROT)
     end
+
     for i = 1, options.fascistCards do
         spawnFascistPolicy(getPositionByGUID(DRAW_ZONE_GUID), FACE_DOWN_ROT)
     end
+
     for i = 1, options.greyCards do
         spawnGreyPolicy(getPositionByGUID(DRAW_ZONE_GUID), FACE_DOWN_ROT)
     end
@@ -4498,9 +4765,11 @@ function setupCoroutine()
 
     -- Tell everyone their role
     printToAll("--------------------------------------", {1,1,1})
+
     for _, color in ipairs(players) do
         if greyPlayer(color) then
             local playerObj = getPlayerObj(color)
+
             if playerObj then
                 playerObj:print(tellRole(color))
             end
@@ -4508,6 +4777,7 @@ function setupCoroutine()
             Player[color]:print(tellRole(color))
         end
     end
+
     printToAll("--------------------------------------", {1,1,1})
 
     -- Move and tell first pres
@@ -4516,9 +4786,11 @@ function setupCoroutine()
     local hcol = stringColorToRGBExtra(players[randomPlayer])
     printToAll(players[randomPlayer] .. " is first president!", hcol)
     printToAll("--------------------------------------", {1,1,1})
+
     for _, color in ipairs(players) do
         if greyPlayer(color) then
             local playerObj = getPlayerObj(color)
+
             if playerObj then
                 playerObj:print(chatHelp(playerObj.admin))
             end
@@ -4528,7 +4800,6 @@ function setupCoroutine()
     end
 
     deleteCustomBoardCards()
-
     sleep(1)
 
     --Shuffle the policy deck
@@ -4544,12 +4815,14 @@ function setupCoroutine()
     chancelor.interactable = true
     tmpObj = getObjectFromGUID(ELECTION_TRACKER_GUID)
     tmpObj.setLock(false)
+
     if #players == 5 then
         destroyObjectByGUID(PREV_PRESIDENT_GUID)
     else
         tmpObj = getObjectFromGUID(PREV_PRESIDENT_GUID)
         tmpObj.setLock(false)
     end
+
     tmpObj = getObjectFromGUID(PREV_CHANCELOR_GUID)
     tmpObj.setLock(false)
 
@@ -4590,10 +4863,13 @@ function setupPowerAbilities(abilitiesDeck)
     local tmpZoneGuid
     local params = {index = 1}
     local card
+
     for _, tmpZoneGuid in ipairs(liberal_zone_guids) do
         tmpZone = getObjectFromGUID(tmpZoneGuid)
+
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if isBoardCardBelowAbility(j) then
                     local pos = j.getPosition()
@@ -4611,10 +4887,13 @@ function setupPowerAbilities(abilitiesDeck)
             end
         end
     end
+
     for _, tmpZoneGuid in ipairs(fascist_zone_guids) do
         tmpZone = getObjectFromGUID(tmpZoneGuid)
+
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if isBoardCardAboveAbility(j) then
                     local pos = j.getPosition()
@@ -4649,11 +4928,13 @@ function changePlayerStatus(clickedObject, playerColor)
         local ownerColor = clickedObject.getName()
         _G.playerStatus[ownerColor] = _G.playerStatus[ownerColor] + 1
         local abilitiesDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
+
         if not abilitiesDeck then
             if _G.playerStatus[ownerColor] == 3 then
                 _G.playerStatus[ownerColor] = 5
             end
         end
+
         --fixme > 7 to allow Imprisoned
         if _G.playerStatus[ownerColor] > 6 then _G.playerStatus[ownerColor] = 1 end
         refreshStatusButtons()
@@ -4664,6 +4945,7 @@ end
 
 function tellRole(player)
     local msg = ""
+
     if player == "Black" then
         if #hitler == 0 and #fascists == 0 and #players > 0 then
             msg = msg .. "[0080F8]Everyone is " .. text.liberalArticle .. " " .. text.liberal .. "![-]\n"
@@ -4671,17 +4953,21 @@ function tellRole(player)
             for _, l in pairs(hitler) do
                 msg = msg .. "[" .. stringColorToHex(l) .. "]" .. l .. " is " .. text.hitler .. "!" .. "[-]\n"
             end
+
             for _, l in pairs(fascists) do
                 msg = msg .. "[" .. stringColorToHex(l) .. "]" .. l .. " is " .. text.fascistArticle .. " " .. text.fascist .. "!" .. "[-]\n"
             end
         end
     else
         local role = roles[player]
+
         if role == "fascist" then
             msg = msg .. "[" .. stringColorToHex(player) .. "]You are " .. text.fascistArticle .. " [FF0000]" .. text.fascist .. "[-]![-]\n"
+
             for _, l in pairs(hitler) do
                 msg = msg .. "[" .. stringColorToHex(l) .. "]" .. l .. " is " .. text.hitler .. "!" .. "[-]\n"
             end
+
             for _, l in pairs(fascists) do
                 if not (l == player) then
                     msg = msg .. "[" .. stringColorToHex(l) .. "]" .. l .. " is " .. text.fascistArticle .. " " .. text.fascist .. ", too!" .. "[-]\n"
@@ -4689,12 +4975,14 @@ function tellRole(player)
             end
         elseif role == "hitler" then
             msg = msg .. "[" .. stringColorToHex(player) .. "]You are [FF0000]" .. text.hitler .. "[-]![-]\n"
+
             if #players < 7 then
                 for _, l in pairs(hitler) do
                     if not (l == player) then
                         msg = msg .. "[" .. stringColorToHex(l) .. "]" .. l .. " is also " .. text.hitler .. "!" .. "[-]\n"
                     end
                 end
+
                 for _, l in pairs(fascists) do
                     msg = msg .. "[" .. stringColorToHex(l) .. "]" .. l .. " is " .. text.fascistArticle .. " " .. text.fascist .. "!" .. "[-]\n"
                 end
@@ -4711,6 +4999,7 @@ end
 
 function shuffleDrawDeck()
     local drawDeck = getDeckFromZoneByGUID(DRAW_ZONE_GUID)
+
     if drawDeck then
         drawDeck.shuffle()
         return true
@@ -4720,7 +5009,6 @@ function shuffleDrawDeck()
 end
 
 function toggleSecurity()
-    --startLuaCoroutine(Global, "toggleSecurityCoroutine")
     toggleSecurityCoroutine()
 end
 
@@ -4731,6 +5019,7 @@ function toggleSecurityCoroutine()
     if (currentlyDisabled == nil) then
         Global.setVar("hold", true)
         broadcastToAll("WARNING: Security has been disabled!", {1,0,0})
+
         for _, tmpObj in ipairs(allObjs) do
             if isPolicyCard(tmpObj) then
                 tmpObj.interactable = true
@@ -4738,15 +5027,23 @@ function toggleSecurityCoroutine()
                 tmpObj.interactable = true
             end
         end
+
         currentlyDisabled = true
     elseif (currentlyDisabled) then
         broadcastToAll("WARNING: Security has been enabled!", {1,0,0})
 
         --Expansion
         tmpObj = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
-        if tmpObj then tmpObj.interactable = false end
+
+        if tmpObj then
+            tmpObj.interactable = false
+        end
+
         tmpObj = getDeckFromZoneByGUID(EFFECTSPILE_ZONE_GUID)
-        if tmpObj then  tmpObj.interactable = false end
+
+        if tmpObj then
+            tmpObj.interactable = false
+        end
 
         Global.setVar("hold", false)
         currentlyDisabled = nil
@@ -4759,6 +5056,7 @@ function disableSecurityCoroutine()
 
     Global.setVar("hold", true)
     broadcastToAll("WARNING: Security has been disabled for 30 seconds!", {1,0,0})
+
     for _, tmpObj in ipairs(allObjs) do
         if isPolicyCard(tmpObj) then
             tmpObj.interactable = true
@@ -4766,193 +5064,203 @@ function disableSecurityCoroutine()
             tmpObj.interactable = true
         end
     end
+
     sleep(30)
 
     --Expansion
     tmpObj = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
-    if tmpObj then tmpObj.interactable = false end
+
+    if tmpObj then
+        tmpObj.interactable = false
+    end
+
     tmpObj = getDeckFromZoneByGUID(EFFECTSPILE_ZONE_GUID)
-    if tmpObj then  tmpObj.interactable = false end
+
+    if tmpObj then
+        tmpObj.interactable = false
+    end
 
     Global.setVar("hold", false)
 
     return true
 end
 
-function enableSecurity()
-
-end
-
 do -- inspect
+    function createInspectButtons(powerHolder)
+        function createInspectButtonsCoroutine()
+            local membershipCard = getObjectFromGUID(fakeMembership_card_guid)
 
-function createInspectButtons(powerHolder)
-    function createInspectButtonsCoroutine()
-        local membershipCard = getObjectFromGUID(fakeMembership_card_guid)
-        if membershipCard then
-            activePowerColor = powerHolder
-            if greyPlayer(powerHolder) then
-                smartBroadcastToColor("Use the UI to inspect a player.", powerHolder, {1, 1, 1})
-            else
-                broadcastToColor("Click on the party membership card of the person you want to inspect.", powerHolder, {1, 1, 1})
-            end
-            for i, playerColor in ipairs(players) do
-                if Player[playerColor] ~= nil and playerColor ~= powerHolder and not inTable(inspected, playerColor) and not (_G.playerStatus[playerColor] > 4) then
-                    local params = {rotation = {0, 0, 0}, sound = false}
-                    card = membershipCard.clone(params)
-                    card.setDescription("Fake Party Card")
-                    card.setLuaScript(
-                        "playerColor = '" .. playerColor .. "'\r\n\r\n" ..
-                        "function onCollisionEnter(collision_info)\r\n" ..
-                        "   if Global.call('greyPlayer', {playerColor}) then\r\n" ..
-                        "       --hard coded\r\n" ..
-                        "       self.setRotation({0, 180, 0})\r\n" ..
-                        "   else\r\n" ..
-                        "       local ph = Player[playerColor].getPlayerHand()\r\n" ..
-                        "       if ph then\r\n" ..
-                        "           self.setRotation({0, ph['rot_y']+180, 0})\r\n" ..
-                        "       end\r\n" ..
-                        "   end\r\n" ..
-                        "   self.setLock(true)\r\n" ..
-                        "end\r\n\r\n" ..
-                        "function onLoad(saveString)\r\n" ..
-                        "   local button = {}\r\n" ..
-                        "   button.click_function = '" .. playerColor .. "Inspected'\r\n" ..
-                        "   button.label = 'Inspect\\n" .. playerColor .. "'\r\n" ..
-                        "   button.function_owner = Global\r\n" ..
-                        "   button.position = {0, 1, 0}\r\n" ..
-                        "   button.rotation = {0, 0, 0}\r\n" ..
-                        "   button.width = 1000\r\n" ..
-                        "   button.height = 1500\r\n" ..
-                        "   button.font_size = 150\r\n" ..
-                        "   self.createButton(button)\r\n" ..
-                        "end")
-                    card.setPosition({0, 30 + (i * 0.25), 0})
-                    card.setLock(false)
-                    card.interactable = false;
-                    wait(5)
-                    giveObjectToPlayer(card, playerColor, {forward = 16.5, right = 0, up = 0}, FACE_UP_ROT, false, true)
+            if membershipCard then
+                activePowerColor = powerHolder
+
+                if greyPlayer(powerHolder) then
+                    smartBroadcastToColor("Use the UI to inspect a player.", powerHolder, {1, 1, 1})
+                else
+                    broadcastToColor("Click on the party membership card of the person you want to inspect.", powerHolder, {1, 1, 1})
                 end
+
+                for i, playerColor in ipairs(players) do
+                    if Player[playerColor] ~= nil and playerColor ~= powerHolder and not inTable(inspected, playerColor) and not (_G.playerStatus[playerColor] > 4) then
+                        local params = {rotation = {0, 0, 0}, sound = false}
+                        card = membershipCard.clone(params)
+                        card.setDescription("Fake Party Card")
+                        card.setLuaScript(
+                            "playerColor = '" .. playerColor .. "'\r\n\r\n" ..
+                            "function onCollisionEnter(collision_info)\r\n" ..
+                            "   if Global.call('greyPlayer', {playerColor}) then\r\n" ..
+                            "       --hard coded\r\n" ..
+                            "       self.setRotation({0, 180, 0})\r\n" ..
+                            "   else\r\n" ..
+                            "       local ph = Player[playerColor].getPlayerHand()\r\n" ..
+                            "       if ph then\r\n" ..
+                            "           self.setRotation({0, ph['rot_y']+180, 0})\r\n" ..
+                            "       end\r\n" ..
+                            "   end\r\n" ..
+                            "   self.setLock(true)\r\n" ..
+                            "end\r\n\r\n" ..
+                            "function onLoad(saveString)\r\n" ..
+                            "   local button = {}\r\n" ..
+                            "   button.click_function = '" .. playerColor .. "Inspected'\r\n" ..
+                            "   button.label = 'Inspect\\n" .. playerColor .. "'\r\n" ..
+                            "   button.function_owner = Global\r\n" ..
+                            "   button.position = {0, 1, 0}\r\n" ..
+                            "   button.rotation = {0, 0, 0}\r\n" ..
+                            "   button.width = 1000\r\n" ..
+                            "   button.height = 1500\r\n" ..
+                            "   button.font_size = 150\r\n" ..
+                            "   self.createButton(button)\r\n" ..
+                            "end")
+                        card.setPosition({0, 30 + (i * 0.25), 0})
+                        card.setLock(false)
+                        card.interactable = false;
+                        wait(5)
+                        giveObjectToPlayer(card, playerColor, {forward = 16.5, right = 0, up = 0}, FACE_UP_ROT, false, true)
+                    end
+                end
+            else
+                printToAll("ERROR: Base membership card not found.", {1,0,0})
             end
-        else
-            printToAll("ERROR: Base membership card not found.", {1,0,0})
-        end
 
-        return true
-    end
-    startLuaCoroutine(Global, "createInspectButtonsCoroutine")
-end
-
-function playerInspected(clickedObject, inspectorColor, checkedColor)
-    if inspectorColor == activePowerColor and needInspect() then
-        local role = roles[checkedColor]
-        local playerColor = stringColorToRGBExtra(checkedColor)
-        local roleText
-        local roleColor
-        if role == "hitler" or role == "fascist" then
-            roleText = text.fascistArticle .. " " .. string.lower(text.fascist)
-            roleColor = {1, 0, 0}
-        else
-            roleText = text.liberalArticle .. " " .. string.lower(text.liberal)
-            roleColor = {0.1, 0.3, 1}
-        end
-
-        timeOfPlay = math.floor(os.time()-timeSinceUV)
-        timeOfPlayM = math.floor(timeOfPlay/60)
-        timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
-
-        if timeOfPlayM == 0 then
-            printToAll(inspectorColor .. " inspected " .. checkedColor .. "("  .. timeOfPlayS .. " Seconds)", playerColor)
-        elseif timeOfPlayM == 1 then
-            printToAll(inspectorColor .. " inspected " .. checkedColor .. "(" .. timeOfPlayM .. "Minute " .. timeOfPlayS .. " Seconds)", playerColor)
-        else
-            printToAll(inspectorColor .. " inspected " .. checkedColor .. "(" .. timeOfPlayM .. "Minutes " .. timeOfPlayS .. " Seconds)" , playerColor)
-        end
-
-        smartBroadcastToColor(checkedColor .. " is " .. roleText .. "!", inspectorColor, roleColor)
-        table.insert(inspected, 1, checkedColor)
-        removeInspect()
-
-        timeSinceUV = os.time()
-        getObjectFromGUID("303db7").Clock.startStopwatch()
-        getObjectFromGUID("68faa0").Clock.startStopwatch()
-
-        if options.autoNotate and notate.line and notate.action == "inspects" then
-            noteTakerNotes[notate.line].color2 = checkedColor
-            refreshNotes(nil)
-            notate.line = nil
-            notate.action = ""
-        end
-        activePowerColor = nil
-    end
-end
-
-function WhiteInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "White")
-end
-
-function BrownInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Brown")
-end
-
-function RedInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Red")
-end
-
-function OrangeInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Orange")
-end
-
-function YellowInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Yellow")
-end
-
-function GreenInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Green")
-end
-
-function TealInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Teal")
-end
-
-function BlueInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Blue")
-end
-
-function PurpleInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Purple")
-end
-
-function PinkInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Pink")
-end
-
-function TanInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Tan")
-end
-
-function MaroonInspected(clickedObject, inspectorColor)
-    playerInspected(clickedObject, inspectorColor, "Maroon")
-end
-
-function removeInspect()
-    local allObjs = getAllObjects()
-    for _, object in ipairs(allObjs) do
-        if object.tag == "Card" and (object.getDescription() == "Fake Party Card") then
-            destroyObject(object)
-        end
-    end
-end
-
-function needInspect()
-    local allObjs = getAllObjects()
-    for _, object in ipairs(allObjs) do
-        if object.tag == "Card" and (object.getDescription() == "Fake Party Card") then
             return true
         end
-    end
-    return false
-end
 
+        startLuaCoroutine(Global, "createInspectButtonsCoroutine")
+    end
+
+    function playerInspected(clickedObject, inspectorColor, checkedColor)
+        if inspectorColor == activePowerColor and needInspect() then
+            local role = roles[checkedColor]
+            local playerColor = stringColorToRGBExtra(checkedColor)
+            local roleText
+            local roleColor
+
+            if role == "hitler" or role == "fascist" then
+                roleText = text.fascistArticle .. " " .. string.lower(text.fascist)
+                roleColor = {1, 0, 0}
+            else
+                roleText = text.liberalArticle .. " " .. string.lower(text.liberal)
+                roleColor = {0.1, 0.3, 1}
+            end
+
+            timeOfPlay = math.floor(os.time()-timeSinceUV)
+            timeOfPlayM = math.floor(timeOfPlay/60)
+            timeOfPlayS = math.floor(timeOfPlay - (timeOfPlayM * 60))
+
+            if timeOfPlayM == 0 then
+                printToAll(inspectorColor .. " inspected " .. checkedColor .. "("  .. timeOfPlayS .. " Seconds)", playerColor)
+            elseif timeOfPlayM == 1 then
+                printToAll(inspectorColor .. " inspected " .. checkedColor .. "(" .. timeOfPlayM .. "Minute " .. timeOfPlayS .. " Seconds)", playerColor)
+            else
+                printToAll(inspectorColor .. " inspected " .. checkedColor .. "(" .. timeOfPlayM .. "Minutes " .. timeOfPlayS .. " Seconds)" , playerColor)
+            end
+
+            smartBroadcastToColor(checkedColor .. " is " .. roleText .. "!", inspectorColor, roleColor)
+            table.insert(inspected, 1, checkedColor)
+            removeInspect()
+            timeSinceUV = os.time()
+            getObjectFromGUID("303db7").Clock.startStopwatch()
+            getObjectFromGUID("68faa0").Clock.startStopwatch()
+
+            if options.autoNotate and notate.line and notate.action == "inspects" then
+                noteTakerNotes[notate.line].color2 = checkedColor
+                refreshNotes(nil)
+                notate.line = nil
+                notate.action = ""
+            end
+
+            activePowerColor = nil
+        end
+    end
+
+    function WhiteInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "White")
+    end
+
+    function BrownInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Brown")
+    end
+
+    function RedInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Red")
+    end
+
+    function OrangeInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Orange")
+    end
+
+    function YellowInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Yellow")
+    end
+
+    function GreenInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Green")
+    end
+
+    function TealInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Teal")
+    end
+
+    function BlueInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Blue")
+    end
+
+    function PurpleInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Purple")
+    end
+
+    function PinkInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Pink")
+    end
+
+    function TanInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Tan")
+    end
+
+    function MaroonInspected(clickedObject, inspectorColor)
+        playerInspected(clickedObject, inspectorColor, "Maroon")
+    end
+
+    function removeInspect()
+        local allObjs = getAllObjects()
+
+        for _, object in ipairs(allObjs) do
+            if object.tag == "Card" and (object.getDescription() == "Fake Party Card") then
+                destroyObject(object)
+            end
+        end
+    end
+
+    function needInspect()
+        local allObjs = getAllObjects()
+
+        for _, object in ipairs(allObjs) do
+            if object.tag == "Card" and (object.getDescription() == "Fake Party Card") then
+                return true
+            end
+        end
+
+        return false
+    end
 end
 
 function giveRoleCards()
@@ -4985,6 +5293,7 @@ function giveRoleCardsCo()
             table.insert(fasCards, newVoteDeck.takeObject())
         end
     end
+
     local hitCard = newVoteDeck.takeObject({position=newPosition})
 
     if not options.dealRoleCards then
@@ -5016,6 +5325,7 @@ function giveRoleCardsCo()
     for i, value in pairs(libCards) do
         value.destruct()
     end
+
     for i, value in pairs(fasCards) do
         value.destruct()
     end
@@ -5033,84 +5343,11 @@ function findUnusedColor()
     end
 end
 
---[[function shufflePlayers()
-    local blackSteamId
-    if #getSeatedPlayers() == 10 and Player["Black"].seated then
-        blackSteamId = Player["Black"].steam_id
-        Player["Black"]:changeColor("Grey")
-        while Player["Black"].seated do
-            coroutine.yield()
-        end
-    end
-    swapColor = findUnusedColor()
-
-    local ranColors = {}
-    for _, v in pairs(getSeatedPlayers()) do
-        if (not Player[v].host) or options.shuffleHost then
-            table.insert(ranColors, 1, v)
-        end
-    end
-    shuffleTable(ranColors)
-
-    seatedPlayers = {}
-    local j = 1
-    for _, v in pairs(getSeatedPlayers()) do
-        if (not Player[v].host) or options.shuffleHost then
-            local playerInfo = {}
-            playerInfo.target = ranColors[j]
-            playerInfo.myColor = v
-            table.insert(seatedPlayers, 1, playerInfo)
-            j = j + 1
-        end
-    end
-
-    local doneCount = 0
-    local tryCount = #seatedPlayers
-    while doneCount ~= #seatedPlayers and tryCount > 0 do
-        doneCount = 0
-        for i, v in pairs(seatedPlayers) do
-            if v.target ~= v.myColor then
-                if Player[v.target].seated == false then
-                    local myC = v.myColor
-                    if Player[myC].seated == true then
-                        Player[myC]:changeColor(v.target)
-                        while Player[myC].seated and not Player[v.target].seated do
-                            coroutine.yield()
-                        end
-                        v.myColor = v.target
-                        doneCount = doneCount + 1
-                    end
-                elseif Player[swapColor].seated == false then
-                    local myC = v.myColor
-                    if Player[myC].seated == true then
-                        Player[myC]:changeColor(swapColor)
-                        while Player[myC].seated and not Player[swapColor].seated do
-                            coroutine.yield()
-                        end
-                        v.myColor = swapColor
-                    end
-                end
-            else
-                doneCount = doneCount + 1
-            end
-        end
-        tryCount = tryCount - 1
-        coroutine.yield()
-    end
-
-    if blackSteamId then
-        for _, p in pairs(Player.getSpectators()) do
-            if p.steam_id == blackSteamId then
-                p:changeColor("Black")
-            end
-        end
-    end
-end]]--
-
 function notateColor2ByObject(tableIn)
     if type(tableIn) == "table" then
         if tableIn[1] then
             local playerColor = closestPlayer(tableIn[1], players, 18)
+
             if playerColor and notate.line then
                 if noteTakerNotes[notate.line] then
                     if noteTakerNotes[notate.line].color1 ~= playerColor then
@@ -5124,9 +5361,6 @@ function notateColor2ByObject(tableIn)
         end
     end
 end
-
-----#include \SecretHitlerCE\main.ttslua
-----#include \SecretHitlerCE\cardsboard.ttslua
 
 --Board cards
 TOPTHREE_STRING = "The president examines\nthe top three cards."
@@ -5154,10 +5388,10 @@ NOTUSED_STRING = "Not Used"
 
 function isBoardCard(objIn)
     if objIn.tag == "Card" and
-       (objIn.getDescription() == TOPTHREE_STRING or
+        (objIn.getDescription() == TOPTHREE_STRING or
          objIn.getDescription() == PICKPRES_STRING or
-        objIn.getDescription() == INSPECT_STRING or
-        objIn.getDescription() == BULLET_STRING or
+         objIn.getDescription() == INSPECT_STRING or
+         objIn.getDescription() == BULLET_STRING or
          objIn.getDescription() == TOPCARD_STRING or
          objIn.getDescription() == IMPRISON_STRING or
          objIn.getDescription() == PRESTAKESABOVE_STRING or
@@ -5173,51 +5407,47 @@ function isBoardCard(objIn)
          objIn.getDescription() == CHANCELLOR_STRING) then
         return true
     end
+
     return false
 end
 
 function isSubBoardCard(objIn)
-    if objIn.tag == "Card" and
-       (objIn.getDescription() == VETO_STRING or
-         objIn.getDescription() == CHANCELLOR_STRING) then
+    if objIn.tag == "Card" and (objIn.getDescription() == VETO_STRING or objIn.getDescription() == CHANCELLOR_STRING) then
         return true
     end
+
     return false
 end
 
 function isBoardCardAboveAbility(objIn)
-    if objIn.tag == "Card" and
-       (objIn.getDescription() == PRESTAKESABOVE_STRING or
-         objIn.getDescription() == PRESGIVESABOVE_STRING) then
+    if objIn.tag == "Card" and (objIn.getDescription() == PRESTAKESABOVE_STRING or objIn.getDescription() == PRESGIVESABOVE_STRING) then
         return true
     end
+
     return false
 end
 
 function isBoardCardAboveHiddenAbility(objIn)
-    if objIn.tag == "Card" and
-       (objIn.getDescription() == PRESTAKESHIDDENABOVE_STRING or
-         objIn.getDescription() == PRESGIVESHIDDENABOVE_STRING) then
+    if objIn.tag == "Card" and (objIn.getDescription() == PRESTAKESHIDDENABOVE_STRING or objIn.getDescription() == PRESGIVESHIDDENABOVE_STRING) then
         return true
     end
+
     return false
 end
 
 function isBoardCardBelowAbility(objIn)
-    if objIn.tag == "Card" and
-       (objIn.getDescription() == PRESTAKESBELOW_STRING or
-         objIn.getDescription() == PRESGIVESBELOW_STRING) then
+    if objIn.tag == "Card" and (objIn.getDescription() == PRESTAKESBELOW_STRING or objIn.getDescription() == PRESGIVESBELOW_STRING) then
         return true
     end
+
     return false
 end
 
 function isBoardCardBelowHiddenAbility(objIn)
-    if objIn.tag == "Card" and
-       (objIn.getDescription() == PRESTAKESHIDDENBELOW_STRING or
-         objIn.getDescription() == PRESGIVESHIDDENBELOW_STRING) then
+    if objIn.tag == "Card" and (objIn.getDescription() == PRESTAKESHIDDENBELOW_STRING or objIn.getDescription() == PRESGIVESHIDDENBELOW_STRING) then
         return true
     end
+
     return false
 end
 
@@ -5225,6 +5455,7 @@ function isBoardCardTopThree(objIn)
     if objIn.tag == "Card" and objIn.getDescription() == TOPTHREE_STRING then
         return true
     end
+
     return false
 end
 
@@ -5232,6 +5463,7 @@ function isBoardCardPickPres(objIn)
     if objIn.tag == "Card" and objIn.getDescription() == PICKPRES_STRING then
         return true
     end
+
     return false
 end
 
@@ -5239,6 +5471,7 @@ function isBoardCardInspect(objIn)
     if objIn.tag == "Card" and objIn.getDescription() == INSPECT_STRING then
         return true
     end
+
     return false
 end
 
@@ -5246,6 +5479,7 @@ function isBoardCardBullet(objIn)
     if objIn.tag == "Card" and objIn.getDescription() == BULLET_STRING then
         return true
     end
+
     return false
 end
 
@@ -5253,6 +5487,7 @@ function isBoardCardTopCard(objIn)
     if objIn.tag == "Card" and objIn.getDescription() == TOPCARD_STRING then
         return true
     end
+
     return false
 end
 
@@ -5260,48 +5495,47 @@ function isBoardCardImprison(objIn)
     if objIn.tag == "Card" and objIn.getDescription() == IMPRISON_STRING then
         return true
     end
+
     return false
 end
 
 function isPolicyCard(objIn)
-    if objIn.tag == "Card" and (objIn.getDescription() == FASCISTPOLICY_STRING
-        or objIn.getDescription() == LIBERALPOLICY_STRING
-        or objIn.getDescription() == GREYPOLICY_STRING)
-        and not objIn.held_by_color then
+    if objIn.tag == "Card" and (objIn.getDescription() == FASCISTPOLICY_STRING or objIn.getDescription() == LIBERALPOLICY_STRING or objIn.getDescription() == GREYPOLICY_STRING) and not objIn.held_by_color then
         return true
     end
+
     return false
 end
 
 function isFascistPolicyCard(objIn)
-    if objIn.tag == "Card" and objIn.getDescription() == FASCISTPOLICY_STRING
-        and not objIn.held_by_color then
+    if objIn.tag == "Card" and objIn.getDescription() == FASCISTPOLICY_STRING and not objIn.held_by_color then
         return true
     end
+
     return false
 end
 
 function isLiberalPolicyCard(objIn)
-    if objIn.tag == "Card" and objIn.getDescription() == LIBERALPOLICY_STRING
-        and not objIn.held_by_color then
+    if objIn.tag == "Card" and objIn.getDescription() == LIBERALPOLICY_STRING and not objIn.held_by_color then
         return true
     end
+
     return false
 end
 
 function isGreyPolicyCard(objIn)
-    if objIn.tag == "Card" and objIn.getDescription() == GREYPOLICY_STRING
-        and not objIn.held_by_color then
+    if objIn.tag == "Card" and objIn.getDescription() == GREYPOLICY_STRING and not objIn.held_by_color then
         return true
     end
+
     return false
 end
 
 function isPolicyNotUsedCard(objIn)
-    if objIn.tag == "Card" and objIn.getDescription() == NOTUSED_STRING
-        and not objIn.held_by_color then
+    if objIn.tag == "Card" and objIn.getDescription() == NOTUSED_STRING and not objIn.held_by_color then
         return true
     end
+
     return false
 end
 
@@ -5309,6 +5543,7 @@ function refreshBoardCards()
     if options.gameType == 2 then
         deleteCustomBoardCards()
         spawnCustomBoardCards()
+
         -- Unlock board cards
         testActionUsedPolicyZones(
             function(p) return isBoardCard(p) or isPolicyNotUsedCard(p) end,
@@ -5323,6 +5558,7 @@ function refreshBoardCards()
             nil)
         spawnNotUsedFascist(getPositionByGUIDOffsetZ(fascist_zone_guids[1], 0.1))
         spawnNotUsedLiberal(getPositionByGUIDOffsetZ(liberal_zone_guids[1], 0.1))
+
         if #getSeatedPlayers() > 8 then
             spawnInspectOrange(getPositionByGUIDOffsetZ(fascist_zone_guids[2], 0.1))
             spawnInspectOrange(getPositionByGUIDOffsetZ(fascist_zone_guids[3], 0.1))
@@ -5333,12 +5569,15 @@ function refreshBoardCards()
         else
             spawnTopThreeOrange(getPositionByGUIDOffsetZ(fascist_zone_guids[4], 0.1))
         end
+
         spawnBulletRed(getPositionByGUIDOffsetZ(fascist_zone_guids[5], 0.1))
         spawnBulletRed(getPositionByGUIDOffsetZ(fascist_zone_guids[6], 0.1))
         spawnVetoRed(getPositionByGUIDOffsetZ(fascist_zone_guids[6], -2))
+
         if boardCardWaitId then
             Wait.stop(boardCardWaitId)
         end
+
         boardCardWaitId = Wait.time(
             function()
                 testReadyToLock(
@@ -5347,18 +5586,23 @@ function refreshBoardCards()
                     end, boardCardWaitId)
             end, 5, -1)
     end
+
     lastPlayerCt = #getSeatedPlayers()
 end
 
 function testActionUsedPolicyZones(testFunc, actionFunc, waitID)
     local tmpZoneGuid
+
     if waitID then
         Wait.stop(waitID)
     end
+
     for _, tmpZoneGuid in ipairs(liberal_zone_guids) do
         tmpZone = getObjectFromGUID(tmpZoneGuid)
+
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if testFunc(j) then
                     actionFunc(j)
@@ -5366,10 +5610,13 @@ function testActionUsedPolicyZones(testFunc, actionFunc, waitID)
             end
         end
     end
+
     for _, tmpZoneGuid in ipairs(fascist_zone_guids) do
         tmpZone = getObjectFromGUID(tmpZoneGuid)
+
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if testFunc(j) then
                     actionFunc(j)
@@ -5383,38 +5630,53 @@ function testReadyToLock(testFunc, waitID)
     if (started ~= true) then
         return false
     end
+
     local lock = true
+
     --check if anything is loading
     for _, j in pairs(getAllObjects()) do
-        if j.loading_custom and j.tag ~= "3D Text" then lock = false end
+        if j.loading_custom and j.tag ~= "3D Text" then
+            lock = false
+        end
     end
+
     --check if resting
     if lock then
         for _, tmpZoneGuid in ipairs(liberal_zone_guids) do
             tmpZone = getObjectFromGUID(tmpZoneGuid)
+
             if tmpZone then
                 inZone = tmpZone.getObjects()
+
                 for _, j in ipairs(inZone) do
                     if testFunc(j) then
-                        if not j.resting then lock = false end
+                        if not j.resting then
+                            lock = false
+                        end
                     end
                 end
             end
         end
     end
+
     if lock then
         for _, tmpZoneGuid in ipairs(fascist_zone_guids) do
             tmpZone = getObjectFromGUID(tmpZoneGuid)
+
             if tmpZone then
                 inZone = tmpZone.getObjects()
+
                 for _, j in ipairs(inZone) do
                     if testFunc(j) then
-                        if not j.resting then lock = false end
+                        if not j.resting then
+                            lock = false
+                        end
                     end
                 end
             end
         end
     end
+
     if lock then
         -- lock board cards
         testActionUsedPolicyZones(
@@ -5427,10 +5689,13 @@ end
 function deleteCustomBoardCards()
     local tmpZoneGuid
     local inUse = {}
+
     for _, tmpZoneGuid in ipairs(liberal_zone_guids) do
         tmpZone = getObjectFromGUID(tmpZoneGuid)
+
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if isBoardCard(j) or isPolicyNotUsedCard(j) then
                     smartTableInsert(inUse, j.getGUID())
@@ -5438,10 +5703,13 @@ function deleteCustomBoardCards()
             end
         end
     end
+
     for _, tmpZoneGuid in ipairs(fascist_zone_guids) do
         tmpZone = getObjectFromGUID(tmpZoneGuid)
+
         if tmpZone then
             inZone = tmpZone.getObjects()
+
             for _, j in ipairs(inZone) do
                 if isBoardCard(j) or isPolicyNotUsedCard(j) then
                     smartTableInsert(inUse, j.getGUID())
@@ -5449,6 +5717,7 @@ function deleteCustomBoardCards()
             end
         end
     end
+
     for _, j in pairs(getAllObjects()) do
         if (isBoardCard(j) or isPolicyNotUsedCard(j)) and not inTable(inUse, j.getGUID()) then
             destroyObject(j);
@@ -5457,187 +5726,182 @@ function deleteCustomBoardCards()
 end
 
 do -- spawn board card functions
+    function spawnCustomBoardCards()
+        spawnTopThreeOrange({-38, 2, 19})
+        spawnTopThreeRed({-38, 2, 15})
+        spawnTopThreeBlue({-38, 2, 11})
+        spawnInspectOrange({-34, 2, 19})
+        spawnInspectRed({-34, 2, 15})
+        spawnInspectBlue({-34, 2, 11})
+        spawnPickPresOrange({-30, 2, 19})
+        spawnPickPresRed({-30, 2, 15})
+        spawnPickPresBlue({-30, 2, 11})
+        spawnBulletOrange({-26, 2, 19})
+        spawnBulletRed({-26, 2, 15})
+        spawnBulletBlue({-26, 2, 11})
+        spawnVetoOrange({-36, 2, 8})
+        spawnVetoRed({-36, 2, 6})
+        spawnVetoBlue({-36, 2, 4})
+        spawnNotUsedFascist({-32, 2, 6})
+        spawnNotUsedLiberal({-28, 2, 6})
+        spawnTopCardOrange({-36, 2, 1})
+        spawnTopCardRed({-36, 2, -3})
+        spawnTopCardBlue({-36, 2, -7})
+        spawnImprisonOrange({-32, 2, 1})
+        spawnImprisonRed({-32, 2, -3})
+        spawnImprisonBlue({-32, 2, -7})
+        spawnDoesNothingOrange({-28, 2, 1})
+        spawnDoesNothingRed({-28, 2, -3})
+        spawnDoesNothingBlue({-28, 2, -7})
+        spawnPresTakesOrange({-38, 2, -11})
+        spawnPresTakesRed({-38, 2, -15})
+        spawnPresTakesBlue({-38, 2, -19})
+        spawnPresTakesHiddenOrange({-34, 2, -11})
+        spawnPresTakesHiddenRed({-34, 2, -15})
+        spawnPresTakesHiddenBlue({-34, 2, -19})
+        spawnPresGivesOrange({-30, 2, -11})
+        spawnPresGivesRed({-30, 2, -15})
+        spawnPresGivesBlue({-30, 2, -19})
+        spawnPresGivesHiddenOrange({-26, 2, -11})
+        spawnPresGivesHiddenRed({-26, 2, -15})
+        spawnPresGivesHiddenBlue({-26, 2, -19})
+    end
 
-function spawnCustomBoardCards()
-    spawnTopThreeOrange({-38, 2, 19})
-    spawnTopThreeRed({-38, 2, 15})
-    spawnTopThreeBlue({-38, 2, 11})
-    spawnInspectOrange({-34, 2, 19})
-    spawnInspectRed({-34, 2, 15})
-    spawnInspectBlue({-34, 2, 11})
-    spawnPickPresOrange({-30, 2, 19})
-    spawnPickPresRed({-30, 2, 15})
-    spawnPickPresBlue({-30, 2, 11})
-    spawnBulletOrange({-26, 2, 19})
-    spawnBulletRed({-26, 2, 15})
-    spawnBulletBlue({-26, 2, 11})
-    spawnVetoOrange({-36, 2, 8})
-    spawnVetoRed({-36, 2, 6})
-    spawnVetoBlue({-36, 2, 4})
-    spawnNotUsedFascist({-32, 2, 6})
-    spawnNotUsedLiberal({-28, 2, 6})
-    spawnTopCardOrange({-36, 2, 1})
-    spawnTopCardRed({-36, 2, -3})
-    spawnTopCardBlue({-36, 2, -7})
-    spawnImprisonOrange({-32, 2, 1})
-    spawnImprisonRed({-32, 2, -3})
-    spawnImprisonBlue({-32, 2, -7})
-    spawnDoesNothingOrange({-28, 2, 1})
-    spawnDoesNothingRed({-28, 2, -3})
-    spawnDoesNothingBlue({-28, 2, -7})
-    spawnPresTakesOrange({-38, 2, -11})
-    spawnPresTakesRed({-38, 2, -15})
-    spawnPresTakesBlue({-38, 2, -19})
-    spawnPresTakesHiddenOrange({-34, 2, -11})
-    spawnPresTakesHiddenRed({-34, 2, -15})
-    spawnPresTakesHiddenBlue({-34, 2, -19})
-    spawnPresGivesOrange({-30, 2, -11})
-    spawnPresGivesRed({-30, 2, -15})
-    spawnPresGivesBlue({-30, 2, -19})
-    spawnPresGivesHiddenOrange({-26, 2, -11})
-    spawnPresGivesHiddenRed({-26, 2, -15})
-    spawnPresGivesHiddenBlue({-26, 2, -19})
-    --spawnChancellorOrange({-36, 2, -22})
-    --spawnChancellorRed({-32, 2, -22})
-    --spawnChancellorBlue({-28, 2, -22})
-end
+    function spawnTopThreeOrange(pos)
+        return spawnBoardCard("10000", TOPTHREE_STRING, pos)
+    end
 
-function spawnTopThreeOrange(pos)
-    return spawnBoardCard("10000", TOPTHREE_STRING, pos)
-end
+    function spawnTopThreeRed(pos)
+        return spawnBoardCard("10001", TOPTHREE_STRING, pos)
+    end
 
-function spawnTopThreeRed(pos)
-    return spawnBoardCard("10001", TOPTHREE_STRING, pos)
-end
+    function spawnTopThreeBlue(pos)
+        return spawnBoardCard("10002", TOPTHREE_STRING, pos)
+    end
 
-function spawnTopThreeBlue(pos)
-    return spawnBoardCard("10002", TOPTHREE_STRING, pos)
-end
+    function spawnPickPresOrange(pos)
+        return spawnBoardCard("10003", PICKPRES_STRING, pos)
+    end
 
-function spawnPickPresOrange(pos)
-    return spawnBoardCard("10003", PICKPRES_STRING, pos)
-end
+    function spawnPickPresRed(pos)
+        return spawnBoardCard("10004", PICKPRES_STRING, pos)
+    end
 
-function spawnPickPresRed(pos)
-    return spawnBoardCard("10004", PICKPRES_STRING, pos)
-end
+    function spawnPickPresBlue(pos)
+        return spawnBoardCard("10005", PICKPRES_STRING, pos)
+    end
 
-function spawnPickPresBlue(pos)
-    return spawnBoardCard("10005", PICKPRES_STRING, pos)
-end
+    function spawnInspectOrange(pos)
+        return spawnBoardCard("10006", INSPECT_STRING, pos)
+    end
 
-function spawnInspectOrange(pos)
-    return spawnBoardCard("10006", INSPECT_STRING, pos)
-end
+    function spawnInspectRed(pos)
+        return spawnBoardCard("10007", INSPECT_STRING, pos)
+    end
 
-function spawnInspectRed(pos)
-    return spawnBoardCard("10007", INSPECT_STRING, pos)
-end
+    function spawnInspectBlue(pos)
+        return spawnBoardCard("10008", INSPECT_STRING, pos)
+    end
 
-function spawnInspectBlue(pos)
-    return spawnBoardCard("10008", INSPECT_STRING, pos)
-end
+    function spawnBulletOrange(pos)
+        return spawnBoardCard("10009", BULLET_STRING, pos)
+    end
 
-function spawnBulletOrange(pos)
-    return spawnBoardCard("10009", BULLET_STRING, pos)
-end
+    function spawnBulletRed(pos)
+        return spawnBoardCard("10010", BULLET_STRING, pos)
+    end
 
-function spawnBulletRed(pos)
-    return spawnBoardCard("10010", BULLET_STRING, pos)
-end
+    function spawnBulletBlue(pos)
+        return spawnBoardCard("10011", BULLET_STRING, pos)
+    end
 
-function spawnBulletBlue(pos)
-    return spawnBoardCard("10011", BULLET_STRING, pos)
-end
+    function spawnTopCardOrange(pos)
+        return spawnBoardCard("10012", TOPCARD_STRING, pos)
+    end
 
-function spawnTopCardOrange(pos)
-    return spawnBoardCard("10012", TOPCARD_STRING, pos)
-end
+    function spawnTopCardRed(pos)
+        return spawnBoardCard("10013", TOPCARD_STRING, pos)
+    end
 
-function spawnTopCardRed(pos)
-    return spawnBoardCard("10013", TOPCARD_STRING, pos)
-end
+    function spawnTopCardBlue(pos)
+        return spawnBoardCard("10014", TOPCARD_STRING, pos)
+    end
 
-function spawnTopCardBlue(pos)
-    return spawnBoardCard("10014", TOPCARD_STRING, pos)
-end
+    function spawnImprisonOrange(pos)
+        return spawnBoardCard("10015", IMPRISON_STRING, pos)
+    end
 
-function spawnImprisonOrange(pos)
-    return spawnBoardCard("10015", IMPRISON_STRING, pos)
-end
+    function spawnImprisonRed(pos)
+        return spawnBoardCard("10016", IMPRISON_STRING, pos)
+    end
 
-function spawnImprisonRed(pos)
-    return spawnBoardCard("10016", IMPRISON_STRING, pos)
-end
+    function spawnImprisonBlue(pos)
+        return spawnBoardCard("10017", IMPRISON_STRING, pos)
+    end
 
-function spawnImprisonBlue(pos)
-    return spawnBoardCard("10017", IMPRISON_STRING, pos)
-end
+    function spawnPresTakesOrange(pos)
+        return spawnBoardCard("10018", PRESTAKESABOVE_STRING, pos)
+    end
 
-function spawnPresTakesOrange(pos)
-    return spawnBoardCard("10018", PRESTAKESABOVE_STRING, pos)
-end
+    function spawnPresTakesRed(pos)
+        return spawnBoardCard("10019", PRESTAKESABOVE_STRING, pos)
+    end
 
-function spawnPresTakesRed(pos)
-    return spawnBoardCard("10019", PRESTAKESABOVE_STRING, pos)
-end
+    function spawnPresTakesBlue(pos)
+        return spawnBoardCard("10020", PRESTAKESBELOW_STRING, pos)
+    end
 
-function spawnPresTakesBlue(pos)
-    return spawnBoardCard("10020", PRESTAKESBELOW_STRING, pos)
-end
+    function spawnPresTakesHiddenOrange(pos)
+        return spawnBoardCard("10021", PRESTAKESHIDDENABOVE_STRING, pos)
+    end
 
-function spawnPresTakesHiddenOrange(pos)
-    return spawnBoardCard("10021", PRESTAKESHIDDENABOVE_STRING, pos)
-end
+    function spawnPresTakesHiddenRed(pos)
+        return spawnBoardCard("10022", PRESTAKESHIDDENABOVE_STRING, pos)
+    end
 
-function spawnPresTakesHiddenRed(pos)
-    return spawnBoardCard("10022", PRESTAKESHIDDENABOVE_STRING, pos)
-end
+    function spawnPresTakesHiddenBlue(pos)
+        return spawnBoardCard("10023", PRESTAKESHIDDENBELOW_STRING , pos)
+    end
 
-function spawnPresTakesHiddenBlue(pos)
-    return spawnBoardCard("10023", PRESTAKESHIDDENBELOW_STRING , pos)
-end
+    function spawnPresGivesOrange(pos)
+        return spawnBoardCard("10024", PRESGIVESABOVE_STRING, pos)
+    end
 
-function spawnPresGivesOrange(pos)
-    return spawnBoardCard("10024", PRESGIVESABOVE_STRING, pos)
-end
+    function spawnPresGivesRed(pos)
+        return spawnBoardCard("10025", PRESGIVESABOVE_STRING, pos)
+    end
 
-function spawnPresGivesRed(pos)
-    return spawnBoardCard("10025", PRESGIVESABOVE_STRING, pos)
-end
+    function spawnPresGivesBlue(pos)
+        return spawnBoardCard("10026", PRESGIVESBELOW_STRING, pos)
+    end
 
-function spawnPresGivesBlue(pos)
-    return spawnBoardCard("10026", PRESGIVESBELOW_STRING, pos)
-end
+    function spawnPresGivesHiddenOrange(pos)
+        return spawnBoardCard("10027", PRESGIVESHIDDENABOVE_STRING, pos)
+    end
 
-function spawnPresGivesHiddenOrange(pos)
-    return spawnBoardCard("10027", PRESGIVESHIDDENABOVE_STRING, pos)
-end
+    function spawnPresGivesHiddenRed(pos)
+        return spawnBoardCard("10028", PRESGIVESHIDDENABOVE_STRING, pos)
+    end
 
-function spawnPresGivesHiddenRed(pos)
-    return spawnBoardCard("10028", PRESGIVESHIDDENABOVE_STRING, pos)
-end
+    function spawnPresGivesHiddenBlue(pos)
+        return spawnBoardCard("10029", PRESGIVESHIDDENBELOW_STRING, pos)
+    end
 
-function spawnPresGivesHiddenBlue(pos)
-    return spawnBoardCard("10029", PRESGIVESHIDDENBELOW_STRING, pos)
-end
+    function spawnDoesNothingOrange(pos)
+        return spawnBoardCard("10030", DOESNOTHING_STRING, pos)
+    end
 
-function spawnDoesNothingOrange(pos)
-    return spawnBoardCard("10030", DOESNOTHING_STRING, pos)
-end
+    function spawnDoesNothingRed(pos)
+        return spawnBoardCard("10031", DOESNOTHING_STRING, pos)
+    end
 
-function spawnDoesNothingRed(pos)
-    return spawnBoardCard("10031", DOESNOTHING_STRING, pos)
-end
+    function spawnDoesNothingBlue(pos)
+        return spawnBoardCard("10032", DOESNOTHING_STRING, pos)
+    end
 
-function spawnDoesNothingBlue(pos)
-    return spawnBoardCard("10032", DOESNOTHING_STRING, pos)
-end
-
-function spawnBoardCard(cardID, desc, pos)
-   local params = {
-      json =
-            "{" ..
+    function spawnBoardCard(cardID, desc, pos)
+        local params = {
+            json = "{" ..
             "\"Name\": \"Card\", " ..
             "\"Transform\": {\"posX\": 0,\"posY\": 0,\"posZ\": 0,\"rotX\": 0,\"rotY\": 0,\"rotZ\": 0,\"scaleX\": 1,\"scaleY\": 1,\"scaleZ\": 1}, " ..
             "\"CardID\": " .. cardID .. ", " ..
@@ -5652,45 +5916,44 @@ function spawnBoardCard(cardID, desc, pos)
             "}" ..
             "}" ..
             "}",
-      position = pos,
-      rotation = FACE_UP_ROT,
-      scale = {x = 1, y = 1, z = 1},
-      sound = false
-   }
-    local card = spawnObjectJSON(params)
-    card.setDescription(desc)
-    card.use_grid = false
-   return card
-end
+            position = pos,
+            rotation = FACE_UP_ROT,
+            scale = {x = 1, y = 1, z = 1},
+            sound = false
+        }
+        local card = spawnObjectJSON(params)
+        card.setDescription(desc)
+        card.use_grid = false
+        return card
+    end
 
-function spawnVetoOrange(pos)
-    return spawnSubBoardCard("10100", VETO_STRING, pos)
-end
+    function spawnVetoOrange(pos)
+        return spawnSubBoardCard("10100", VETO_STRING, pos)
+    end
 
-function spawnVetoRed(pos)
-    return spawnSubBoardCard("10101", VETO_STRING, pos)
-end
+    function spawnVetoRed(pos)
+        return spawnSubBoardCard("10101", VETO_STRING, pos)
+    end
 
-function spawnVetoBlue(pos)
-    return spawnSubBoardCard("10102", VETO_STRING, pos)
-end
+    function spawnVetoBlue(pos)
+        return spawnSubBoardCard("10102", VETO_STRING, pos)
+    end
 
-function spawnChancellorOrange(pos)
-    return spawnSubBoardCard("10103", CHANCELLOR_STRING, pos)
-end
+    function spawnChancellorOrange(pos)
+        return spawnSubBoardCard("10103", CHANCELLOR_STRING, pos)
+    end
 
-function spawnChancellorRed(pos)
-    return spawnSubBoardCard("10104", CHANCELLOR_STRING, pos)
-end
+    function spawnChancellorRed(pos)
+        return spawnSubBoardCard("10104", CHANCELLOR_STRING, pos)
+    end
 
-function spawnChancellorBlue(pos)
-    return spawnSubBoardCard("10105", CHANCELLOR_STRING, pos)
-end
+    function spawnChancellorBlue(pos)
+        return spawnSubBoardCard("10105", CHANCELLOR_STRING, pos)
+    end
 
-function spawnSubBoardCard(cardID, desc, pos)
-   local params = {
-      json =
-            "{" ..
+    function spawnSubBoardCard(cardID, desc, pos)
+        local params = {
+            json = "{" ..
             "\"Name\": \"Card\", " ..
             "\"Transform\": {\"posX\": 0,\"posY\": 0,\"posZ\": 0,\"rotX\": 0,\"rotY\": 0,\"rotZ\": 0,\"scaleX\": 1,\"scaleY\": 1,\"scaleZ\": 1}, " ..
             "\"CardID\": " .. cardID .. ", " ..
@@ -5705,40 +5968,40 @@ function spawnSubBoardCard(cardID, desc, pos)
             "}" ..
             "}" ..
             "}",
-      position = pos,
-      rotation = FACE_UP_ROT,
-      scale = {x = 0.3, y = 1, z = 0.3},
-      sound = false
-   }
-    local card = spawnObjectJSON(params)
-    card.setDescription(desc)
-    card.use_grid = false
-   return card
-end
+            position = pos,
+            rotation = FACE_UP_ROT,
+            scale = {x = 0.3, y = 1, z = 0.3},
+            sound = false
+        }
+        local card = spawnObjectJSON(params)
+        card.setDescription(desc)
+        card.use_grid = false
+        return card
+    end
 
-function spawnLiberalPolicy(pos, rot)
-    return spawnPolicyCard("10200", LIBERALPOLICY_STRING, pos, rot, true)
-end
+    function spawnLiberalPolicy(pos, rot)
+        return spawnPolicyCard("10200", LIBERALPOLICY_STRING, pos, rot, true)
+    end
 
-function spawnFascistPolicy(pos, rot)
-    return spawnPolicyCard("10201", FASCISTPOLICY_STRING, pos, rot, true)
-end
+    function spawnFascistPolicy(pos, rot)
+        return spawnPolicyCard("10201", FASCISTPOLICY_STRING, pos, rot, true)
+    end
 
-function spawnGreyPolicy(pos, rot)
-    return spawnPolicyCard("10203", GREYPOLICY_STRING, pos, rot, true)
-end
+    function spawnGreyPolicy(pos, rot)
+        return spawnPolicyCard("10203", GREYPOLICY_STRING, pos, rot, true)
+    end
 
-function spawnNotUsedLiberal(pos)
-    return spawnPolicyCard("10204", NOTUSED_STRING, pos, FACE_UP_ROT, false)
-end
+    function spawnNotUsedLiberal(pos)
+        return spawnPolicyCard("10204", NOTUSED_STRING, pos, FACE_UP_ROT, false)
+    end
 
-function spawnNotUsedFascist(pos)
-    return spawnPolicyCard("10205", NOTUSED_STRING, pos, FACE_UP_ROT, false)
-end
+    function spawnNotUsedFascist(pos)
+        return spawnPolicyCard("10205", NOTUSED_STRING, pos, FACE_UP_ROT, false)
+    end
 
-function spawnPolicyCard(cardID, desc, pos, rot, luaBool)
-   local params = {
-      json =
+    function spawnPolicyCard(cardID, desc, pos, rot, luaBool)
+        local params = {
+            json =
             "{" ..
             "\"Name\": \"Card\", " ..
             "\"Transform\": {\"posX\": 0,\"posY\": 0,\"posZ\": 0,\"rotX\": 0,\"rotY\": 0,\"rotZ\": 0,\"scaleX\": 1,\"scaleY\": 1,\"scaleZ\": 1}, " ..
@@ -5754,36 +6017,34 @@ function spawnPolicyCard(cardID, desc, pos, rot, luaBool)
             "}" ..
             "}" ..
             "}",
-      position = pos,
-      rotation = rot,
-      scale = {x = 1.51, y = 1, z = 1.51},
-      sound = false
-   }
-    local card = spawnObjectJSON(params)
-    card.setDescription(desc)
-    card.use_grid = false
-    if luaBool then
-        card.setLuaScript(
-            "enabled = false -- workaround for rewind error\r\n" ..
-            "\r\n" ..
-            "function onDrop(playerColor)\r\n" ..
-            "   enabled = true\r\n" ..
-            "   Global.call('createPolicyCardWait')\r\n" ..
-            "end\r\n" ..
-            "\r\n" ..
-            "function onCollisionEnter(collisionInfo)\r\n" ..
-            "   if enabled then\r\n" ..
-            "       Global.call('createPolicyCardWait')\r\n" ..
-            "   end\r\n" ..
-            "end\r\n")
+            position = pos,
+            rotation = rot,
+            scale = {x = 1.51, y = 1, z = 1.51},
+            sound = false
+        }
+        local card = spawnObjectJSON(params)
+        card.setDescription(desc)
+        card.use_grid = false
+
+        if luaBool then
+            card.setLuaScript(
+                "enabled = false -- workaround for rewind error\r\n" ..
+                "\r\n" ..
+                "function onDrop(playerColor)\r\n" ..
+                "   enabled = true\r\n" ..
+                "   Global.call('createPolicyCardWait')\r\n" ..
+                "end\r\n" ..
+                "\r\n" ..
+                "function onCollisionEnter(collisionInfo)\r\n" ..
+                "   if enabled then\r\n" ..
+                "       Global.call('createPolicyCardWait')\r\n" ..
+                "   end\r\n" ..
+                "end\r\n")
+        end
+
+        return card
     end
-   return card
 end
-
-end
-
-----#include \SecretHitlerCE\cardsboard.ttslua
-----#include \SecretHitlerCE\UI.ttslua
 
 UIActionTable = {}
 UITargetColorTable = {}
@@ -5794,6 +6055,7 @@ UIhidden = false
 function refreshUI()
     if options.zoneType == 6 then
         local abilitiesDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
+
         if abilitiesDeck then
             UI.setAttribute("greyCommandsExp", "visibility", "Grey")
             UI.setAttribute("greyCommands", "visibility", " ")
@@ -5801,28 +6063,31 @@ function refreshUI()
             UI.setAttribute("greyCommands", "visibility", "Grey")
             UI.setAttribute("greyCommandsExp", "visibility", " ")
         end
+
         UI.setAttribute("greyPolicy", "visibility", "Grey")
         UI.setAttribute("greyVote", "visibility", "Grey")
         UI.setAttribute("adminButton", "visibility", "Admin")
         UI.setAttribute("admin", "visibility", "Admin")
         UI.setAttribute("adminButton", "active", "true")
     end
+
     if started == nil or started == false then
         for _, playerColor in pairs(MAIN_PLAYABLE_COLORS) do
-            --UI.hide("player" .. playerColor)
-            --UI.setAttribute("player" .. playerColor, "visibility", "")
             UI.setAttribute("player" .. playerColor, "active", "false")
         end
+
         UI.setAttribute("youNotPlaying", "active", "false")
         UI.setAttribute("playerBlack", "active", "false")
         UIhidden = true
     end
+
     updateClaimUI()
+
     if started then
         local clrnums = {"ffffff","703A16","DA1917","F3631C","E6E42B","30B22A","20B09A","1E87FF","9F1FEF","F46FCD","3F3F3F", "BCBCBC"}
-
         hitText = ""
         fasTexts = {}
+
         for i, playerColor in pairs(MAIN_PLAYABLE_COLORS) do
             if (roles[playerColor] == "hitler") then
                 hitText = '\n<textcolor color="#' .. clrnums[i] .. '">' .. playerColor .. " is Hitler!</textcolor>"
@@ -5830,9 +6095,11 @@ function refreshUI()
                 fasTexts[playerColor] = '\n<textcolor color="#' .. clrnums[i] .. '">' .. playerColor .. " is a Fascist!</textcolor>"
             end
         end
+
         -- set seated player UI
         for _, playerColor in pairs(MAIN_PLAYABLE_COLORS) do
             UI.setAttribute("player" .. playerColor, "active", "true")
+ 
             if (roles[playerColor] == nil) then
                 UI.setValue("player" .. playerColor, '<textcolor color="#FFFFFF">You are not playing!</textcolor>')
             elseif (roles[playerColor] == "liberal") then
@@ -5841,31 +6108,33 @@ function refreshUI()
                 UI.setValue("player" .. playerColor, "Player " .. playerColor .. ':\n<textcolor color="#FF0000">You are Hitler!</textcolor>')
             elseif (roles[playerColor] == "fascist") then
                 local fasString = "Player " .. playerColor .. ':\n<textcolor color="#FF0000">You are a Fascist!</textcolor>' .. hitText
+ 
                 for j, playerColor2 in pairs(MAIN_PLAYABLE_COLORS) do
                     if (playerColor2 ~= playerColor and fasTexts[playerColor2] ~= nil) then
                         fasString = fasString .. fasTexts[playerColor2]
                     end
                 end
+ 
                 UI.setValue("player" .. playerColor, fasString)
             end
-
         end
 
         -- set black UI (and set visibility again)
         local blackString = hitText
+
         for i, playerColor in pairs(MAIN_PLAYABLE_COLORS) do
             if (fasTexts[playerColor] ~= nil) then
                 blackString = blackString .. fasTexts[playerColor]
             end
+
             UI.setAttribute("player" .. playerColor, "visibility", playerColor)
         end
+
         UI.setValue("playerBlack", blackString)
         UI.setAttribute("playerBlack", "visibility", "Black")
         UI.setAttribute("playerBlack", "active", "true")
-
         UIhidden = false
     end
-
 end
 
 function hitVisibility(colorIn)
@@ -5873,11 +6142,13 @@ function hitVisibility(colorIn)
 
     if inTable(hitler, colorIn) then
         visList = "Black"
+
         for _, playerColor in pairs(fascists) do
             if playerColor ~= colorIn and not inTable(GREY_PLAYABLE_COLORS, playerColor) then
                 visList = visList .. "|" .. playerColor
             end
         end
+
         if #players < 7 then
             for _, playerColor in pairs(hitler) do
                 if playerColor ~= colorIn and not inTable(GREY_PLAYABLE_COLORS, playerColor) then
@@ -5899,11 +6170,13 @@ function fasVisibility(colorIn)
 
     if inTable(fascists, colorIn) then
         visList = "Black"
+
         for _, playerColor in pairs(fascists) do
             if playerColor ~= colorIn and not inTable(GREY_PLAYABLE_COLORS, playerColor) then
                 visList = visList .. "|" .. playerColor
             end
         end
+
         if #players < 7 then
             for _, playerColor in pairs(hitler) do
                 if playerColor ~= colorIn and not inTable(GREY_PLAYABLE_COLORS, playerColor) then
@@ -5923,9 +6196,13 @@ end
 function chooseChan12P(targetColor, playerColor)
     local player = getPlayerObj(playerColor)
     local currPres = getPres()
+
     if currPres == playerColor then
         local tmpChan = getObjectFromGUID(CHANCELOR_GUID)
-        if tmpChan then giveObjectToPlayer(tmpChan, targetColor, {forward = 11, right = 0, up = 0, forceHeight = 2.8}, NO_ROT, false, false) end
+
+        if tmpChan then
+            giveObjectToPlayer(tmpChan, targetColor, {forward = 11, right = 0, up = 0, forceHeight = 2.8}, NO_ROT, false, false)
+        end
     else
         player.print("You are not the current president.", {1,0,0})
     end
@@ -5942,19 +6219,23 @@ function deal12P(amount, playerColor)
             giveObjectToPlayer(card, playerColor, {forward = GREY_FORWARD, right = GREY_POLICY_RIGHT, up = GREY_UP}, cardRot, false, true)
             sleep(0.1)
         end
+
         sleep(2)
         printPolicyCards12P("Draw", playerColor)
         return 1
     end
+
     startLuaCoroutine(Global, "deal12PCoroutine")
 end
 
 function discard12P(policy, playerColor)
     local discardZone = getObjectFromGUID(DISCARD_ZONE_GUID)
+
     if discardZone then
         local pos = discardZone.getPosition()
         pos = {pos["x"], 2.5, pos["z"]}
         local result = moveCard12P(nil, policy, pos, FACE_DOWN_ROT, playerColor)
+
         if result ~= -1 then
             smartBroadcastToColor("You discarded a " .. policy .. " card.", playerColor, {1, 1, 1})
         end
@@ -5966,6 +6247,7 @@ end
 function givePres12P(targetColor, playerColor)
     local player = getPlayerObj(playerColor)
     local currPres = getPres()
+
     if currPres == playerColor then
         movePlacards(targetColor, true)
     else
@@ -5977,10 +6259,12 @@ function moveCard12P(name, description, pos, rot, playerColor)
     local foundIndex = nil
 
     local zoneObjs = getObjsFromZone(GREY_HAND_ZONE_GUIDS[playerColor])
+
     if #zoneObjs == nil then
         smartBroadcastToColor("ERROR: No cards found in your hand.", playerColor, {1, 0, 0})
         return -1
     end
+
     if name == nil then
         for i = 1, #zoneObjs do
             if string.match(zoneObjs[i].description, description) then
@@ -5996,10 +6280,12 @@ function moveCard12P(name, description, pos, rot, playerColor)
             end
         end
     end
+
     if foundIndex == nil then
         smartBroadcastToColor("ERROR: Card not found.", playerColor, {1, 0, 0})
         return -1
     end
+
     if zoneObjs[foundIndex].deck_guid == nil then
         local card = getObjectFromGUID(zoneObjs[foundIndex].guid)
         card.setPositionSmooth(pos)
@@ -6027,6 +6313,7 @@ function printPolicyCards12P(mode, playerColor)
 
     if player then
         zoneObjs = getObjsFromZone(GREY_HAND_ZONE_GUIDS[playerColor])
+
         for k, v in pairs(zoneObjs) do
             if v.description == "Liberal Policy" then
                 policyCardStr = policyCardStr .. "[0000FF]L[-]"
@@ -6036,6 +6323,7 @@ function printPolicyCards12P(mode, playerColor)
                 expansionCardStr = expansionCardStr .. "\n" .. v.name
             end
         end
+
         if mode == "Draw" then
             outStr = "You drew " .. policyCardStr .. ".\n"
         elseif mode == "Check" then
@@ -6045,6 +6333,7 @@ function printPolicyCards12P(mode, playerColor)
                 outStr = "Your policy cards are:" .. policyCardStr .. "\n"
             end
         end
+
         if expansionCardStr == "Your other cards are:" or mode == "Draw" then
             bigBroadcast(outStr, player)
         else
@@ -6063,16 +6352,19 @@ function vote12P(playerColor, voteName)
             local jaCardRot = {x = 0, y = 180, z = 180, exactRot = true}
             giveObjectToPlayer(jaCard, playerColor, {forward = GREY_FORWARD, right = GREY_RIGHT, up = GREY_UP}, jaCardRot, false, true)
         end
+
         if neinCard then
             local neinCardRot = {x = 0, y = 180, z = 180, exactRot = true}
             giveObjectToPlayer(neinCard, playerColor, {forward = GREY_FORWARD, right = GREY_RIGHT, up = GREY_UP}, neinCardRot, false, true)
         end
+
         sleep(0.1)
         -- move vote out
         moveCard12P(nil, voteName, GREY_VOTE_POS[playerColor], FACE_DOWN_ROT, playerColor)
 
         return 1
     end
+
     startLuaCoroutine(Global, "vote12PCoroutine")
 end
 
@@ -6092,14 +6384,17 @@ function sitColorGrey(player, color)
     if player.admin then
         if UIPlayerNameTable[player.steam_id] then
             local sitPlayer = getPlayerByNameSteamID(UIPlayerNameTable[player.steam_id], Player.getSpectators())
+
             if not sitPlayer then
                 player.broadcast(UIPlayerNameTable[player.steam_id] .. " not found or is not grey.", {1, 0, 0})
-              return
+                return
             end
+
             if inTable(greyPlayerSteamIds, sitPlayer.steam_id) then
-            player.broadcast(sitPlayer.steam_name .. " is already seated.", {1, 0, 0})
-              return
+                player.broadcast(sitPlayer.steam_name .. " is already seated.", {1, 0, 0})
+                return
             end
+
             printToAll(sitPlayer.steam_name .. " is color " .. color .. ".", GREY_PLAYABLE_COLORS_RGB[color])
             local textObj = getObjectFromGUID(GREY_TEXT_GUIDS[color])
             textObj.TextTool.setValue(sitPlayer.steam_name)
@@ -6112,9 +6407,11 @@ function sitColorGrey(player, color)
                 callback = "greyAvatarCallback",
                 sound = false
             }
+
             if greyAvatarGuids[color] then
                 destroyObjectByGUID(greyAvatarGuids[color])
             end
+
             local avatar = spawnObject(objParam)
             avatar.setLock(true)
             avatar.setDescription(color .. " Avatar")
@@ -6139,15 +6436,19 @@ end
 function removeColorGreyUIB(player, value, id)
     if player.admin then
         local sitPlayer = getPlayerByNameSteamID(UIPlayerNameTable[player.steam_id], Player.getSpectators())
+
         if not sitPlayer then
             player.broadcast(UIPlayerNameTable[player.steam_id] .. " not found or is not grey.", {1, 0, 0})
           return
         end
+
         local colorFound = getGreyColor(sitPlayer.steam_id)
+
         if colorFound then
             greyPlayerSteamIds[colorFound] = nil
             destroyObjectByGUID(greyAvatarGuids[colorFound])
             local textObj = getObjectFromGUID(GREY_TEXT_GUIDS[colorFound])
+
             if textObj then
                 textObj.TextTool.setValue(" ")
             end
@@ -6159,8 +6460,9 @@ end
 
 function tellRoleButtonUIB(player, value, id)
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
-    bigBroadcast(tellRole(colorFound), player)
+        bigBroadcast(tellRole(colorFound), player)
     else
         bigBroadcast(tellRole(player.color), player)
     end
@@ -6171,7 +6473,9 @@ function voteJaUIB(player, value, id)
         player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         vote12P(colorFound, "Ja Card")
     else
@@ -6184,7 +6488,9 @@ function voteNeinUIB(player, value, id)
         player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         vote12P(colorFound, "Nein Card")
     else
@@ -6197,14 +6503,18 @@ function voteRemoveUIB(player, value, id)
         player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         local jaCard = getObjectFromGUID(jaCardGuids[colorFound])
         local neinCard = getObjectFromGUID(neinCardGuids[colorFound])
+
         if jaCard then
             local jaCardRot = {x = 0, y = 180, z = 180, exactRot = true}
             giveObjectToPlayer(jaCard, colorFound, {forward = GREY_FORWARD, right = GREY_RIGHT, up = GREY_UP}, jaCardRot, false, true)
         end
+
         if neinCard then
             local neinCardRot = {x = 0, y = 180, z = 180, exactRot = true}
             giveObjectToPlayer(neinCard, colorFound, {forward = GREY_FORWARD, right = GREY_RIGHT, up = GREY_UP}, neinCardRot, false, true)
@@ -6216,10 +6526,12 @@ end
 
 function UIDrawCards(player, value, id)
     if not started then
-    player.print("Game has not started.")
+        player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         drawThree(nil, colorFound)
     else
@@ -6232,24 +6544,28 @@ function discardFUIB(player, value, id)
         player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         discard12P("Fascist Policy", colorFound)
-   else
+    else
         player.print("You are not seated.")
     end
 end
 
 function discardLUIB(player, value, id)
     if not started then
-    player.print("Game has not started.")
+        player.print("Game has not started.")
         return
-   end
+    end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
-    discard12P("Liberal Policy", colorFound)
+        discard12P("Liberal Policy", colorFound)
     else
-    player.print("You are not seated.")
+        player.print("You are not seated.")
     end
 end
 
@@ -6258,7 +6574,9 @@ function checkCardsUIB(player, value, id)
         player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         printPolicyCards12P("Check", colorFound)
     else
@@ -6283,7 +6601,9 @@ function startUIB(player, value, id)
         player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         if UIActionTable[player.steam_id] == "Choose Chancellor" then
             chooseChan12P(UITargetColorTable[player.steam_id], colorFound)
@@ -6313,6 +6633,7 @@ function discardAbility(cardName, playerColor)
     local result = {}
 
     result = moveCard12P(cardName, nil, pos, FACE_DOWN_ROT, playerColor)
+
     if result ~= -1 then
         smartBroadcastToColor("You discarded " .. result.name, playerColor, {1, 1, 1})
     end
@@ -6323,6 +6644,7 @@ function revealAbility(cardName, playerColor)
     local result = {}
 
     result = moveCard12P(cardName, nil, pos, FACE_UP_ROT, playerColor)
+
     if result ~= -1 then
         broadcastToAll(playerColor .. " has played " .. result.name, {1, 1, 1})
     end
@@ -6332,15 +6654,19 @@ function examineAbilityDeck(playerColor)
     local player = getPlayerObj(playerColor)
     local abilityDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
     local deckString = ""
+
     if abilityDeck == nil then
         player.broadcast("ERROR: Ability deck not found.", {1, 1, 1})
         return
     end
+
     local deckTable = abilityDeck.getObjects()
     player.print("Cards in the ability deck:")
+
     for k, v in pairs(deckTable) do
         deckString = deckString .. v.nickname .. " "
     end
+
     player.print(deckString)
     broadcastToAll(playerColor .. " examines the Ability deck.", {1, 1, 1})
 end
@@ -6349,20 +6675,25 @@ function takeAbility(cardName, playerColor)
     local player = getPlayerObj(playerColor)
     local foundIndex = nil
     local abilityDeck = getDeckFromZoneByGUID(ABILITIESPILE_ZONE_GUID)
+
     if abilityDeck == nil then
         player.broadcast("ERROR: Ability deck not found.", {1, 0, 0})
         return
     end
+
     local deckTable = abilityDeck.getObjects()
+
     for k,v in pairs(deckTable) do
         if string.match(string.lower(v.nickname), string.lower(cardName)) then
             foundIndex = v.index
         end
     end
+
     if foundIndex == nil then
         player.broadcast("ERROR: Ability not found in deck.", {1, 0, 0})
     else
         local info = getPlayerPosRotVectors(playerColor)
+
         if info.pos then
             local takeParams = {
                 index = foundIndex,
@@ -6382,6 +6713,7 @@ function giveCardExp(cardName, targetColor, playerColor)
     if info.pos then
         result = moveCard12P(cardName, nil, info.pos, FACE_DOWN_ROT, playerColor)
     end
+
     if result ~= -1 then
         smartBroadcastToColor("You gave " .. targetColor .. " the " .. result.name .. " card.", playerColor, {1, 1, 1})
     end
@@ -6406,17 +6738,15 @@ function drawCardsUIB(player, value, id)
         player.print("Game has not started.")
         return
     end
+
     local colorFound = getGreyColor(player.steam_id)
+
     if colorFound then
         drawThree(player, colorFound)
     else
         player.print("You are not seated.")
     end
 end
-
-----#include \SecretHitlerCE\UI.ttslua
-----#include \SecretHitlerCE\notetaker.ttslua
-
 
 useColor = true
 cooperative = false
@@ -6434,40 +6764,35 @@ forceMenu = nil
 lastGUID = nil
 editMode = true -- true is right, false is left
 
-
---CUT HERE
-
---function callImport()
 lineDrawerImportScript = [[
-        clearLines()
-        local noteTakerNotes = Global.getTable("noteTakerNotes")
-        for i = 1, #noteTakerNotes do
-            if ((noteTakerNotes[i].conflict == "(Conflict)" or noteTakerNotes[i].conflict == "(Rev Con)") and noteTakerNotes[i].color2 ~= "") or (noteTakerNotes[i].action == "inspects" and noteTakerNotes[i].result == "claims [FF0000]Fascist[-]" and noteTakerNotes[i].color2 ~= "") then
-                local p1, p2, lC
-                p1 = noteTakerNotes[i].color1
-                p2 = noteTakerNotes[i].color2
-                lC = p1
-                if style == "straight" then
-                    addLineStraight(p1, p2, lC)
-                else
-                    addLineBlock(p1, p2, lC)
-                end
+    clearLines()
+    local noteTakerNotes = Global.getTable("noteTakerNotes")
+    for i = 1, #noteTakerNotes do
+        if ((noteTakerNotes[i].conflict == "(Conflict)" or noteTakerNotes[i].conflict == "(Rev Con)") and noteTakerNotes[i].color2 ~= "") or (noteTakerNotes[i].action == "inspects" and noteTakerNotes[i].result == "claims [FF0000]Fascist[-]" and noteTakerNotes[i].color2 ~= "") then
+            local p1, p2, lC
+            p1 = noteTakerNotes[i].color1
+            p2 = noteTakerNotes[i].color2
+            lC = p1
+            if style == "straight" then
+                addLineStraight(p1, p2, lC)
+            else
+                addLineBlock(p1, p2, lC)
             end
         end
+    end
+    mergeTables()
+    Global.setVectorLines(vectorTable)
+    clearUI()
+]]
+
+lineDrawerRemoveLineScript = [[
+    function callRemoveLine(args)
+        clearLines()
+        removeLine(args[1], args[2])
         mergeTables()
         Global.setVectorLines(vectorTable)
         clearUI()
-    ]]
---end
-
-lineDrawerRemoveLineScript = [[
-        function callRemoveLine(args)
-            clearLines()
-            removeLine(args[1], args[2])
-            mergeTables()
-            Global.setVectorLines(vectorTable)
-            clearUI()
-        end
+    end
 ]]
 
 model_list = {}
@@ -6517,6 +6842,7 @@ electionTrackerMoveX = 2.7
 noteTakerDesc = "Note Taker by Lost Savage\nBased on the work of:\nsmiling Aktheon,\nSwiftPanda,\nThe Blind Dragon\nand Max\n"
 function noteTakerOnLoad(saveString)
     self.setDescription(noteTakerDesc)
+
     if not (saveString == "") then
         local save = JSON.decode(saveString)
         useColor = save["c"]
@@ -6535,15 +6861,19 @@ function noteTakerOnLoad(saveString)
     if self.name ~= "backgammon_board" then
         sharedHistory = true
         Global.call("initNoteTakerValues", {self.name})
+
         if Global.getVar("noteTakerCurrLine") == 0 then
             Global.call("addNewLine")
         end
     else
         initNoteTakerValues(self.name)
+
         if noteTakerCurrLine == 0 then
             addNewLine()
         end
+
         local oldNoteTaker = getObjectFromGUID(lastGUID)
+
         if oldNoteTaker then
             noteTakerNotes = oldNoteTaker.getTable("noteTakerNotes")
             noteTakerCurrLine = oldNoteTaker.getVar("noteTakerCurrLine")
@@ -6553,6 +6883,7 @@ function noteTakerOnLoad(saveString)
     if playerNoteTaker and not (playerNoteTaker == "") then
         if forceMenu then
             forceMenu = false
+
             if sharedHistory then
                 Global.call("menu", {self})
             else
@@ -6595,8 +6926,13 @@ end
 
 function notetakerOnDestroy()
     if not cancelDestroy then
-        if privateScreenGUID then destroyObjectByGUID(privateScreenGUID) end
-        if privateFogGUID then destroyObjectByGUID(privateFogGUID) end
+        if privateScreenGUID then
+            destroyObjectByGUID(privateScreenGUID)
+        end
+
+        if privateFogGUID then
+            destroyObjectByGUID(privateFogGUID)
+        end
     end
 end
 
@@ -6604,6 +6940,7 @@ function initNoteTakerValues(boardName)
     if type(boardName) == "table" then
         boardName = boardName[1]
     end
+
     local options = Global.getTable("options")
 
     if boardName == "Custom_Board" then
@@ -6615,6 +6952,7 @@ function initNoteTakerValues(boardName)
         posXscale = -1
         posY = -0.9
         rotZ = 180
+
         if options.zoneType == 6 then
             posZoffsetMenu = -0.25
             posZoffsetCenterButtons = -0.25
@@ -6624,6 +6962,7 @@ function initNoteTakerValues(boardName)
         posY = -0.1
         rotZ = 180
         giveHeight = 1
+
         if options.zoneType == 6 then
             posZoffsetMenu = -0.25
             posZoffsetCenterButtons = -0.25
@@ -6636,6 +6975,7 @@ function initNoteTakerValues(boardName)
         giveHeight = -1
         buttonScale = 1.1
         fontScale = 1.1
+
         if options.zoneType == 6 then
             posZoffsetMenu = -0.25
             posZoffsetCenterButtons = -0.25
@@ -6648,6 +6988,7 @@ function initNoteTakerValues(boardName)
         giveHeight = -1
         buttonScale = 1.1
         fontScale = 1.1
+
         if options.zoneType == 6 then
             posZoffsetMenu = -0.25
             posZoffsetCenterButtons = -0.25
@@ -6659,11 +7000,13 @@ function initNoteTakerValues(boardName)
         posZoffsetMenu = -3.7
         posZoffsetColors = 4.5
         posZoffsetSettingsColors = 4.5
+
         if options.zoneType == 6 then
             posZoffsetCenterButtons = 4.25
         else
             posZoffsetCenterButtons = 4.5
         end
+
         posZoffsetOther = 4.2
         rotZ = 180
         giveHeight = 1
@@ -6675,6 +7018,7 @@ function initNoteTakerValues(boardName)
         noteTakerSetNotes = function(stringIn)
             local out = string.gsub(stringIn, stringColorToHex("White") .. "]", textColorReplace)
             local screen = getObjectFromGUID(privateScreenGUID)
+
             if screen then
                 screen.setDescription(out)
             end
@@ -6684,6 +7028,7 @@ function initNoteTakerValues(boardName)
         posZscale = 1.5
         buttonScale = 1.5
         fontScale = 1.5
+
         if options.zoneType == 6 then
             posZoffsetMenu = -0.25
             posZoffsetCenterButtons = -0.25
@@ -6711,8 +7056,10 @@ function spawnWaitDestructCoroutine()
     local notetaker = spawnObject(params)
     notetaker.setLuaScript(respawnNoteTakerLuaScript())
     notetaker.setLock(true)
+
     if params.type == "Custom_Board" then
         local custom = {}
+
         if image_list[functionName] then
             custom.image = image_list[functionName]
         elseif image_list["default"] then
@@ -6723,6 +7070,7 @@ function spawnWaitDestructCoroutine()
         notetaker.setCustomObject(custom)
     elseif params.type == "Custom_Model" then
         local custom = {}
+
         if image_list[functionName] then
             custom.diffuse = image_list[functionName]
         elseif image_list["default"] then
@@ -6730,6 +7078,7 @@ function spawnWaitDestructCoroutine()
         else
             custom.diffuse = "http://cloud-3.steamusercontent.com/ugc/478894184492866532/6639B6E1AB511AB10D53DB91B2A47A0A63410DDF/"
         end
+
         if model_list[functionName] then
             custom.mesh = model_list[functionName]
         elseif image_list["default"] then
@@ -6737,10 +7086,12 @@ function spawnWaitDestructCoroutine()
         else
             custom.mesh = "http://cloud-3.steamusercontent.com/ugc/478894184492865468/51C18F993BBDD5D1B55FE5261A625B2CE0B2FD9F/"
         end
+
         custom.type = 4
         custom.material = 3
         notetaker.setCustomObject(custom)
     end
+
     wait(5)
     cancelDestroy = true
     self.destruct()
@@ -6763,6 +7114,7 @@ function menu(selfIn)
 
     if selfIn.name == "backgammon_board" then
         local screen = getObjectFromGUID(privateScreenGUID)
+
         if screen then
             forceObjectToPlayer(screen, selfIn.getVar("playerNoteTaker"), {forward = giveForward + 12.5, right = rightOffset[selfIn.getVar("playerNoteTaker")], up = 0, forceHeight = 0.9}, {x = 0, y = 180 - rotZ, z = 0})
             screen.setLock(true)
@@ -6777,6 +7129,7 @@ function menu(selfIn)
     end
 
     local buttonParam = {rotation = {0, 0, rotZ}, font_size = 300 * fontScale}
+
     if sharedHistory then
         buttonParam.function_owner = Global
     else
@@ -6786,6 +7139,7 @@ function menu(selfIn)
     selfIn.clearButtons()
 
     local fakePlayerNoteTaker = false
+
     if selfIn.getVar("playerNoteTaker") == "" then
         fakePlayerNoteTaker = true
         selfIn.setVar("playerNoteTaker", "White")
@@ -6794,6 +7148,7 @@ function menu(selfIn)
     -- Who is the note taker?
     if selfIn.name == "backgammon_board" then
         local screen = getObjectFromGUID(privateScreenGUID)
+
         if screen then
             screen.setDescription("\n\n\n\n\n\n\n\n\n                      Who is the note taker?")
         end
@@ -6809,6 +7164,7 @@ function menu(selfIn)
     -- Player Options
     buttonParam.height = 700 * buttonScale
     buttonParam.width = 1800 * buttonScale
+
     if not cooperative or Player[selfIn.getVar("playerNoteTaker")].admin then
         buttonParam.click_function = "setupWhite"
         buttonParam.label = "White"
@@ -6895,7 +7251,13 @@ function menuBase(selfIn)
     end
 
     buttonParam.click_function = "flipUseNames"
-    if useNames then buttonParam.label = "x" else buttonParam.label = "" end
+
+    if useNames then
+        buttonParam.label = "x"
+    else
+        buttonParam.label = ""
+    end
+
     buttonParam.position = {posXscale * -7.5, posY, (1.25 * posZscale) + posZoffsetOther}
     buttonParam.width = 300 * buttonScale
     buttonParam.height = 300 * buttonScale
@@ -6907,7 +7269,13 @@ function menuBase(selfIn)
     selfIn.createButton(buttonParam)
 
     buttonParam.click_function = "flipUseColor"
-    if useColor then buttonParam.label = "x" else buttonParam.label = "" end
+
+    if useColor then
+        buttonParam.label = "x"
+    else
+        buttonParam.label = ""
+    end
+
     buttonParam.position = {posXscale * -7.5, posY, (2.75 * posZscale) + posZoffsetOther}
     buttonParam.width = 300 * buttonScale
     buttonParam.height = 300 * buttonScale
@@ -6920,7 +7288,13 @@ function menuBase(selfIn)
 
     if selfIn.name ~= "backgammon_board" or Player[selfIn.getVar("playerNoteTaker")].admin then
         buttonParam.click_function = "flipMoveTracker"
-        if moveTracker then buttonParam.label = "x" else buttonParam.label = "" end
+
+        if moveTracker then
+            buttonParam.label = "x"
+        else
+            buttonParam.label = ""
+        end
+
         buttonParam.position = {posXscale * -7.5, posY, (4.25 * posZscale) + posZoffsetOther}
         buttonParam.width = 300 * buttonScale
         buttonParam.height = 300 * buttonScale
@@ -6933,7 +7307,13 @@ function menuBase(selfIn)
     end
 
     buttonParam.click_function = "flipSwapLF"
-    if swapLF then buttonParam.label = "x" else buttonParam.label = "" end
+
+    if swapLF then
+        buttonParam.label = "x"
+    else
+        buttonParam.label = ""
+    end
+
     buttonParam.position = {posXscale * -7.5, posY, (5.75 * posZscale) + posZoffsetOther}
     buttonParam.width = 300 * buttonScale
     buttonParam.height = 300 * buttonScale
@@ -6946,7 +7326,13 @@ function menuBase(selfIn)
 
     if selfIn.name == "Checker_Board" or selfIn.name == "Go_Board" then
         buttonParam.click_function = "flipColorMatch"
-        if colorMatch then buttonParam.label = "x" else buttonParam.label = "" end
+
+        if colorMatch then
+            buttonParam.label = "x"
+        else
+            buttonParam.label = ""
+        end
+
         buttonParam.position = {posXscale * -7.5, posY, (7.25 * posZscale) + posZoffsetOther}
         buttonParam.width = 300 * buttonScale
         buttonParam.height = 300 * buttonScale
@@ -6958,7 +7344,13 @@ function menuBase(selfIn)
         selfIn.createButton(buttonParam)
     elseif selfIn.name == "backgammon_board" and Player[selfIn.getVar("playerNoteTaker")].admin then
         buttonParam.click_function = "flipCooperative"
-        if cooperative then buttonParam.label = "x" else buttonParam.label = "" end
+
+        if cooperative then
+            buttonParam.label = "x"
+        else
+            buttonParam.label = ""
+        end
+
         buttonParam.position = {posXscale * -7.5, posY, (7.25 * posZscale) + posZoffsetOther}
         buttonParam.width = 300 * buttonScale
         buttonParam.height = 300 * buttonScale
@@ -6977,11 +7369,13 @@ function menuBase(selfIn)
 
     buttonParam.click_function = "disableSecurityButton"
     savedButtons[buttonParam.click_function] = #selfIn.getButtons()
+
     if (Global.getVar("currentlyDisabled") == true) then
         buttonParam.label = "Enable security"
     else
         buttonParam.label = "Disable security"
     end
+
     buttonParam.position = {posXscale * 4, posY, 2.75 * posZscale + posZoffsetOther}
     selfIn.createButton(buttonParam)
 
@@ -7006,13 +7400,20 @@ function setupBoard(selfIn)
     if type(selfIn) == "table" then
         selfIn = selfIn[1]
     end
+
     local playerNT = selfIn.getVar("playerNoteTaker")
     local imagename = setupBoardGetFunction(playerIn) .. colorOffset[playerNT]
-    if colorMatch then selfIn.setColorTint(stringColorToRGBExtra(playerNT)) end
+
+    if colorMatch then
+        selfIn.setColorTint(stringColorToRGBExtra(playerNT))
+    end
+
     forceObjectToPlayer(selfIn, playerNT, {forward = giveForward, right = rightOffset[playerNT], up = 0, forceHeight = giveHeight}, {x = rotZ, y = 180 - rotZ, z = 0})
     selfIn.setLock(true)
+
     if selfIn.name == "backgammon_board" then
         local screen = getObjectFromGUID(privateScreenGUID)
+
         if screen then
             forceObjectToPlayer(screen, playerNT, {forward = giveForward + 12.5, right = rightOffset[playerNT], up = 0, forceHeight = 0.9}, {x = 0, y = 180 - rotZ, z = 0})
             screen.setLock(true)
@@ -7023,12 +7424,14 @@ function setupBoard(selfIn)
             return
         end
     end
+
     local fName = setupBoardGetFunction(playerNT)
     _G[fName](selfIn, colorOffset[playerNT])
 end
 
 function setupBoardGetFunction(playerIn)
     local options = Global.getTable("options")
+
     if options.zoneType == 6 then
         return "init12Player"
     elseif playerIn == "Orange" or playerIn == "Yellow" or playerIn == "Purple" or playerIn == "Pink" then
@@ -7160,6 +7563,7 @@ function disableSecurityButton(clickedObject, playerColor)
     if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
         Global.call("toggleSecurity")
         securityIsDisabled = not securityIsDisabled
+
         if (securityIsDisabled) then
             local tempParams = {}
             tempParams.index = savedButtons["disableSecurityButton"]
@@ -7198,7 +7602,11 @@ function initHorizontal(selfIn, offset)
 
     -- Players
     local color = offset + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 4, posY, (-2.25 * posZscale) + posZoffsetColors}
@@ -7206,7 +7614,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 0, posY, (-2.25 * posZscale) + posZoffsetColors}
@@ -7214,7 +7626,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -4, posY, (-2.25 * posZscale) + posZoffsetColors}
@@ -7222,7 +7638,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-3.75 * posZscale) + posZoffsetColors}
@@ -7230,7 +7650,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-5.25 * posZscale) + posZoffsetColors}
@@ -7238,7 +7662,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -4, posY, (-6.75 * posZscale) + posZoffsetColors}
@@ -7246,7 +7674,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 0, posY, (-6.75 * posZscale) + posZoffsetColors}
@@ -7254,7 +7686,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 4, posY, (-6.75 * posZscale) + posZoffsetColors}
@@ -7262,7 +7698,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-5.25 * posZscale) + posZoffsetColors}
@@ -7270,7 +7710,11 @@ function initHorizontal(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-3.75 * posZscale) + posZoffsetColors}
@@ -7291,7 +7735,11 @@ function initVertical(selfIn, offset)
 
     -- Players
     local color = offset + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-6.0 * posZscale) + posZoffsetColors}
@@ -7299,7 +7747,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-4.5 * posZscale) + posZoffsetColors}
@@ -7307,7 +7759,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-3.0 * posZscale) + posZoffsetColors}
@@ -7315,7 +7771,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 2, posY, (-2.25 * posZscale) + posZoffsetColors}
@@ -7323,7 +7783,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -2, posY, (-2.25 * posZscale) + posZoffsetColors}
@@ -7331,7 +7795,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-3.0 * posZscale) + posZoffsetColors}
@@ -7339,7 +7807,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-4.5 * posZscale) + posZoffsetColors}
@@ -7347,7 +7819,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-6.0 * posZscale) + posZoffsetColors}
@@ -7355,7 +7831,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -2, posY, (-6.75 * posZscale) + posZoffsetColors}
@@ -7363,7 +7843,11 @@ function initVertical(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 10 then color = color - 10 end
+
+    if color > 10 then
+        color = color - 10
+    end
+
     buttonParam.click_function = MAIN_PLAYABLE_COLORS[color]
     buttonParam.label = MAIN_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 2, posY, (-6.75 * posZscale) + posZoffsetColors}
@@ -7384,7 +7868,11 @@ function init12Player(selfIn, offset)
 
     -- Players
     local color = offset + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 4, posY, (-1.75 * posZscale) + posZoffsetColors}
@@ -7392,7 +7880,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 0, posY, (-1.75 * posZscale) + posZoffsetColors}
@@ -7400,7 +7892,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -4, posY, (-1.75 * posZscale) + posZoffsetColors}
@@ -7408,7 +7904,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-3.25 * posZscale) + posZoffsetColors}
@@ -7416,7 +7916,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-4.75 * posZscale) + posZoffsetColors}
@@ -7424,7 +7928,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -6, posY, (-6.25 * posZscale) + posZoffsetColors}
@@ -7432,7 +7940,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * -4, posY, (-7.75 * posZscale) + posZoffsetColors}
@@ -7440,7 +7952,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 0, posY, (-7.75 * posZscale) + posZoffsetColors}
@@ -7448,7 +7964,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 4, posY, (-7.75 * posZscale) + posZoffsetColors}
@@ -7456,7 +7976,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-6.25 * posZscale) + posZoffsetColors}
@@ -7464,7 +7988,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-4.75 * posZscale) + posZoffsetColors}
@@ -7472,7 +8000,11 @@ function init12Player(selfIn, offset)
     selfIn.createButton(buttonParam)
 
     color = color + 1
-    if color > 12 then color = color - 12 end
+
+    if color > 12 then
+        color = color - 12
+    end
+
     buttonParam.click_function = ALL_PLAYABLE_COLORS[color]
     buttonParam.label = ALL_PLAYABLE_COLORS[color]
     buttonParam.position = {posXscale * 6, posY, (-3.25 * posZscale) + posZoffsetColors}
@@ -7496,6 +8028,7 @@ function initCommon(selfIn)
     -- Info
     if selfIn.name == "backgammon_board" then
         local screen = getObjectFromGUID(privateScreenGUID)
+
         if screen then
             screen.setName("Private Notes")
         end
@@ -7527,6 +8060,7 @@ function initCommon(selfIn)
     buttonParam.click_function = "autoButton"
     buttonParam.label = "Auto Gov"
     buttonParam.height = 700 * buttonScale
+
     if Player[selfIn.getVar("playerNoteTaker")].admin or selfIn.name ~= "backgammon_board" then
         buttonParam.width = 1800 * buttonScale
         buttonParam.position = {posXscale * -2, posY, (-5.25 * posZscale) + posZoffsetCenterButtons}
@@ -7632,38 +8166,46 @@ function initCommon(selfIn)
 
     buttonParam.click_function = "FFF"
     buttonParam.label = text.fascistLetter .. text.fascistLetter .. text.fascistLetter
+
     if swapLF then
         buttonParam.position = {posXscale * -3.8, posY, (2.75 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * 1.9, posY, (2.75 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     buttonParam.click_function = "FFL"
     buttonParam.label = text.fascistLetter .. text.fascistLetter .. text.liberalLetter
+
     if swapLF then
         buttonParam.position = {posXscale * -1.9, posY, (2.75 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * 0.0, posY, (2.75 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     buttonParam.click_function = "FLL"
     buttonParam.label = text.fascistLetter .. text.liberalLetter .. text.liberalLetter
+
     if swapLF then
         buttonParam.position = {posXscale * 0.0, posY, (2.75 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * -1.9, posY, (2.75 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     buttonParam.click_function = "LLL"
     buttonParam.label = text.liberalLetter .. text.liberalLetter .. text.liberalLetter
+
     if swapLF then
         buttonParam.position = {posXscale * 1.9, posY, (2.75 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * -3.8, posY, (2.75 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     -- Policy x2
@@ -7674,11 +8216,13 @@ function initCommon(selfIn)
 
     buttonParam.click_function = "FF"
     buttonParam.label = text.fascistLetter .. text.fascistLetter
+
     if swapLF then
         buttonParam.position = {posXscale * -2.85, posY, (4.25 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * 0.95, posY, (4.25 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     -- same if swapLF
@@ -7689,11 +8233,13 @@ function initCommon(selfIn)
 
     buttonParam.click_function = "LL"
     buttonParam.label = text.liberalLetter .. text.liberalLetter
+
     if swapLF then
         buttonParam.position = {posXscale * 0.95, posY, (4.25 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * -2.85, posY, (4.25 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     -- Policy final
@@ -7704,20 +8250,24 @@ function initCommon(selfIn)
 
     buttonParam.click_function = "F"
     buttonParam.label = text.fascistLetter
+
     if swapLF then
         buttonParam.position = {posXscale * -1.9, posY, (5.75 * posZscale) + posZoffsetOther}
     else
         buttonParam.position =  {posXscale * 0.0, posY, (5.75 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     buttonParam.click_function = "L"
     buttonParam.label = text.liberalLetter
+
     if swapLF then
         buttonParam.position = {posXscale * 0.0, posY, (5.75 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * -1.9, posY, (5.75 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     -- Power buttons
@@ -7742,20 +8292,24 @@ function initCommon(selfIn)
     buttonParam.click_function = "liberal"
     buttonParam.label = text.liberalAbbr
     buttonParam.width = 1500 * buttonScale
+
     if swapLF then
         buttonParam.position = {posXscale * 0.0, posY, (1.25 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * -3.2, posY, (1.25 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     buttonParam.click_function = "fascist"
     buttonParam.label = text.fascistAbbr
+
     if swapLF then
         buttonParam.position = {posXscale * -3.2, posY, (1.25 * posZscale) + posZoffsetOther}
     else
         buttonParam.position = {posXscale * 0.0, posY, (1.25 * posZscale) + posZoffsetOther}
     end
+
     selfIn.createButton(buttonParam)
 
     buttonParam.click_function = "noComment"
@@ -7798,6 +8352,7 @@ end
 function spawnScreenCallback(objIn, paramsIn)
     privateScreenGUID = objIn.getGUID()
     refreshNotes(self)
+
     if playerNoteTaker and not (playerNoteTaker == "") then
         if forceMenu then
             forceMenu = false
@@ -7812,19 +8367,23 @@ end
 
 function spawnFogCoroutine()
     local screen = getObjectFromGUID(privateScreenGUID)
+
     if screen then
         if privateFogGUID ~= HIDDEN_ZONE_GUIDS[playerNoteTaker] then
             destroyObjectByGUID(privateFogGUID)
         end
+
         local secretZone = getObjectFromGUID(HIDDEN_ZONE_GUIDS[playerNoteTaker])
         local params = {position = {-100, 100, -100}, sound = false}
         local fog
+
         if secretZone then
             fog = secretZone.clone(params) -- only way I know to set the color
         else
             params.type = "FogOfWarTrigger"
             fog = spawnObject(params)
         end
+
         wait(5)
         fog.setPosition(screen.getPosition())
         fog.setRotation(screen.getRotation())
@@ -7842,6 +8401,7 @@ function postButton(clickedObject, playerColor)
             Global.setTable("noteTakerNotes", noteTakerNotes)
             Global.setVar("noteTakerCurrLine", noteTakerCurrLine)
             local options = Global.getTable("options")
+
             if options.scriptedVoting then
                 local notesString = noteTakerNotesString(19, false, true)
                 Global.setVar("mainNotes", notesString)
@@ -7860,20 +8420,24 @@ function retrieveButton(clickedObject, playerColor)
     if clickedObject.getVar("playerNoteTaker") == playerColor then
         noteTakerNotes = Global.getTable("noteTakerNotes")
         noteTakerCurrLine = Global.getVar("noteTakerCurrLine")
+
         if not noteTakerCurrLine or noteTakerCurrLine == 0 then
             noteTakerNotes = {}
             noteTakerCurrLine = 0
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
 
 function addNewLine()
     noteTakerCurrLine = noteTakerCurrLine + 1
+
     if noteTakerCurrLine > #noteTakerNotes then
         table.insert(noteTakerNotes, defaultLine())
     end
+
     editMode = true
 end
 
@@ -7883,6 +8447,7 @@ function refreshNotes(selfIn)
     if selfIn and selfIn.name == "backgammon_board" then
         tempNotes = string.gsub(tempNotes, stringColorToHex("White") .. "]", textColorReplace)
         local screen = getObjectFromGUID(privateScreenGUID)
+
         if screen then -- save the long version by not using noteTakerSetNotes
             screen.setDescription(tempNotes)
         end
@@ -7894,6 +8459,7 @@ end
 function buttonColor(clickedObject, playerColor, colorClicked)
     if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
         local bulletInfo = Global.getTable("bulletInfo")
+
         if noteTakerNotes[noteTakerCurrLine].color1 == "" or not editMode then
             noteTakerNotes[noteTakerCurrLine].color1 = colorClicked
             noteTakerNotes[noteTakerCurrLine].action = ">"
@@ -7902,12 +8468,14 @@ function buttonColor(clickedObject, playerColor, colorClicked)
             noteTakerNotes[noteTakerCurrLine].color2 = colorClicked
             prevChanColor = colorClicked
         end
+
         if (noteTakerNotes[noteTakerCurrLine].action == string.lower(bulletInfo.action)
              or noteTakerNotes[noteTakerCurrLine].action == string.lower(imprisonInfo.action)
              or noteTakerNotes[noteTakerCurrLine].action == "gives pres to")
              and noteTakerNotes[noteTakerCurrLine].color1 ~= "" and noteTakerNotes[noteTakerCurrLine].color2 ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -7973,11 +8541,13 @@ function autoButton(clickedObject, playerColor)
             noteTakerNotes[noteTakerCurrLine].action = ">"
             prevPresColor = pres
         end
+
         if chan then
             noteTakerNotes[noteTakerCurrLine].color2 = chan
             noteTakerNotes[noteTakerCurrLine].action = ">"
             prevChanColor = chan
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -7986,9 +8556,16 @@ function setPreviousPlacs(clickedObject, playerColor)
     if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
         if prevPresColor and prevChanColor then
             local tmpPres = getObjectFromGUID(PREV_PRESIDENT_GUID)
-            if tmpPres then giveObjectToPlayer(tmpPres, prevPresColor, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, true) end
+
+            if tmpPres then
+                giveObjectToPlayer(tmpPres, prevPresColor, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, true)
+            end
+
             local tmpChan = getObjectFromGUID(PREV_CHANCELOR_GUID)
-            if tmpChan then giveObjectToPlayer(tmpChan, prevChanColor, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, true) end
+
+            if tmpChan then
+                giveObjectToPlayer(tmpChan, prevChanColor, {forward = 11, right = 0, up = 0, forceHeight = 1.1}, NO_ROT, false, true)
+            end
         end
     end
 end
@@ -8015,9 +8592,11 @@ function examinesButton(clickedObject, playerColor)
             noteTakerNotes[noteTakerCurrLine].action = "examines deck:"
             noteTakerNotes[noteTakerCurrLine].color2 = ""
         end
+
         if noteTakerNotes[noteTakerCurrLine].result ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8027,6 +8606,7 @@ function conflictButton(clickedObject, playerColor)
         if noteTakerConflict(noteTakerCurrLine) then
             noteTakerNotes[noteTakerCurrLine].conflict = ""
             noteTakerNotes[noteTakerCurrLine].claim2 = ""
+
             if (Global.getVar("options").autoDrawConflicts and noteTakerNotes[noteTakerCurrLine].color1 ~= "" and noteTakerNotes[noteTakerCurrLine].color2 ~= "") then
                 local lineDrawer = getLineDrawer()
                 lineDrawer.executeScript(lineDrawerRemoveLineScript)
@@ -8035,12 +8615,13 @@ function conflictButton(clickedObject, playerColor)
             end
         else
             noteTakerNotes[noteTakerCurrLine].conflict = "(Conflict)"
+
             if (Global.getVar("options").autoDrawConflicts) then
                 local lineDrawer = getLineDrawer()
                 lineDrawer.executeScript(lineDrawerImportScript)
-                --lineDrawer.call("callImport", {})
             end
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8069,6 +8650,7 @@ function resultOnly(clickedObject, playerColor, text)
             noteTakerNotes[noteTakerCurrLine].result = text
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8085,10 +8667,12 @@ function topdeckButton(clickedObject, playerColor)
             noteTakerNotes[noteTakerCurrLine].claim3 = ""
             noteTakerNotes[noteTakerCurrLine].claim2 = ""
             noteTakerNotes[noteTakerCurrLine].claim1 = ""
+
             if noteTakerNotes[noteTakerCurrLine].result ~= "" then
                 addNewLine()
             end
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8106,6 +8690,7 @@ function revisedButton(clickedObject, playerColor)
         else
             noteTakerNotes[noteTakerCurrLine].conflict = "(Rev)"
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8120,6 +8705,7 @@ function deleteLineButton(clickedObject, playerColor)
         else
             table.remove(noteTakerNotes, noteTakerCurrLine)
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8152,11 +8738,14 @@ function upButton(clickedObject, playerColor)
         if noteTakerCurrLine - 1 > 0 then
             noteTakerCurrLine = noteTakerCurrLine - 1
         end
+
         editMode = true
         refreshNotes(clickedObject)
+
         if noteTakerNotes[noteTakerCurrLine].color1 ~= "" then
             prevPresColor = noteTakerNotes[noteTakerCurrLine].color1
         end
+
         if noteTakerNotes[noteTakerCurrLine].color2 ~= "" then
             prevChanColor = noteTakerNotes[noteTakerCurrLine].color2
         end
@@ -8168,9 +8757,11 @@ function downButton(clickedObject, playerColor)
         addNewLine()
         editMode = true
         refreshNotes(clickedObject)
+
         if noteTakerNotes[noteTakerCurrLine].color1 ~= "" then
             prevPresColor = noteTakerNotes[noteTakerCurrLine].color1
         end
+
         if noteTakerNotes[noteTakerCurrLine].color2 ~= "" then
             prevChanColor = noteTakerNotes[noteTakerCurrLine].color2
         end
@@ -8199,11 +8790,13 @@ function investigate(clickedObject, playerColor)
         else
             noteTakerNotes[noteTakerCurrLine].action = "inspects"
         end
+
         if noteTakerNotes[noteTakerCurrLine].color1 ~= ""
             and noteTakerNotes[noteTakerCurrLine].color2 ~= ""
             and noteTakerNotes[noteTakerCurrLine].result ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8215,10 +8808,12 @@ function givesTo(clickedObject, playerColor)
         else
             noteTakerNotes[noteTakerCurrLine].action = "gives pres to"
         end
+
         if noteTakerNotes[noteTakerCurrLine].color1 ~= ""
             and noteTakerNotes[noteTakerCurrLine].color2 ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8226,15 +8821,18 @@ end
 function shoots(clickedObject, playerColor)
     if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
         local bulletInfo = Global.getTable("bulletInfo")
+
         if noteTakerNotes[noteTakerCurrLine].action == string.lower(bulletInfo.action) then
             noteTakerNotes[noteTakerCurrLine].action = ">"
         else
             noteTakerNotes[noteTakerCurrLine].action = string.lower(bulletInfo.action)
         end
+
         if noteTakerNotes[noteTakerCurrLine].color1 ~= ""
             and noteTakerNotes[noteTakerCurrLine].color2 ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8261,135 +8859,140 @@ function resultText(clickedObject, playerColor, text)
             noteTakerNotes[noteTakerCurrLine].result = text
             addNewLine()
         end
+
         if (Global.getVar("options").autoDrawConflicts and noteTakerNotes[noteTakerCurrLine].color1 ~= "" and noteTakerNotes[noteTakerCurrLine].color2 ~= "") then
-                local lineDrawer = getLineDrawer()
-                lineDrawer.executeScript(lineDrawerRemoveLineScript)
-                lineDrawer.call("callRemoveLine", {noteTakerNotes[noteTakerCurrLine].color1,noteTakerNotes[noteTakerCurrLine].color2})
-                lineDrawer.executeScript(lineDrawerImportScript)
-            end
+            local lineDrawer = getLineDrawer()
+            lineDrawer.executeScript(lineDrawerRemoveLineScript)
+            lineDrawer.call("callRemoveLine", {noteTakerNotes[noteTakerCurrLine].color1,noteTakerNotes[noteTakerCurrLine].color2})
+            lineDrawer.executeScript(lineDrawerImportScript)
+        end
+
         refreshNotes(clickedObject)
     end
 end
 
 do -- main card buttons
+    function LLL(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        XXX(clickedObject, playerColor, "[0080F8]" .. text.liberalLetter .. text.liberalLetter .. text.liberalLetter .. "[-]")
+    end
 
-function LLL(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    XXX(clickedObject, playerColor, "[0080F8]" .. text.liberalLetter .. text.liberalLetter .. text.liberalLetter .. "[-]")
-end
+    function FLL(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        XXX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. "[-][0080F8]" .. text.liberalLetter .. text.liberalLetter .. "[-]")
+    end
 
-function FLL(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    XXX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. "[-][0080F8]" .. text.liberalLetter .. text.liberalLetter .. "[-]")
-end
+    function FFL(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        XXX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. text.fascistLetter .. "[-][0080F8]" .. text.liberalLetter .. "[-]")
+    end
 
-function FFL(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    XXX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. text.fascistLetter .. "[-][0080F8]" .. text.liberalLetter .. "[-]")
-end
+    function FFF(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        XXX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. text.fascistLetter .. text.fascistLetter .. "[-]")
+    end
 
-function FFF(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    XXX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. text.fascistLetter .. text.fascistLetter .. "[-]")
-end
+    function QQQ(clickedObject, playerColor)
+        XXX(clickedObject, playerColor, "???")
+    end
 
-function QQQ(clickedObject, playerColor)
-    XXX(clickedObject, playerColor, "???")
-end
+    function XXX(clickedObject, playerColor, text)
+        if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
+            if noteTakerNotes[noteTakerCurrLine].action == "examines deck:" then
+                if noteTakerNotes[noteTakerCurrLine].result == text then
+                    noteTakerNotes[noteTakerCurrLine].result = ""
+                else
+                    noteTakerNotes[noteTakerCurrLine].result = text
+                    addNewLine()
+                end
+            else
+                if noteTakerNotes[noteTakerCurrLine].claim3 == text then
+                    noteTakerNotes[noteTakerCurrLine].claim3 = ""
+                else
+                    noteTakerNotes[noteTakerCurrLine].claim3 = text
 
-function XXX(clickedObject, playerColor, text)
-    if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
-        if noteTakerNotes[noteTakerCurrLine].action == "examines deck:" then
+                    if noteTakerNotes[noteTakerCurrLine].claim1 ~= ""
+                            and noteTakerNotes[noteTakerCurrLine].result ~= ""
+                            and noteTakerCurrLine == #noteTakerNotes then
+                        addNewLine()
+                    end
+                end
+            end
+
+            refreshNotes(clickedObject)
+        end
+    end
+
+    function LL(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        XX(clickedObject, playerColor, "[0080F8]" .. text.liberalLetter .. text.liberalLetter .. "[-]")
+    end
+
+    function FL(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        XX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. "[-][0080F8]" .. text.liberalLetter .. "[-]")
+    end
+
+    function FF(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        XX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. text.fascistLetter .. "[-]")
+    end
+
+    function QQ(clickedObject, playerColor)
+        XX(clickedObject, playerColor, "??")
+    end
+
+    function XX(clickedObject, playerColor, text)
+        if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
+            if not editMode or (noteTakerNotes[noteTakerCurrLine].claim2 == ""
+                and noteTakerConflict(noteTakerCurrLine)) then
+                if noteTakerNotes[noteTakerCurrLine].claim2 == text then
+                    noteTakerNotes[noteTakerCurrLine].claim2 = ""
+                else
+                    noteTakerNotes[noteTakerCurrLine].claim2 = text
+                end
+            else
+                if noteTakerNotes[noteTakerCurrLine].claim1 == text then
+                    noteTakerNotes[noteTakerCurrLine].claim1 = ""
+                else
+                    noteTakerNotes[noteTakerCurrLine].claim1 = text
+                end
+            end
+
+            refreshNotes(clickedObject)
+        end
+    end
+
+    function L(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        X(clickedObject, playerColor, "[0080F8]" .. text.liberalLetter .. "[-]")
+    end
+
+    function F(clickedObject, playerColor)
+        local text = Global.getTable("text")
+        X(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. "[-]")
+    end
+
+    function X(clickedObject, playerColor, text)
+        if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
             if noteTakerNotes[noteTakerCurrLine].result == text then
                 noteTakerNotes[noteTakerCurrLine].result = ""
             else
                 noteTakerNotes[noteTakerCurrLine].result = text
-                addNewLine()
-            end
-        else
-            if noteTakerNotes[noteTakerCurrLine].claim3 == text then
-                noteTakerNotes[noteTakerCurrLine].claim3 = ""
-            else
-                noteTakerNotes[noteTakerCurrLine].claim3 = text
-                if noteTakerNotes[noteTakerCurrLine].claim1 ~= ""
-                        and noteTakerNotes[noteTakerCurrLine].result ~= ""
-                        and noteTakerCurrLine == #noteTakerNotes then
+                if noteTakerCurrLine == #noteTakerNotes and
+                    ((noteTakerNotes[noteTakerCurrLine].claim1 ~= ""
+                    and noteTakerNotes[noteTakerCurrLine].claim3 ~= "")
+                    or noteTakerNotes[noteTakerCurrLine].action == "Topdeck:"
+                    or noteTakerNotes[noteTakerCurrLine].action == "examines deck:") then
                     addNewLine()
                 end
+
+                resetTracker()
             end
+
+            refreshNotes(clickedObject)
         end
-        refreshNotes(clickedObject)
     end
-end
-
-function LL(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    XX(clickedObject, playerColor, "[0080F8]" .. text.liberalLetter .. text.liberalLetter .. "[-]")
-end
-
-function FL(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    XX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. "[-][0080F8]" .. text.liberalLetter .. "[-]")
-end
-
-function FF(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    XX(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. text.fascistLetter .. "[-]")
-end
-
-function QQ(clickedObject, playerColor)
-    XX(clickedObject, playerColor, "??")
-end
-
-function XX(clickedObject, playerColor, text)
-    if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
-        if not editMode or (noteTakerNotes[noteTakerCurrLine].claim2 == ""
-            and noteTakerConflict(noteTakerCurrLine)) then
-            if noteTakerNotes[noteTakerCurrLine].claim2 == text then
-                noteTakerNotes[noteTakerCurrLine].claim2 = ""
-            else
-                noteTakerNotes[noteTakerCurrLine].claim2 = text
-            end
-        else
-            if noteTakerNotes[noteTakerCurrLine].claim1 == text then
-                noteTakerNotes[noteTakerCurrLine].claim1 = ""
-            else
-                noteTakerNotes[noteTakerCurrLine].claim1 = text
-            end
-        end
-        refreshNotes(clickedObject)
-    end
-end
-
-function L(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    X(clickedObject, playerColor, "[0080F8]" .. text.liberalLetter .. "[-]")
-end
-
-function F(clickedObject, playerColor)
-    local text = Global.getTable("text")
-    X(clickedObject, playerColor, "[FF0000]" .. text.fascistLetter .. "[-]")
-end
-
-function X(clickedObject, playerColor, text)
-    if clickedObject.getVar("playerNoteTaker") == playerColor or Player[playerColor].admin then
-        if noteTakerNotes[noteTakerCurrLine].result == text then
-            noteTakerNotes[noteTakerCurrLine].result = ""
-        else
-            noteTakerNotes[noteTakerCurrLine].result = text
-            if noteTakerCurrLine == #noteTakerNotes and
-                ((noteTakerNotes[noteTakerCurrLine].claim1 ~= ""
-                  and noteTakerNotes[noteTakerCurrLine].claim3 ~= "")
-                 or noteTakerNotes[noteTakerCurrLine].action == "Topdeck:"
-                 or noteTakerNotes[noteTakerCurrLine].action == "examines deck:") then
-                addNewLine()
-            end
-            resetTracker()
-        end
-        refreshNotes(clickedObject)
-    end
-end
-
 end
 
 function vetoButton(clickedObject, playerColor)
@@ -8410,9 +9013,11 @@ function exDiscardButton(clickedObject, playerColor)
             noteTakerNotes[noteTakerCurrLine].action = "examines discard:"
             noteTakerNotes[noteTakerCurrLine].color2 = ""
         end
+
         if noteTakerNotes[noteTakerCurrLine].result ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8425,9 +9030,11 @@ function discardsButton(clickedObject, playerColor)
             noteTakerNotes[noteTakerCurrLine].action = "discards:"
             noteTakerNotes[noteTakerCurrLine].color2 = ""
         end
+
         if noteTakerNotes[noteTakerCurrLine].result ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
@@ -8440,15 +9047,18 @@ function addsButton(clickedObject, playerColor)
             noteTakerNotes[noteTakerCurrLine].action = "adds to deck:"
             noteTakerNotes[noteTakerCurrLine].color2 = ""
         end
+
         if noteTakerNotes[noteTakerCurrLine].result ~= "" then
             addNewLine()
         end
+
         refreshNotes(clickedObject)
     end
 end
 
 function incTracker()
     local tracker = getObjectFromGUID(ELECTION_TRACKER_GUID)
+
     if moveTracker and tracker then
         tracker.translate({electionTrackerMoveX, 0, 0})
     end
@@ -8456,6 +9066,7 @@ end
 
 function resetTracker()
     local tracker = getObjectFromGUID(ELECTION_TRACKER_GUID)
+
     if moveTracker and tracker then
         tracker.setPositionSmooth(electionTrackerOrgPos)
         tracker.setRotationSmooth({0, 315, 0})
@@ -8474,9 +9085,11 @@ function noteTakerNotesString(maxLinesIn, showArrow, useColorIn)
     if maxLinesIn < #noteTakerNotes then
         startLine = #noteTakerNotes - maxLinesIn + 1
     end
+
     if startLine > noteTakerCurrLine then
         startLine = noteTakerCurrLine
         lastLine = startLine + maxLinesIn - 1
+
         if lastLine > #noteTakerNotes then
             lastLine = #noteTakerNotes
         end
@@ -8490,6 +9103,7 @@ function noteTakerNotesString(maxLinesIn, showArrow, useColorIn)
                 stringOut = stringOut .. left_unicode .. " "
             end
         end
+
         stringOut = stringOut .. noteTakerNotesLine(i, useColorIn)
     end
 
@@ -8509,65 +9123,78 @@ function noteTakerNotesLine(lineIn, useColorIn)
     if noteTakerNotes[lineIn].conflict ~= "" then
         stringOut = stringOut .. noteTakerNotes[lineIn].conflict .. " "
     end
+
     if noteTakerNotes[lineIn].color1 ~= "" then
         local text = noteTakerNotes[lineIn].color1
+
         if useNames then
             local playerObj = nil
+
             if greyPlayer(noteTakerNotes[lineIn].color1) then
                 playerObj = getPlayerObj(noteTakerNotes[lineIn].color1)
             else
                 playerObj = Player[noteTakerNotes[lineIn].color1]
             end
+
             if playerObj then text = string.sub(playerObj.steam_name, 1, 7) end
         end
+
         if useColorIn then
             text = "[" .. stringColorToHex(noteTakerNotes[lineIn].color1) .. "]" .. text .. "[-]"
         end
+
         stringOut = stringOut .. "[i]" .. text .. "[/i]" .. " "
     end
+
     if noteTakerNotes[lineIn].action ~= "" then
         stringOut = stringOut .. noteTakerNotes[lineIn].action .. " "
     end
+
     if noteTakerNotes[lineIn].color2 ~= "" then
         local text = noteTakerNotes[lineIn].color2
+
         if useNames then
             local playerObj = nil
+
             if greyPlayer(noteTakerNotes[lineIn].color2) then
                 playerObj = getPlayerObj(noteTakerNotes[lineIn].color2)
             else
                 playerObj = Player[noteTakerNotes[lineIn].color2]
             end
+
             if playerObj then text = string.sub(playerObj.steam_name, 1, 7) end
         end
+
         if useColorIn then
             text = "[" .. stringColorToHex(noteTakerNotes[lineIn].color2) .. "]" .. text .. "[-]"
         end
+
         stringOut = stringOut .. "[i]" .. text .. "[/i]"
-        if noteTakerNotes[lineIn].action ~= "gives pres to"
-            and noteTakerNotes[lineIn].action ~= string.lower(bulletInfo.action)
-            and noteTakerNotes[lineIn].action ~= string.lower(imprisonInfo.action) then
+
+        if noteTakerNotes[lineIn].action ~= "gives pres to" and noteTakerNotes[lineIn].action ~= string.lower(bulletInfo.action) and noteTakerNotes[lineIn].action ~= string.lower(imprisonInfo.action) then
             stringOut = stringOut .. ": "
-        elseif noteTakerNotes[lineIn].claim3 ~= ""
-                or noteTakerNotes[lineIn].claim2 ~= ""
-                or noteTakerNotes[lineIn].claim1 ~= ""
-                or noteTakerNotes[lineIn].result ~= "" then
+        elseif noteTakerNotes[lineIn].claim3 ~= "" or noteTakerNotes[lineIn].claim2 ~= "" or noteTakerNotes[lineIn].claim1 ~= "" or noteTakerNotes[lineIn].result ~= "" then
             stringOut = stringOut .. " "
         end
     end
+
     if noteTakerNotes[lineIn].claim3 ~= "" then
         stringOut = stringOut .. noteTakerNotes[lineIn].claim3 .. " > "
     end
+
     if noteTakerNotes[lineIn].claim2 ~= "" then
         stringOut = stringOut .. noteTakerNotes[lineIn].claim2 .. " > "
     end
+
     if noteTakerNotes[lineIn].claim1 ~= "" then
         stringOut = stringOut .. noteTakerNotes[lineIn].claim1 .. " > "
     end
+
     if noteTakerNotes[lineIn].result ~= "" then
         stringOut = stringOut .. noteTakerNotes[lineIn].result
     end
-    stringOut = stringOut .. "\n"
 
+    stringOut = stringOut .. "\n"
     return stringOut
 end
 
@@ -8589,14 +9216,17 @@ function notateInfo(color1In, actionIn, color2In, resultIn, updateLaterIn)
         addNewLine()
         noteTakerCurrLine = #noteTakerNotes
     end
+
     noteTakerNotes[noteTakerCurrLine].color1 = color1In
     noteTakerNotes[noteTakerCurrLine].action = actionIn
     noteTakerNotes[noteTakerCurrLine].color2 = color2In
     noteTakerNotes[noteTakerCurrLine].result = resultIn
+
     if updateLaterIn then
         notate.line = noteTakerCurrLine
         notate.action = actionIn
     end
+
     noteTakerCurrLine = lineSave
     refreshNotes(nil)
 end
@@ -8614,7 +9244,7 @@ function noteTakerBlankLine(currLineIn)
         and noteTakerNotes[noteTakerCurrLine].claim1 == ""
         and noteTakerNotes[noteTakerCurrLine].result == ""
     ) then
-            return true
+        return true
     end
 
     return false
@@ -8622,6 +9252,7 @@ end
 
 function noteTakerSetNotes(stringIn)
     local options = Global.getTable("options")
+
     if options.scriptedVoting then
         Global.setVar("mainNotes", stringIn)
         setNotes(Global.getVar("voteNotes") .. "\n\n" .. stringIn)
@@ -8635,32 +9266,32 @@ function newNoteTakerLuaScript(playerNoteTakerIn, useColorIn, cooperativeIn, col
     local cutHerePos = string.find(mainScript, "--CUT HERE")
 
     return "useColor = " .. useColorIn .. "\r\n" ..
-    "cooperative = " .. cooperativeIn .. "\r\n" ..
-    "colorMatch = " .. colorMatchIn .. "\r\n" ..
-    "useNames = " .. useNamesIn .. "\r\n" ..
-    "playerNoteTaker = '" .. playerNoteTakerIn .. "'\r\n" ..
-    "privateFogGUID = nil\r\n" ..
-    "privateScreenGUID = nil\r\n" ..
-    "swapLF = " .. swapLFIn .. "\r\n" ..
-    "moveTracker = " .. moveTrackerIn .. "\r\n" ..
-    "prevPresColor = nil\r\n" ..
-    "prevChanColor = nil\r\n" ..
-    "nextPost = nil\r\n" ..
-    "forceMenu = nil\r\n" ..
-    "lastGUID = nil\r\n" ..
-    "\r\n" ..
-    "function onLoad(saveString)\r\n" ..
-    "   noteTakerOnLoad(saveString)\r\n" ..
-    "end\r\n" ..
-    "\r\n" ..
-    "function onSave()\r\n" ..
-    "   return notetakerOnSave()\r\n" ..
-    "end\r\n" ..
-    "\r\n" ..
-    "function onDestroy()\r\n" ..
-    "   notetakerOnDestroy()\r\n" ..
-    "end\r\n" ..
-    string.sub(mainScript, cutHerePos, string.len(mainScript))
+        "cooperative = " .. cooperativeIn .. "\r\n" ..
+        "colorMatch = " .. colorMatchIn .. "\r\n" ..
+        "useNames = " .. useNamesIn .. "\r\n" ..
+        "playerNoteTaker = '" .. playerNoteTakerIn .. "'\r\n" ..
+        "privateFogGUID = nil\r\n" ..
+        "privateScreenGUID = nil\r\n" ..
+        "swapLF = " .. swapLFIn .. "\r\n" ..
+        "moveTracker = " .. moveTrackerIn .. "\r\n" ..
+        "prevPresColor = nil\r\n" ..
+        "prevChanColor = nil\r\n" ..
+        "nextPost = nil\r\n" ..
+        "forceMenu = nil\r\n" ..
+        "lastGUID = nil\r\n" ..
+        "\r\n" ..
+        "function onLoad(saveString)\r\n" ..
+        "   noteTakerOnLoad(saveString)\r\n" ..
+        "end\r\n" ..
+        "\r\n" ..
+        "function onSave()\r\n" ..
+        "   return notetakerOnSave()\r\n" ..
+        "end\r\n" ..
+        "\r\n" ..
+        "function onDestroy()\r\n" ..
+        "   notetakerOnDestroy()\r\n" ..
+        "end\r\n" ..
+        string.sub(mainScript, cutHerePos, string.len(mainScript))
 end
 
 function respawnNoteTakerLuaScript()
@@ -8668,32 +9299,32 @@ function respawnNoteTakerLuaScript()
     local cutHerePos = string.find(mainScript, "--CUT HERE")
 
     return "useColor = " .. tostring(useColor) .. "\r\n" ..
-    "cooperative = " .. tostring(cooperative) .. "\r\n" ..
-    "colorMatch = " .. tostring(colorMatch) .. "\r\n" ..
-    "useNames = " .. tostring(useNames) .. "\r\n" ..
-    "playerNoteTaker = " .. easyQuotes(playerNoteTaker) .. "\r\n" ..
-    "privateFogGUID = " .. easyQuotes(privateFogGUID) .. "\r\n" ..
-    "privateScreenGUID = " .. easyQuotes(privateScreenGUID) .. "\r\n" ..
-    "swapLF = " .. tostring(swapLF) .. "\r\n" ..
-    "moveTracker = " .. tostring(moveTracker) .. "\r\n" ..
-    "prevPresColor = " .. easyQuotes(prevPresColor) .. "\r\n" ..
-    "prevChanColor = " .. easyQuotes(prevChanColor) .. "\r\n" ..
-    "nextPost = " .. tostring(nextPost) .. "\r\n" ..
-    "forceMenu = " ..  tostring(forceMenu) .. "\r\n" ..
-    "lastGUID = " .. easyQuotes(self.getGUID()) .. "\r\n" ..
-    "\r\n" ..
-    "function onLoad(saveString)\r\n" ..
-    "   noteTakerOnLoad(saveString)\r\n" ..
-    "end\r\n" ..
-    "\r\n" ..
-    "function onSave()\r\n" ..
-    "   return notetakerOnSave()\r\n" ..
-    "end\r\n" ..
-    "\r\n" ..
-    "function onDestroy()\r\n" ..
-    "   notetakerOnDestroy()\r\n" ..
-    "end\r\n" ..
-    string.sub(mainScript, cutHerePos, string.len(mainScript))
+        "cooperative = " .. tostring(cooperative) .. "\r\n" ..
+        "colorMatch = " .. tostring(colorMatch) .. "\r\n" ..
+        "useNames = " .. tostring(useNames) .. "\r\n" ..
+        "playerNoteTaker = " .. easyQuotes(playerNoteTaker) .. "\r\n" ..
+        "privateFogGUID = " .. easyQuotes(privateFogGUID) .. "\r\n" ..
+        "privateScreenGUID = " .. easyQuotes(privateScreenGUID) .. "\r\n" ..
+        "swapLF = " .. tostring(swapLF) .. "\r\n" ..
+        "moveTracker = " .. tostring(moveTracker) .. "\r\n" ..
+        "prevPresColor = " .. easyQuotes(prevPresColor) .. "\r\n" ..
+        "prevChanColor = " .. easyQuotes(prevChanColor) .. "\r\n" ..
+        "nextPost = " .. tostring(nextPost) .. "\r\n" ..
+        "forceMenu = " ..  tostring(forceMenu) .. "\r\n" ..
+        "lastGUID = " .. easyQuotes(self.getGUID()) .. "\r\n" ..
+        "\r\n" ..
+        "function onLoad(saveString)\r\n" ..
+        "   noteTakerOnLoad(saveString)\r\n" ..
+        "end\r\n" ..
+        "\r\n" ..
+        "function onSave()\r\n" ..
+        "   return notetakerOnSave()\r\n" ..
+        "end\r\n" ..
+        "\r\n" ..
+        "function onDestroy()\r\n" ..
+        "   notetakerOnDestroy()\r\n" ..
+        "end\r\n" ..
+        string.sub(mainScript, cutHerePos, string.len(mainScript))
 end
 
 function easyQuotes(stringIn)
@@ -8704,8 +9335,6 @@ function easyQuotes(stringIn)
     end
 end
 
-----#include \SecretHitlerCE\notetaker.ttslua
-----#include \SecretHitlerCE\common.ttslua
 --Static
 ALL_PLAYABLE_COLORS = {"White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink", "Tan", "Maroon"}
 MAIN_PLAYABLE_COLORS = {"White", "Brown", "Red", "Orange", "Yellow", "Green", "Teal", "Blue", "Purple", "Pink"}
@@ -8731,6 +9360,7 @@ function getPlayerPosRotVectors(playerColor)
 
     if greyPlayer(playerColor) then
         local ph = getObjectFromGUID(greyPlayerHandGuids[playerColor])
+
         if ph then
             local pos = ph.getPosition()
             returnVal.pos = {x = pos["x"], y = pos["y"], z = pos["z"] - 2.26}
@@ -8741,6 +9371,7 @@ function getPlayerPosRotVectors(playerColor)
         end
     else
         local ph = Player[playerColor].getPlayerHand();
+
         if ph then
             returnVal.pos = {x = ph["pos_x"], y = ph["pos_y"], z = ph["pos_z"]}
             returnVal.rot = {x = ph["rot_x"], y = ph["rot_y"], z = ph["rot_z"]}
@@ -8753,23 +9384,24 @@ function getPlayerPosRotVectors(playerColor)
     return returnVal
 end
 
---function giveObjectToPlayer(object, playerColor, posAdd, rotAdd, collide, fast)
 function giveObjectToPlayer(object, playerColor, posAdd, rotAdd, ...)
     local info = getPlayerPosRotVectors(playerColor)
+
     if info then
         if rotAdd["exactRot"] then
             object.setRotationSmooth({rotAdd["x"], rotAdd["y"], rotAdd["z"]}, ...)
         else
             object.setRotationSmooth({info.rot["x"] + rotAdd["x"], info.rot["y"] + rotAdd["y"], info.rot["z"] + rotAdd["z"]}, ...)
         end
+
         if posAdd["forceHeight"] then
             object.setPositionSmooth({info.pos["x"] + info.vForward["x"] * posAdd["forward"] + info.vRight["x"] * posAdd["right"] + info.vUp["x"] * posAdd["up"],
-                                              posAdd["forceHeight"],
-                                              info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]}, ...)
+                posAdd["forceHeight"],
+                info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]}, ...)
         else
             object.setPositionSmooth({info.pos["x"] + info.vForward["x"] * posAdd["forward"] + info.vRight["x"] * posAdd["right"] + info.vUp["x"] * posAdd["up"],
-                                              info.pos["y"] + info.vForward["y"] * posAdd["forward"] + info.vRight["y"] * posAdd["right"] + info.vUp["y"] * posAdd["up"],
-                                              info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]}, ...)
+                info.pos["y"] + info.vForward["y"] * posAdd["forward"] + info.vRight["y"] * posAdd["right"] + info.vUp["y"] * posAdd["up"],
+                info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]}, ...)
         end
     end
 end
@@ -8782,14 +9414,15 @@ function forceObjectToPlayer(object, playerColor, posAdd, rotAdd)
         else
             object.setRotation({info.rot["x"] + rotAdd["x"], info.rot["y"] + rotAdd["y"], info.rot["z"] + rotAdd["z"]})
         end
+
         if posAdd["forceHeight"] then
             object.setPosition({info.pos["x"] + info.vForward["x"] * posAdd["forward"] + info.vRight["x"] * posAdd["right"] + info.vUp["x"] * posAdd["up"],
-                                      posAdd["forceHeight"],
-                                      info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]})
+                posAdd["forceHeight"],
+                info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]})
         else
             object.setPosition({info.pos["x"] + info.vForward["x"] * posAdd["forward"] + info.vRight["x"] * posAdd["right"] + info.vUp["x"] * posAdd["up"],
-                                      info.pos["y"] + info.vForward["y"] * posAdd["forward"] + info.vRight["y"] * posAdd["right"] + info.vUp["y"] * posAdd["up"],
-                                      info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]})
+                info.pos["y"] + info.vForward["y"] * posAdd["forward"] + info.vRight["y"] * posAdd["right"] + info.vUp["y"] * posAdd["up"],
+                info.pos["z"] + info.vForward["z"] * posAdd["forward"] + info.vRight["z"] * posAdd["right"] + info.vUp["z"] * posAdd["up"]})
         end
     end
 end
@@ -8797,8 +9430,10 @@ end
 --tableIn = {guid = , max = , forward = , height = }
 function moveObjectToPlayerByGUID(tableIn)
     local object = getObjectFromGUID(tableIn.guid)
+
     if object then
         local playerColor = closestPlayer(object, players, tableIn.max)
+
         if playerColor then
             giveObjectToPlayer(object, playerColor, {forward = tableIn.forward, right = 0, up = 0, forceHeight = tableIn.height}, NO_ROT, false, true)
         end
@@ -8807,8 +9442,8 @@ end
 
 function findDistance(posA, posB)
     return math.sqrt((posA["x"] - posB["x"])^2 +
-                          (posA["y"] - posB["y"])^2 +
-                          (posA["z"] - posB["z"])^2)
+        (posA["y"] - posB["y"])^2 +
+        (posA["z"] - posB["z"])^2)
 end
 
 function closestPlayer(objectIn, playerListIn, maxIn)
@@ -8816,23 +9451,28 @@ function closestPlayer(objectIn, playerListIn, maxIn)
     local pos = nil
 
     local lastDistance = maxIn
+
     if objectIn then
         local tempPos = objectIn.getPosition()
+
         for i, playerColor in ipairs(playerListIn) do
             if greyPlayer(playerColor) then
                 ph = getObjectFromGUID(greyPlayerHandGuids[playerColor])
+
                 if ph then
                     pos = ph.getPosition()
                     pos = {x = pos["x"], y = pos["y"], z = pos["z"] - 2.26}
                 end
             else
                 local ph = Player[playerColor].getPlayerHand()
+
                 if ph then
                     pos = {x = ph["pos_x"], y = ph["pos_y"], z = ph["pos_z"]}
                 end
             end
             if pos then
                 local distance = findDistance(tempPos, pos);
+
                 if distance < lastDistance then
                     lastDistance = distance
                     playerColorOut = playerColor
@@ -8880,6 +9520,7 @@ function removeBBCode(stringIn)
 
     for i = 1, string.len(stringIn) do
         local tmpChar = string.sub(stringIn, i, i)
+
         if tmpChar == "[" then
             formating = true
         elseif tmpChar == "]" then
@@ -8912,6 +9553,7 @@ function getDeckFromZoneByGUID(guidIn)
 
     if zone then
         local inZone = zone.getObjects()
+
         for _, object in ipairs(inZone) do
             if object.tag == "Card" then
                 deck_ct = 2
@@ -8921,14 +9563,17 @@ function getDeckFromZoneByGUID(guidIn)
             end
         end
     end
+
     if deck_ct == 1 then
         return deck
     end
+
     return nil
 end
 
 function inTable(tableIn, valueIn)
     local value
+
     if tableIn then
         for _, value in pairs(tableIn) do
             if value == valueIn then
@@ -8936,6 +9581,7 @@ function inTable(tableIn, valueIn)
             end
         end
     end
+
     return false
 end
 
@@ -8949,16 +9595,19 @@ function versionInfo()
     local msg
 
     msg = _VERSION -- Lua info
+
     if MOD_NAME then
         msg = msg .. "\nMOD_NAME = " .. MOD_NAME
     else
         msg = msg .. "\nMOD_NAME = nil"
     end
+
     if UPDATE_VERSION then
         msg = msg .. "\nUPDATE_VERSION = " .. UPDATE_VERSION
     else
         msg = msg .. "\nUPDATE_VERSION = nil"
     end
+
     msg = msg .. "\nGlobal Lua length " .. string.len(Global.getLuaScript())
 
     return msg
@@ -8976,21 +9625,25 @@ function callFunction(packet)
 end
 
 function tableToString(tbl, indent)
-    if not indent then indent = 0 end
+    if not indent then
+        indent = 0
+    end
+
     local out = ""
 
     for k, v in pairs(tbl) do
-    formatting = string.rep("  ", indent) .. k .. ": "
-    if type(v) == "table" then
-        out = out .. formatting .. "\n" .. tableToString(v, indent + 1)
-    elseif type(v) == "boolean" then
-        out = out .. formatting .. tostring(v) .. "\n"
-    else
-            out = out .. formatting .. v .. "\n"
-    end
-  end
+        formatting = string.rep("  ", indent) .. k .. ": "
 
-  return out
+        if type(v) == "table" then
+            out = out .. formatting .. "\n" .. tableToString(v, indent + 1)
+        elseif type(v) == "boolean" then
+            out = out .. formatting .. tostring(v) .. "\n"
+        else
+            out = out .. formatting .. v .. "\n"
+        end
+    end
+
+    return out
 end
 
 function generateAvatarImageUrl(steamId)
@@ -9001,6 +9654,7 @@ function greyPlayer(color)
     if type(color) == "table" then
         color = color[1]
     end
+
     if inTable(GREY_PLAYABLE_COLORS, color) then
         return true
     else
@@ -9012,12 +9666,14 @@ function getPlayerObj(color)
     if greyPlayer(color) then
         local playerFound = nil
         steamId = greyPlayerSteamIds[color]
+
         for _, player in ipairs(Player.getSpectators()) do
             if steamId == player.steam_id then
                 playerFound = player
                 break
             end
         end
+
         return playerFound
     else
         return Player[color]
@@ -9026,12 +9682,14 @@ end
 
 function getGreyColor(steamId)
     local colorFound = nil
+
     for testColor, testSteamId in pairs(greyPlayerSteamIds) do
         if steamId == testSteamId then
             colorFound = testColor
             break
         end
     end
+
     return colorFound
 end
 
@@ -9055,6 +9713,7 @@ function getObjsFromZone(zoneGUID)
         elseif v1.tag == "Deck" then
             deckGuid = v1.getGUID()
             deckTab = v1.getObjects()
+
             for k2, v2 in pairs(deckTab) do
                 table.insert(returnTable, {
                     name = v2.nickname,
@@ -9066,6 +9725,7 @@ function getObjsFromZone(zoneGUID)
             end
         end
     end
+
     return returnTable
 end
 
@@ -9115,14 +9775,14 @@ function getPlayerByName(playerName, playerList)
    local playerToReturn = nil
 
     if playerName then
-       for index, name in pairs(playerList) do
-        if string.match(string.lower(playerList[index].steam_name), string.lower(playerName)) then
-             playerToReturn = playerList[index]
+        for index, name in pairs(playerList) do
+            if string.match(string.lower(playerList[index].steam_name), string.lower(playerName)) then
+                playerToReturn = playerList[index]
                 amountOfPlayersFound = amountOfPlayersFound + 1
             end
         end
 
-       if amountOfPlayersFound == 1 then
+        if amountOfPlayersFound == 1 then
             return playerToReturn
         end
     end
@@ -9133,6 +9793,7 @@ end
 function getPlayerByNameSteamID(playerNameSteamID, playerList)
     if playerNameSteamID then
         local playerFound = getPlayerByName(playerNameSteamID, playerList)
+
         if playerFound then
             return playerFound
         else
@@ -9150,6 +9811,7 @@ end
 function smartBroadcastToColor(msg, playerColor, msgColor)
     if greyPlayer(playerColor) then
         local player = getPlayerObj(playerColor)
+
         if player then
             player.broadcast(msg, msgColor)
         end
@@ -9165,5 +9827,3 @@ function getLineDrawer()
         end
     end
 end
-
-----#include \SecretHitlerCE\common.ttslua
