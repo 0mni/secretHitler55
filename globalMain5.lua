@@ -69,6 +69,7 @@ bolSilenced = false
 bolTD = false
 bolRichard = false
 richardRemaining = 100
+tempRichard = -999
 
 function debugInfo(str)
     if (Player["White"] ~= nil and Player["White"].steam_name == "Player 1") then
@@ -721,6 +722,7 @@ end
 
 function setTimerRichard(obj, color, input, stillEditing)
     timerRichard = input
+    makeRulesTextBox()
 end
 
 function getNumAlivePlayers()
@@ -1773,6 +1775,50 @@ function onLoad(saveString)
     end
 end
 
+function recreateWallText(arrayNumber)
+	if arrayNumber == 1 then
+		tempNewText = spawnObject({
+			type = "3DText",
+			position = {0, 7, 144},
+			rotation = {0, 0, 0},
+			scale = {5, 5, 5},
+			sound = false,
+			snap_to_grid = false,
+			})
+		lastVote_guids[1] = tempNewText.guid
+	elseif arrayNumber == 2 then
+		tempNewText = spawnObject({
+			type = "3DText",
+			position = {-144, 7, 0},
+			rotation = {0, 270, 0},
+			scale = {5, 5, 5},
+			sound = false,
+			snap_to_grid = false,
+			})
+		lastVote_guids[2] = tempNewText.guid
+	elseif arrayNumber == 3 then
+		tempNewText = spawnObject({
+			type = "3DText",
+			position = {144, 7, 0},
+			rotation = {0, 90, 0},
+			scale = {5, 5, 5},
+			sound = false,
+			snap_to_grid = false,
+			})
+		lastVote_guids[3] = tempNewText.guid
+	elseif arrayNumber == 4 then
+		tempNewText = spawnObject({
+			type = "3DText",
+			position = {0, 7, -144},
+			rotation = {0, 180, 0},
+			scale = {5, 5, 5},
+			sound = false,
+			snap_to_grid = false,
+			})
+		lastVote_guids[4] = tempNewText.guid
+	end
+end
+
 function lockNeededCards()
     local tempObj = getObjectFromGUID("2ab2e8")
 
@@ -2494,19 +2540,11 @@ do -- settings panel
             makeSquareButtonLabel(settingsPannel, options.omn1Rule, check_string, "", "Omn1 Rule - Mute on Death", "omn1Flip", {startX, 0.2, startZ + offsetZ * 13}, 6.8, true)
             makeSquareButtonLabel(settingsPannel, options.richardRule, check_string, "", "Richard Rule", "richardFlip", {startX, 0.2, startZ + offsetZ * 14}, 3.7, true)
 
-            ruleTextBox = ""
-
-            if options.nicholasRule then
-                ruleTextBox = ruleTextBox .. "Handsome Nicholas Rule is in Effect \n"
-            end
-    
             if (options.richardRule) then
                 local inputParams = { --scale = {0.2, 0.2, 0.2},
                     rotation={0,0,0},
                     height=300, width=600, font_size=250, validation=2,
                 }
-
-                ruleTextBox = ruleTextBox .. "Handsome Richard Rule is in Effect " .. timerRichard .. " Seconds \n"
 
                 --positions @@@
                 inputParams.input_function = "setTimerRichard"
@@ -2514,33 +2552,6 @@ do -- settings panel
                 inputParams.value = timerRichard
                 inputParams.tooltip = "How much time the last voter gets"
                 settingsPannel.createInput(inputParams)
-            end
-
-            if options.nicholasRule or options.richardRule then
-                if Global.getVar("textRulesGUID") ~= "" then
-                    destroyObjectByGUID(Global.getVar("textRulesGUID"))
-                    Global.setVar("textRulesGUID", "")
-                end
-
-                local textRules = spawnObject({
-                    type = "3DText",
-                    position = {0, 1, -16},
-                    rotation = {90, 0, 0},
-                    scale = {1, 1, 1},
-                    sound = false,
-                    snap_to_grid = false
-                })
-        
-                textRules.interactable = false
-                textRules.setValue(ruleTextBox)
-                Global.setVar("textRulesGUID", textRules.guid)
-            else
-                if Global.getVar("textRulesGUID") ~= "" then
-                    destroyObjectByGUID(Global.getVar("textRulesGUID"))
-                    Global.setVar("textRulesGUID", "")
-                else
-                    Global.setVar("textRulesGUID", "")
-                end
             end
 
             --Expansion
@@ -2571,6 +2582,42 @@ do -- settings panel
             settingsPannel.createButton(buttonParam)
         else
             printToAll("ERROR: Settings pannel not found.", {1,0,0})
+        end
+
+        makeRulesTextBox()
+    end
+
+    function makeRulesTextBox()
+        ruleTextBox = ""
+
+        if options.nicholasRule then
+            ruleTextBox = ruleTextBox .. "Handsome Nicholas Rule is in Effect \n"
+        end
+
+        if options.richardRule then
+            ruleTextBox = ruleTextBox .. "Handsome Richard Rule is in Effect, " .. timerRichard .. " Seconds \n"
+        end
+    
+        if ruleTextBox ~= "" then
+            if objTextRules == nil then
+                objTextRules = spawnObject({
+                    type = "3DText",
+                    position = {0, 1, -16.5},
+                    rotation = {90, 0, 0},
+                    scale = {1, 1, 1},
+                    sound = false,
+                    snap_to_grid = false,
+                    })
+            end
+
+            objTextRules.setValue(ruleTextBox)
+            objTextRules.TextTool.setFontColor(stringColorToRGB("Red"))
+            objTextRules.TextTool.setFontSize(90)
+            objTextRules.interactable = false
+        else
+            if objTextRules then
+                destroyObject(objTextRules)
+            end
         end
     end
 
@@ -3305,6 +3352,10 @@ function movePlacards(playerIn, returnVoteCards)
     if tmpChan then
         giveObjectToPlayer(tmpChan, moveToPlayer, {forward = 11, right = 0, up = 0, forceHeight = 2.8}, NO_ROT, false, false)
     end
+
+    if not getObjectFromGUID(objTextRules.guid) then
+        makeRulesTextBox()
+    end
 end
 
 function giveBullet(playerIn)
@@ -3974,9 +4025,12 @@ function startVoteCheck()
         for _, lastVoteGuid in ipairs(lastVote_guids) do
             local lastVoteObj = getObjectFromGUID(lastVoteGuid)
 
-            if lastVoteObj then
-                lastVoteObj.TextTool.setValue(removeBBCode(out))
+            if not lastVoteObj then
+                recreateWallText(_)
+                lastVoteObj = getObjectFromGUID(lastVote_guids[_])
             end
+
+            lastVoteObj.TextTool.setValue(removeBBCode(out))
         end
 
         startLuaCoroutine(Global, "attemptLastVoteFixCo")
