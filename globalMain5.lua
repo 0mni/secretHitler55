@@ -84,6 +84,10 @@ function debugInfo(str)
             value.broadcast(str)
         end
 
+        if (value.steam_name == "Anti Derg") then
+            value.broadcast(str)
+        end
+
         if (value.steam_name == "omn1pot3ntm3") then
             value.broadcast(str)
             return
@@ -2490,11 +2494,19 @@ do -- settings panel
             makeSquareButtonLabel(settingsPannel, options.omn1Rule, check_string, "", "Omn1 Rule - Mute on Death", "omn1Flip", {startX, 0.2, startZ + offsetZ * 13}, 6.8, true)
             makeSquareButtonLabel(settingsPannel, options.richardRule, check_string, "", "Richard Rule", "richardFlip", {startX, 0.2, startZ + offsetZ * 14}, 3.7, true)
 
+            ruleTextBox = ""
+
+            if options.nicholasRule then
+                ruleTextBox = ruleTextBox .. "Handsome Nicholas Rule is in Effect \n"
+            end
+    
             if (options.richardRule) then
                 local inputParams = { --scale = {0.2, 0.2, 0.2},
                     rotation={0,0,0},
                     height=300, width=600, font_size=250, validation=2,
                 }
+
+                ruleTextBox = ruleTextBox .. "Handsome Richard Rule is in Effect " .. timerRichard .. " Seconds \n"
 
                 --positions @@@
                 inputParams.input_function = "setTimerRichard"
@@ -2502,6 +2514,33 @@ do -- settings panel
                 inputParams.value = timerRichard
                 inputParams.tooltip = "How much time the last voter gets"
                 settingsPannel.createInput(inputParams)
+            end
+
+            if options.nicholasRule or options.richardRule then
+                if Global.getVar("textRulesGUID") ~= "" then
+                    destroyObjectByGUID(Global.getVar("textRulesGUID"))
+                    Global.setVar("textRulesGUID", "")
+                end
+
+                local textRules = spawnObject({
+                    type = "3DText",
+                    position = {0, 1, -16},
+                    rotation = {90, 0, 0},
+                    scale = {1, 1, 1},
+                    sound = false,
+                    snap_to_grid = false
+                })
+        
+                textRules.interactable = false
+                textRules.setValue(ruleTextBox)
+                Global.setVar("textRulesGUID", textRules.guid)
+            else
+                if Global.getVar("textRulesGUID") ~= "" then
+                    destroyObjectByGUID(Global.getVar("textRulesGUID"))
+                    Global.setVar("textRulesGUID", "")
+                else
+                    Global.setVar("textRulesGUID", "")
+                end
             end
 
             --Expansion
@@ -4407,38 +4446,6 @@ function setupCoroutine()
     if #players < 1 then
         printToAll("Not enough players!", {1,1,1})
         return true
-    end
-
-    if options.nicholasRule or options.richardRule then
-        local textRules = spawnObject({
-            type = "3DText",
-            position = {0, 1, 0},
-            rotation = {0, 0, 0},
-            scale = {1, 1, 1},
-            sound = false,
-            snap_to_grid = false
-        })
-
-        textRules.interactable = false
-        ruleTextBox = ""
-
-        if options.nicholasRule then
-            ruleTextBox = ruleTextBox .. "Handsome Nicholas Rule is in Effect \n"
-        end
-
-        if options.richardRule then
-            ruleTextBox = ruleTextBox .. "Handsome Richard Rule is in Effect " .. timerRichard .. " Seconds \n"
-        end
-
-        textRules.setValue(ruleTextBox)
-        Global.setVar("textRulesGUID") = textRules.guid
-    else
-        if Global.getVar("textRulesGUID") ~= "" then
-            destroyObjectByGUID(Global.getVar("textRulesGUID"))
-            Global.setVar("textRulesGUID") = ""
-        else
-            Global.setVar("textRulesGUID") = ""
-        end
     end
 
     getObjectFromGUID("303db7").Clock.startStopwatch()
@@ -6764,35 +6771,40 @@ forceMenu = nil
 lastGUID = nil
 editMode = true -- true is right, false is left
 
+
+--CUT HERE
+
+--function callImport()
 lineDrawerImportScript = [[
-    clearLines()
-    local noteTakerNotes = Global.getTable("noteTakerNotes")
-    for i = 1, #noteTakerNotes do
-        if ((noteTakerNotes[i].conflict == "(Conflict)" or noteTakerNotes[i].conflict == "(Rev Con)") and noteTakerNotes[i].color2 ~= "") or (noteTakerNotes[i].action == "inspects" and noteTakerNotes[i].result == "claims [FF0000]Fascist[-]" and noteTakerNotes[i].color2 ~= "") then
-            local p1, p2, lC
-            p1 = noteTakerNotes[i].color1
-            p2 = noteTakerNotes[i].color2
-            lC = p1
-            if style == "straight" then
-                addLineStraight(p1, p2, lC)
-            else
-                addLineBlock(p1, p2, lC)
+        clearLines()
+        local noteTakerNotes = Global.getTable("noteTakerNotes")
+        for i = 1, #noteTakerNotes do
+            if ((noteTakerNotes[i].conflict == "(Conflict)" or noteTakerNotes[i].conflict == "(Rev Con)") and noteTakerNotes[i].color2 ~= "") or (noteTakerNotes[i].action == "inspects" and noteTakerNotes[i].result == "claims [FF0000]Fascist[-]" and noteTakerNotes[i].color2 ~= "") then
+                local p1, p2, lC
+                p1 = noteTakerNotes[i].color1
+                p2 = noteTakerNotes[i].color2
+                lC = p1
+                if style == "straight" then
+                    addLineStraight(p1, p2, lC)
+                else
+                    addLineBlock(p1, p2, lC)
+                end
             end
         end
-    end
-    mergeTables()
-    Global.setVectorLines(vectorTable)
-    clearUI()
-]]
-
-lineDrawerRemoveLineScript = [[
-    function callRemoveLine(args)
-        clearLines()
-        removeLine(args[1], args[2])
         mergeTables()
         Global.setVectorLines(vectorTable)
         clearUI()
-    end
+	]]
+--end
+
+lineDrawerRemoveLineScript = [[
+        function callRemoveLine(args)
+			clearLines()
+			removeLine(args[1], args[2])
+			mergeTables()
+			Global.setVectorLines(vectorTable)
+			clearUI()
+		end
 ]]
 
 model_list = {}
@@ -6840,6 +6852,7 @@ electionTrackerNichPos = {x = 1.41, y = 1.27525151, z = -9.385001}
 electionTrackerMoveX = 2.7
 
 noteTakerDesc = "Note Taker by Lost Savage\nBased on the work of:\nsmiling Aktheon,\nSwiftPanda,\nThe Blind Dragon\nand Max\n"
+
 function noteTakerOnLoad(saveString)
     self.setDescription(noteTakerDesc)
 
