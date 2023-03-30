@@ -67,6 +67,10 @@ timeSinceUV = 0
 silenced = {}
 bolSilenced = false
 bolTD = false
+bolStarted = false
+bol5m = false
+bol10m = false
+bol15m = false 
 bolRichard = false
 richardRemaining = 100
 tempRichard = -999
@@ -140,7 +144,29 @@ pleaseConfirmRestart = false
 timerRichard = 10
 
 function onUpdate()
-    if richardRemaining < 0 then startVoteCheck() end
+    if richardRemaining < 0 then
+        startVoteCheck()
+    end
+
+	if bolStarted then
+		timeOfPlay = os.time()-timeSinceUV
+		timeOfPlayM = math.floor(timeOfPlay/60)
+
+		if timeOfPlayM >= 5 and not bol5 then
+			bol5 = true
+			broadcastToAll("5 minutes have elapsed on this play", stringColorToRGB("Green"))
+		end
+
+		if timeOfPlayM >= 10 and not bol10 then
+			bol10 = true
+			broadcastToAll("Attention, 10 minutes have elapsed on this play", stringColorToRGB("Orange"))
+		end
+
+		if timeOfPlayM >= 15 and not bol15 then
+			bol15 = true
+			broadcastToAll("Warning, 15 minutes have elapsed on this play", stringColorToRGB("Red"))
+		end
+	end
 end
 
 function refreshBelowLibButtons()
@@ -493,7 +519,11 @@ end
 function resetGameCo()
     local tempObj
 
-    bolTD = false
+	bolStarted = false
+	bolTD = false
+	bol5m = false
+	bol10m = false
+	bol15m = false
     unmuteAll()
     removeInspect()
 
@@ -1454,7 +1484,7 @@ text = {
 MOD_NAME = "Secret Hitler: 55x - Modified by Tyler"
 
 ADD_ON_VERSION = 6
-linkToWorkshop = "https://steamcommunity.com/sharedfiles/filedetails/?id=2954059664"
+linkToWorkshop = "https://steamcommunity.com/sharedfiles/filedetails/?id=2953402973"
 
 --Static
 pastDiscards = {}
@@ -2391,6 +2421,16 @@ function onChat(messageIn, player)
     elseif messageTable[1] == "nogetdraws" and (player.host) then
         options.allowGetDraws = not options.allowGetDraws
         return false;
+	elseif messageTable[1] == '!time' then
+		if bolStarted then
+			gameLength = math.floor(os.time() - timeSinceStart)
+			gameLengthM = math.floor(gameLength/60)
+			gameLengthS = math.floor(gameLength - (gameLengthM * 60))
+			player:print("Game Length: " .. gameLengthM .. " Minutes " .. math.floor(gameLengthS) .. " Seconds")
+		else
+			player:print("Game has not yet started")
+		end
+		return false
     end
 
     for _, color in pairs(GREY_PLAYABLE_COLORS) do
@@ -3322,6 +3362,13 @@ function movePlacards(playerIn, returnVoteCards)
     timeSinceUV = os.time()
     getObjectFromGUID("303db7").Clock.startStopwatch()
     getObjectFromGUID("68faa0").Clock.startStopwatch()
+    bol5m = false
+    bol10m = false
+    bol15m = false
+  
+    if not getObjectFromGUID(objTextRules.guid) then 
+        makeRulesTextBox() 
+    end
 
     local moveToPlayer = playerIn
 
@@ -4507,6 +4554,7 @@ function setupCoroutine()
     timeSinceStart = os.time()
     timeSinceUV = os.time()
     bolRichard = false
+    bolStarted = true
 
     drawLog = {}
     voteNotes = ""
