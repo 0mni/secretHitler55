@@ -148,25 +148,25 @@ function onUpdate()
         startVoteCheck()
     end
 
-	if bolStarted then
-		timeOfPlay = os.time()-timeSinceUV
-		timeOfPlayM = math.floor(timeOfPlay/60)
+    if bolStarted then
+        timeOfPlay = os.time()-timeSinceUV
+        timeOfPlayM = math.floor(timeOfPlay/60)
 
-		if timeOfPlayM >= 5 and not bol5 then
-			bol5 = true
-			broadcastToAll("5 minutes have elapsed on this play", stringColorToRGB("Green"))
-		end
+        if timeOfPlayM >= 5 and not bol5 then
+            bol5 = true
+            broadcastToAll("5 minutes have elapsed on this play", stringColorToRGB("Green"))
+        end
 
-		if timeOfPlayM >= 10 and not bol10 then
-			bol10 = true
-			broadcastToAll("Attention, 10 minutes have elapsed on this play", stringColorToRGB("Orange"))
-		end
+        if timeOfPlayM >= 10 and not bol10 then
+            bol10 = true
+            broadcastToAll("Attention, 10 minutes have elapsed on this play", stringColorToRGB("Orange"))
+        end
 
-		if timeOfPlayM >= 15 and not bol15 then
-			bol15 = true
-			broadcastToAll("Warning, 15 minutes have elapsed on this play", stringColorToRGB("Red"))
-		end
-	end
+        if timeOfPlayM >= 15 and not bol15 then
+            bol15 = true
+            broadcastToAll("Warning, 15 minutes have elapsed on this play", stringColorToRGB("Red"))
+        end
+    end
 end
 
 function refreshBelowLibButtons()
@@ -519,11 +519,11 @@ end
 function resetGameCo()
     local tempObj
 
-	bolStarted = false
-	bolTD = false
-	bol5m = false
-	bol10m = false
-	bol15m = false
+    bolStarted = false
+    bolTD = false
+    bol5m = false
+    bol10m = false
+    bol15m = false
     unmuteAll()
     removeInspect()
 
@@ -1806,47 +1806,47 @@ function onLoad(saveString)
 end
 
 function recreateWallText(arrayNumber)
-	if arrayNumber == 1 then
-		tempNewText = spawnObject({
-			type = "3DText",
-			position = {0, 7, 144},
-			rotation = {0, 0, 0},
-			scale = {5, 5, 5},
-			sound = false,
-			snap_to_grid = false,
-			})
-		lastVote_guids[1] = tempNewText.guid
-	elseif arrayNumber == 2 then
-		tempNewText = spawnObject({
-			type = "3DText",
-			position = {-144, 7, 0},
-			rotation = {0, 270, 0},
-			scale = {5, 5, 5},
-			sound = false,
-			snap_to_grid = false,
-			})
-		lastVote_guids[2] = tempNewText.guid
-	elseif arrayNumber == 3 then
-		tempNewText = spawnObject({
-			type = "3DText",
-			position = {144, 7, 0},
-			rotation = {0, 90, 0},
-			scale = {5, 5, 5},
-			sound = false,
-			snap_to_grid = false,
-			})
-		lastVote_guids[3] = tempNewText.guid
-	elseif arrayNumber == 4 then
-		tempNewText = spawnObject({
-			type = "3DText",
-			position = {0, 7, -144},
-			rotation = {0, 180, 0},
-			scale = {5, 5, 5},
-			sound = false,
-			snap_to_grid = false,
-			})
-		lastVote_guids[4] = tempNewText.guid
-	end
+    if arrayNumber == 1 then
+        tempNewText = spawnObject({
+            type = "3DText",
+            position = {0, 7, 144},
+            rotation = {0, 0, 0},
+            scale = {5, 5, 5},
+            sound = false,
+            snap_to_grid = false,
+            })
+        lastVote_guids[1] = tempNewText.guid
+    elseif arrayNumber == 2 then
+        tempNewText = spawnObject({
+            type = "3DText",
+            position = {-144, 7, 0},
+            rotation = {0, 270, 0},
+            scale = {5, 5, 5},
+            sound = false,
+            snap_to_grid = false,
+            })
+        lastVote_guids[2] = tempNewText.guid
+    elseif arrayNumber == 3 then
+        tempNewText = spawnObject({
+            type = "3DText",
+            position = {144, 7, 0},
+            rotation = {0, 90, 0},
+            scale = {5, 5, 5},
+            sound = false,
+            snap_to_grid = false,
+            })
+        lastVote_guids[3] = tempNewText.guid
+    elseif arrayNumber == 4 then
+        tempNewText = spawnObject({
+            type = "3DText",
+            position = {0, 7, -144},
+            rotation = {0, 180, 0},
+            scale = {5, 5, 5},
+            sound = false,
+            snap_to_grid = false,
+            })
+        lastVote_guids[4] = tempNewText.guid
+    end
 end
 
 function lockNeededCards()
@@ -2421,16 +2421,16 @@ function onChat(messageIn, player)
     elseif messageTable[1] == "nogetdraws" and (player.host) then
         options.allowGetDraws = not options.allowGetDraws
         return false;
-	elseif messageTable[1] == '!time' then
-		if bolStarted then
-			gameLength = math.floor(os.time() - timeSinceStart)
-			gameLengthM = math.floor(gameLength/60)
-			gameLengthS = math.floor(gameLength - (gameLengthM * 60))
-			player:print("Game Length: " .. gameLengthM .. " Minutes " .. math.floor(gameLengthS) .. " Seconds")
-		else
-			player:print("Game has not yet started")
-		end
-		return false
+    elseif messageTable[1] == '!time' then
+        if bolStarted then
+            gameLength = math.floor(os.time() - timeSinceStart)
+            gameLengthM = math.floor(gameLength/60)
+            gameLengthS = math.floor(gameLength - (gameLengthM * 60))
+            player:print("Game Length: " .. gameLengthM .. " Minutes " .. math.floor(gameLengthS) .. " Seconds")
+        else
+            player:print("Game has not yet started")
+        end
+        return false
     end
 
     for _, color in pairs(GREY_PLAYABLE_COLORS) do
@@ -3192,9 +3192,9 @@ function displayBannerCardsCoroutine()
         end
 
         gameLength = os.time() - timeSinceStart
-		gameLengthM = math.floor(gameLength/60)
-		gameLengthS = math.floor(gameLength - (gameLengthM * 60))
-		printToAll("Game Took " .. gameLengthM .. " Minutes " .. gameLengthS .. " Seconds")
+        gameLengthM = math.floor(gameLength/60)
+        gameLengthS = math.floor(gameLength - (gameLengthM * 60))
+        printToAll("Game Took " .. gameLengthM .. " Minutes " .. gameLengthS .. " Seconds")
         unmuteAll()
         bolTD = false
     end
@@ -4102,10 +4102,10 @@ function startVoteCheck()
             if (numFasDown >= 4) then
                 if (roles[chanColor] == "hitler") then
                     giveRoleCards()
-    				gameLength = math.floor(os.time() - timeSinceStart)
-					gameLengthM = math.floor(gameLength/60)
-					gameLengthS = math.floor(gameLength - (gameLengthM * 60))
-					printToAll("Game Took " .. gameLengthM .. " Minutes " .. gameLengthS .. " Seconds")
+                    gameLength = math.floor(os.time() - timeSinceStart)
+                    gameLengthM = math.floor(gameLength/60)
+                    gameLengthS = math.floor(gameLength - (gameLengthM * 60))
+                    printToAll("Game Took " .. gameLengthM .. " Minutes " .. gameLengthS .. " Seconds")
                     unmuteAll()
                     bolTD = false
                 else
@@ -6896,17 +6896,17 @@ lineDrawerImportScript = [[
         mergeTables()
         Global.setVectorLines(vectorTable)
         clearUI()
-	]]
+    ]]
 --end
 
 lineDrawerRemoveLineScript = [[
         function callRemoveLine(args)
-			clearLines()
-			removeLine(args[1], args[2])
-			mergeTables()
-			Global.setVectorLines(vectorTable)
-			clearUI()
-		end
+            clearLines()
+            removeLine(args[1], args[2])
+            mergeTables()
+            Global.setVectorLines(vectorTable)
+            clearUI()
+        end
 ]]
 
 model_list = {}
